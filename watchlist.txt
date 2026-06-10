@@ -1,0 +1,23 @@
+# Watchlist - one US ticker per line.
+# Lines starting with '#' and blank lines are ignored.
+
+AAPL
+MSFT
+NVDA
+GOOGL
+AMZN
+META
+TSLA
+AMD
+AVGO
+NFLX
+COST
+LLY
+JPM
+V
+MA
+UNH
+HD
+PG
+CRM
+ADBE

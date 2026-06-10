@@ -1,0 +1,8 @@
+# Free, open-source dependencies only — no paid APIs.
+yfinance>=0.2.40     # Free Yahoo Finance market data (OHLCV, news, fundamentals)
+pandas>=2.0.0        # Data handling / tables
+numpy>=1.24.0        # Numeric helpers
+openpyxl>=3.1.0      # Excel (.xlsx) export engine
+streamlit>=1.30.0    # Dashboard UI
+plotly>=5.18.0       # Interactive charts in the dashboard
+matplotlib>=3.7.0    # Sparkline charts for the email/report

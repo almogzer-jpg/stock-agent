@@ -1,0 +1,12 @@
+# Secrets — never commit your email credentials
+email_config.json
+
+# Generated outputs
+data/
+
+# Python
+__pycache__/
+*.pyc
+
+# Local editor / harness config
+.claude/
