@@ -53,9 +53,40 @@ DARK_CSS = f"""
   .pill {{ background:#10331f; color:{GREEN}; border-radius:20px;
            padding:3px 12px; font-size:13px; }}
   .mk b {{ color:#cfe0f5; }}
-  /* Dataframe tweaks */
-  div[data-testid="stDataFrame"] {{ background:{CARD}; border-radius:10px; }}
-  .stTabs [data-baseweb="tab-list"] {{ gap:4px; }}
+  /* Spacing & typography */
+  .block-container {{ padding-top:1.2rem; padding-bottom:2rem; max-width:1500px; }}
+  h2,h3,h4,h5 {{ margin-top:0.5rem; margin-bottom:0.4rem; font-weight:800; }}
+  p {{ margin-bottom:0.4rem; }}
+
+  /* Metric cards — consistent, RTL */
+  div[data-testid="stMetric"] {{ text-align:right; }}
+  div[data-testid="stMetricValue"] {{ font-size:1.6rem; }}
+
+  /* Cards — consistent rhythm */
+  .card {{ box-shadow:0 1px 3px rgba(0,0,0,.25); }}
+
+  /* Tables — RTL, bordered, readable, zebra */
+  div[data-testid="stDataFrame"] {{
+      background:{CARD}; border:1px solid {BORDER}; border-radius:10px; direction:rtl;
+  }}
+  div[data-testid="stDataFrame"] * {{ font-size:13px; }}
+
+  /* Tabs / expanders / inputs — RTL */
+  .stTabs [data-baseweb="tab-list"] {{ gap:4px; direction:rtl; }}
+  details summary {{ direction:rtl; text-align:right; }}
+  .stSelectbox label, .stSlider label, .stRadio label {{ text-align:right; }}
+  .stPlotlyChart {{ margin-bottom:6px; }}
+  .stButton button {{ border-radius:8px; font-weight:600; }}
+
+  /* Mobile responsiveness */
+  @media (max-width:640px) {{
+    .block-container {{ padding:0.5rem !important; }}
+    div[data-testid="stMetricValue"] {{ font-size:1.2rem; }}
+    .card {{ padding:12px 14px; }}
+    .topbar {{ flex-direction:column; gap:6px; align-items:flex-start; }}
+    h2 {{ font-size:1.3rem; }} h3 {{ font-size:1.1rem; }}
+    div[data-testid="stDataFrame"] * {{ font-size:11px; }}
+  }}
 </style>
 """
 

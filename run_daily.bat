@@ -16,6 +16,12 @@ echo ============================================================>> "data\daily_
 echo ===== Run started: %DATE% %TIME% =====>> "data\daily_run.log"
 
 REM Full path to Python so the task doesn't depend on PATH.
-"C:\Users\Almog\AppData\Local\Programs\Python\Python312\python.exe" run.py >> "data\daily_run.log" 2>&1
+set PY="C:\Users\Almog\AppData\Local\Programs\Python\Python312\python.exe"
+
+REM 1) Watchlist run (scores, portfolio, alerts, email).
+%PY% run.py >> "data\daily_run.log" 2>&1
+
+REM 2) Market-wide universe scan (S&P 500 + Nasdaq-100 discovery engine, ~1.5 min).
+%PY% scanner.py ALL >> "data\daily_run.log" 2>&1
 
 echo ===== Run finished: %DATE% %TIME% =====>> "data\daily_run.log"

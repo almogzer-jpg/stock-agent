@@ -62,6 +62,26 @@ def _market_answer(market) -> str:
     return "  \n".join(parts)
 
 
+def _sector_answer(market, q: str) -> str:
+    sectors = (market or {}).get("sectors", [])
+    if not sectors or "score" not in sectors[0]:
+        return "אין נתוני סקטורים כרגע. נסה לרענן את הנתונים."
+    ranked = sorted(sectors, key=lambda s: s["score"], reverse=True)
+    if any(w in q for w in ["חלש", "גרוע", "נמוך", "הכי גרוע"]):
+        w = ranked[-1]
+        return (f"🔴 הסקטור החלש ביותר היום: **{w['sector']}** — "
+                f"ציון {w['score']}/100, מגמה {w['trend']}, "
+                f"חוזק יחסי מול S&P {w['rs']:+}%, תשואה חודשית {w['ret_1m']:+}%.")
+    if any(w in q for w in ["חזק", "מוביל", "הכי טוב", "חם", "מומלץ"]):
+        s = ranked[0]
+        return (f"🟢 הסקטור החזק ביותר היום: **{s['sector']}** — "
+                f"ציון {s['score']}/100, מגמה {s['trend']}, "
+                f"חוזק יחסי מול S&P {s['rs']:+}%, תשואה חודשית {s['ret_1m']:+}%.")
+    lines = [f"- {x['rank']}. **{x['sector']}** · ציון {x['score']} · {x['trend']} "
+             f"· חוזק יחסי {x['rs']:+}%" for x in ranked]
+    return "**דירוג הסקטורים היום (לפי ציון):**  \n" + "  \n".join(lines)
+
+
 HELP = (
     "אני עונה על שאלות לגבי תוצאות הסריקה. נסה למשל:  \n"
     "- *מה המניות הכי חזקות?*  \n"
@@ -91,7 +111,11 @@ def answer(question: str, df, market=None) -> str:
     if tickers:
         return "\n\n".join(_stock_detail(df[df["Ticker"] == t].iloc[0]) for t in tickers[:3])
 
-    # 2) Market questions.
+    # 2) Sector questions (check before generic market).
+    if any(w in q for w in ["סקטור", "ענף", "סקטורים", "ענפים"]):
+        return _sector_answer(market, q)
+
+    # 3) Market questions.
     if any(w in q for w in ["מצב שוק", "השוק", "מדד", "מאקרו"]) or \
        any(w in low for w in ["s&p", "nasdaq", "vix", "market"]):
         return _market_answer(market)

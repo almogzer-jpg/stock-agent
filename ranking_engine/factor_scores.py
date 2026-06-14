@@ -30,36 +30,45 @@ def _annualized_vol(closes) -> float | None:
     return float(np.std(rets) * np.sqrt(252) * 100.0)
 
 
-def fundamental_score(f) -> float | None:
-    """0-100 from valuation/quality fields; None if no fundamentals.
+def _band(v, good, ok, bad, pts_good, pts_ok, pts_bad, higher_better=True):
+    """Score one metric into points by thresholds (None -> 0 contribution)."""
+    if v is None:
+        return 0.0
+    if higher_better:
+        return pts_good if v >= good else (pts_ok if v >= ok else (pts_bad if v < bad else 0))
+    return pts_good if v <= good else (pts_ok if v <= ok else (pts_bad if v > bad else 0))
 
-    Accepts a dict or a pandas Series (so it works from both run.py and the
-    dashboard). Returns None when the fundamental fields aren't present.
+
+def fundamental_score(f) -> float | None:
+    """0-100 from the fundamental set; None if no fundamental fields present.
+
+    Uses Revenue/EPS/FCF growth, operating margin, debt/equity, ROIC, PEG and
+    forward PE (real yfinance data). Accepts a dict or pandas Series.
     """
     if f is None:
         return None
-    has_any = any(f.get(k) not in (None, "") for k in
-                  ("TrailingPE", "ProfitMargin", "RevenueGrowth"))
-    if not has_any:
+    keys = ("RevenueGrowth", "EPSGrowth", "FCFGrowth", "OperatingMargin",
+            "DebtToEquity", "ROIC", "PEG", "ForwardPE")
+    if not any(f.get(k) not in (None, "") for k in keys):
         return None
 
+    def g(k):
+        v = f.get(k)
+        return v if isinstance(v, (int, float)) and v == v else None
+
     s = 50.0
-    pe = f.get("TrailingPE")
-    if isinstance(pe, (int, float)) and pe > 0:
-        if pe <= 15:      s += 18
-        elif pe <= 25:    s += 10
-        elif pe <= 40:    s += 0
-        else:             s -= 12          # expensive
-    margin = f.get("ProfitMargin")
-    if isinstance(margin, (int, float)):
-        if margin >= 0.20:   s += 16
-        elif margin >= 0.10: s += 8
-        elif margin < 0:     s -= 15       # losing money
-    growth = f.get("RevenueGrowth")
-    if isinstance(growth, (int, float)):
-        if growth >= 0.15:   s += 16
-        elif growth >= 0.05: s += 8
-        elif growth < 0:     s -= 12       # shrinking
+    s += _band(g("RevenueGrowth"), 15, 5, 0, 8, 4, -8)          # %
+    s += _band(g("EPSGrowth"), 15, 0, 0, 8, 4, -8)
+    s += _band(g("FCFGrowth"), 10, 0, 0, 5, 0, -5)
+    s += _band(g("OperatingMargin"), 20, 10, 0, 8, 4, -6)
+    s += _band(g("DebtToEquity"), 0.5, 1.0, 2.0, 6, 3, -6, higher_better=False)
+    s += _band(g("ROIC"), 15, 8, 0, 10, 5, -5)
+    peg = g("PEG")
+    if peg is not None and peg > 0:
+        s += 8 if peg <= 1 else (4 if peg <= 2 else -6)
+    fpe = g("ForwardPE")
+    if fpe is not None and fpe > 0:
+        s += 4 if fpe <= 20 else (0 if fpe <= 35 else -6)
     return round(_clamp(s), 1)
 
 

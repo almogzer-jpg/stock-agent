@@ -22,11 +22,15 @@ if hasattr(sys.stdout, "reconfigure"):
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import base64
+import json
 from datetime import datetime
 
 import pandas as pd
 
 import config
+import proprietary
+import portfolio
+import insights as insights_mod
 from data_loader import load_ohlcv
 from names import get_company_name
 from indicators.technical import compute_indicators
@@ -34,11 +38,18 @@ from scanners.breakout import is_breakout
 from ranking_engine.score import score_stock
 from ranking_engine.interpret import classify
 from ranking_engine.factor_scores import factor_scores
+from ranking_engine.composite import composite_score
+from news.sentiment import score_headlines
 from charts import sparkline_png
 from fundamentals.fundamentals import get_fundamentals
 from news.headlines import get_headlines
-from backtesting.backtester import backtest_symbol
+from backtesting.backtester import backtest_symbol, backtest_signal
 import market
+import risk as risk_engine
+import decisions as decision_engine
+import trust as trust_engine
+import events as events_mod
+from alerts.center import build_alerts
 from alerts.notifier import Notifier
 from alerts.email_notifier import EmailNotifier
 
@@ -385,9 +396,12 @@ def _write_xlsx(df_he: pd.DataFrame, path: str, sheet: str) -> None:
 
 # Hebrew labels for the backtest summary columns.
 BACKTEST_LABELS_HE = {
-    "Ticker": "סימול", "Name": "שם", "signals": "מספר איתותים",
-    "hit_rate": "אחוז הצלחה %", "avg_return_pct": "תשואה ממוצעת %",
-    "horizon": "טווח (ימי מסחר)",
+    "Ticker": "סימול", "Name": "שם", "occurrences": "מספר מופעים",
+    "win_rate": "אחוז הצלחה %", "avg_return": "תשואה ממוצעת %",
+    "median_return": "תשואה חציונית %", "max_drawdown": "ירידה מקס׳ %",
+    "benchmark_rel": "מול בנצ׳מרק %", "avg_holding": "החזקה ממוצעת (ימים)",
+    "is_win_rate": "IS הצלחה %", "oos_win_rate": "OOS הצלחה %",
+    "oos_avg_return": "OOS תשואה %", "confidence": "רמת ביטחון",
 }
 
 
@@ -457,6 +471,96 @@ def write_timestamped_outputs(df: pd.DataFrame, closes_map: dict,
 
 
 # ---------------------------------------------------------------------------
+# Portfolio helpers
+# ---------------------------------------------------------------------------
+
+def _returns(close) -> dict:
+    """Daily / 1-month / YTD % returns from a Close series (NaN-safe)."""
+    close = close.dropna()
+    out = {"daily": None, "m1": None, "ytd": None}
+    if len(close) >= 2:
+        out["daily"] = round(float(close.iloc[-1] / close.iloc[-2] - 1) * 100, 2)
+    if len(close) > 22:
+        out["m1"] = round(float(close.iloc[-1] / close.iloc[-23] - 1) * 100, 2)
+    year = datetime.now().year
+    ytd_base = close[close.index.year == year]
+    if len(ytd_base):
+        out["ytd"] = round(float(close.iloc[-1] / ytd_base.iloc[0] - 1) * 100, 2)
+    return out
+
+
+def build_portfolio_payload(sectors=None, regime_label=""):
+    """Load holdings, fetch each one's real data, and compute the analytics
+    + Risk (Part 2) + Decisions (Part 3)."""
+    sectors = sectors or []
+    holdings = portfolio.load_holdings(config.PORTFOLIO_CSV)
+    if not holdings:
+        return {"empty": True}
+    print(f"\nמחשב תיק ({len(holdings)} החזקות)...")
+    mkt_df = load_ohlcv("^GSPC")
+    mkt_close = mkt_df["Close"] if mkt_df is not None else None
+    positions, closes_pf = [], {}
+    for h in holdings:
+        sym = h["ticker"]
+        pdf = load_ohlcv(sym)
+        if pdf is None:
+            print(f"  ! {sym}: אין נתונים — דולג")
+            continue
+        close = pdf["Close"]
+        m = compute_indicators(pdf)
+        if m is None:
+            continue
+        m["Breakout"] = is_breakout(m)
+        m["Score"] = score_stock(m)
+        rets = _returns(close)
+        fund = get_fundamentals(sym)
+        fs = factor_scores(m, closes=close.tail(60).tolist(), fundamentals=fund)
+        rp = risk_engine.risk_profile(close, mkt_close)   # beta / vol / maxDD
+        closes_pf[sym] = close.tail(252)
+        # Composite v2 + decision inputs for this holding.
+        m["ScoreFundamental"] = fs["fundamental"]
+        m["ScoreSentiment"] = fs["sentiment"]
+        m["ScoreRisk"] = rp["risk_score"] if rp["risk_score"] is not None else fs["risk"]
+        sec_score = market.sector_score_for(fund.get("Sector"), sectors)
+        news_sc = (score_headlines(get_headlines(sym, config.NEWS_LIMIT))["score"]
+                   if config.ENABLE_NEWS else 50)
+        comp = composite_score(technical=m["Score"], fundamental=fs["fundamental"],
+                               sector=sec_score, news=news_sc, risk=m["ScoreRisk"])
+        positions.append({
+            "ticker": sym, "name": get_company_name(sym),
+            "quantity": h["quantity"], "avg_cost": h["avg_cost"],
+            "price": round(float(close.iloc[-1]), 2),
+            "daily_change_pct": rets["daily"], "ret_1m": rets["m1"], "ret_ytd": rets["ytd"],
+            "sector": fund.get("Sector") or None,
+            "market_cap": fund.get("MarketCap") or None,
+            "risk_level": rp["category"] if rp["risk_score"] is not None else fs["risk_level"],
+            "beta": rp["beta"], "volatility": rp["volatility"], "max_drawdown": rp["max_drawdown"],
+            "score": m["Score"],
+            "score_v2": comp["final"] if comp else m["Score"],
+            "valuation": decision_engine.valuation_score(fund),
+            "sector_score": sec_score,
+            "confidence": proprietary.confidence(m)["score"],
+            "status_group": classify(m)["group"],
+        })
+    # Benchmark: S&P 500 returns.
+    b = _returns(mkt_close) if mkt_close is not None else {}
+    benchmark = {"daily": b.get("daily"), "ret_1m": b.get("m1"), "ret_ytd": b.get("ytd")}
+    payload = portfolio.build_portfolio(positions, benchmark)
+    # Portfolio-level risk: correlation matrix + weighted beta/vol + concentration.
+    if not payload.get("empty"):
+        betas = {p["ticker"]: p.get("beta") for p in positions}
+        vols = {p["ticker"]: p.get("volatility") for p in positions}
+        payload["correlation"] = risk_engine.correlation_pairs(closes_pf)
+        payload["risk"] = risk_engine.portfolio_risk(
+            payload["positions"], betas, vols, payload["exposures"]["sector"])
+        # Decision engine (Part 3): actions, allocation targets, rebalancing.
+        payload["decisions"] = decision_engine.portfolio_decisions(
+            payload["positions"], sectors, regime_label,
+            payload["risk"], payload["correlation"])
+    return payload
+
+
+# ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
 
@@ -468,12 +572,19 @@ def main() -> None:
     rows: list[dict] = []
     closes_map: dict[str, list] = {}   # symbol -> recent closes (for charts)
     backtest_rows: list[dict] = []     # historical signal performance per ticker
+    events_map: dict[str, dict] = {}   # symbol -> earnings/analyst events
+    backtest_map: dict[str, dict] = {}  # symbol -> institutional backtest stats
+    failed_pulls = 0                    # tickers we couldn't get usable data for
+    # Market history (for beta) fetched once.
+    _mkt_df = load_ohlcv("^GSPC")
+    mkt_close = _mkt_df["Close"] if _mkt_df is not None else None
     for sym in tickers:
         print(f"  · {sym} ...")
         price_df = load_ohlcv(sym)
         metrics = compute_indicators(price_df)
         if metrics is None:
             print(f"  ! {sym}: אין מספיק נתונים — דולג")
+            failed_pulls += 1
             continue
         metrics["Ticker"] = sym
         metrics["Name"] = get_company_name(sym)   # English name (cached)
@@ -498,26 +609,89 @@ def main() -> None:
         metrics["ScoreSentiment"] = fs["sentiment"]
         metrics["ScoreRisk"] = fs["risk"]
         metrics["RiskLevel"] = fs["risk_level"]
+        # Risk Intelligence Engine (Part 2): beta / volatility / max drawdown.
+        # Its risk score OVERRIDES the simple one and feeds the composite (v2).
+        rp = risk_engine.risk_profile(price_df["Close"], mkt_close)
+        metrics["Beta"] = rp["beta"]
+        metrics["Volatility"] = rp["volatility"]
+        metrics["MaxDrawdown"] = rp["max_drawdown"]
+        metrics["RiskWarnings"] = " · ".join(rp["warnings"])
+        if rp["risk_score"] is not None:
+            metrics["ScoreRisk"] = rp["risk_score"]
+            metrics["RiskLevel"] = rp["category"]
+        # Per-stock news score (needed by the composite Final Score v2).
+        metrics["ScoreNews"] = (score_headlines(get_headlines(sym, config.NEWS_LIMIT))["score"]
+                                if config.ENABLE_NEWS else 50)
         rows.append(metrics)
-        # Backtest the breakout signal on this ticker's history (reuses price_df).
-        bt = backtest_symbol(price_df)
+        # Institutional backtest of the breakout signal (reuses price_df + market).
+        bt = backtest_signal(price_df, mkt_close)
         if bt:
+            backtest_map[sym] = bt
             backtest_rows.append({"Ticker": sym, "Name": metrics["Name"], **bt})
+        # Proprietary per-stock estimates (real-data heuristics, clearly labeled).
+        metrics["ExpectedUpside%"] = proprietary.expected_upside(metrics)["pct"]
+        conf = proprietary.confidence(metrics, bt["win_rate"] if bt else None)
+        metrics["Confidence"] = conf["score"]
+        metrics["ConfidenceLevel"] = conf["level"]
+        # Corporate events (earnings / analyst actions) for catalysts & alerts.
+        if config.ENABLE_EVENTS:
+            events_map[sym] = events_mod.get_events(sym)
 
     if not rows:
         raise SystemExit("לא התקבלו נתונים עבור אף מניה. יוצא.")
 
-    # Build results, score-ranked. Keep the core columns first; any
-    # fundamentals columns (when enabled) follow.
     df = pd.DataFrame(rows)
+
+    # Market context fetched HERE (needed for each stock's Sector Score in the
+    # composite, and reused by the market-overview section below).
+    print("\nמושך נתוני שוק ומחשב מדדים קנייניים...")
+    try:
+        indices = market.get_indices()
+        regime = market.market_regime_score()
+        sectors = market.sector_intelligence()
+    except Exception as exc:
+        print(f"  ! נתוני שוק לא זמינים: {exc}")
+        indices, regime, sectors = [], {"score": "-", "label": ""}, []
+
+    # --- Composite Final Score v2 (Phase 14): Fundamental 35 / Technical 25 /
+    #     Sector 20 / News 10 / Risk 10, with per-dimension contributions. ---
+    v2, cF, cT, cS, cN, cR, comp = [], [], [], [], [], [], []
+    for _, r in df.iterrows():
+        ss = market.sector_score_for(r.get("Sector"), sectors)
+        c = composite_score(technical=r["Score"], fundamental=r.get("ScoreFundamental"),
+                            sector=ss, news=r.get("ScoreNews"), risk=r.get("ScoreRisk"))
+        if c:
+            k = c["contributions"]
+            v2.append(c["final"]); comp.append(int(c["completeness"] * 100))
+            cF.append(k.get("fundamental")); cT.append(k.get("technical"))
+            cS.append(k.get("sector")); cN.append(k.get("news")); cR.append(k.get("risk"))
+        else:
+            v2.append(int(r["Score"])); comp.append(None)
+            cF.append(None); cT.append(None); cS.append(None); cN.append(None); cR.append(None)
+    df["ScoreV2"] = v2
+    df["ContribFund"], df["ContribTech"], df["ContribSector"] = cF, cT, cS
+    df["ContribNews"], df["ContribRisk"], df["Completeness"] = cN, cR, comp
+
+    # --- Trust Score (Part 6): meta-confidence per recommendation ---
+    ts_s, ts_c = [], []
+    for _, r in df.iterrows():
+        ti = trust_engine.trust_score(r, backtest_map.get(r["Ticker"]))
+        ts_s.append(ti["score"]); ts_c.append(ti["category"])
+    df["TrustScore"], df["TrustCategory"] = ts_s, ts_c
+
     base_cols = [
         "Ticker", "Name", "Status", "Summary", "Date", "Price", "DailyChange%",
+        "ScoreV2", "TrustScore", "TrustCategory", "Score", "ScoreFundamental",
+        "ScoreSentiment", "ScoreRisk", "ScoreNews",
+        "ContribFund", "ContribTech", "ContribSector", "ContribNews", "ContribRisk", "Completeness",
         "MA20", "MA50", "MA200", "RSI14", "AvgVol20", "CurVol",
         "VolRatio", "High52w", "DistFromHigh%", "RiskLevel",
-        "ScoreSentiment", "ScoreRisk", "ScoreFundamental", "Breakout", "Score",
+        "Beta", "Volatility", "MaxDrawdown", "RiskWarnings",
+        "ExpectedUpside%", "Confidence", "ConfidenceLevel", "Breakout",
     ]
     extra = [c for c in df.columns if c not in base_cols]
-    df = df[base_cols + extra].sort_values("Score", ascending=False).reset_index(drop=True)
+    # Rank by the new composite Final Score v2.
+    df = df[base_cols + extra].sort_values("ScoreV2", ascending=False).reset_index(drop=True)
 
     export(df)
 
@@ -541,14 +715,65 @@ def main() -> None:
         subject, html, text, images = build_report_email(df, closes_map)
         EmailNotifier().send(subject, html, text, images=images)
 
-    # Market context for the dashboard snapshot (real index data; best-effort).
-    print("\nמושך נתוני מדדים ומצב שוק...")
+    # Market overview + proprietary indicators (reuse indices/regime/sectors
+    # already fetched above for the composite) — saved to JSON for the dashboard.
+    vix = next((ix["price"] for ix in indices if ix["name"] == "VIX"), None)
+    breadth = proprietary.market_breadth(df)
+    fng = proprietary.fear_greed(df, vix, breadth)
+    flow = proprietary.capital_flow(sectors)
     try:
-        indices = market.get_indices()
-        regime = market.market_regime_score()
+        spx_hist = market.get_index_history("^GSPC", "6mo")
+        spx_hist = [round(float(x), 2) for x in spx_hist] if spx_hist is not None else []
+    except Exception:
+        spx_hist = []
+    market_overview = {
+        "date": datetime.now().strftime(config.DATE_FMT),
+        "indices": indices, "regime": regime, "sectors": sectors,
+        "breadth": breadth, "fear_greed": fng, "capital_flow": flow,
+        "spx_hist": spx_hist,
+    }
+    # Alert Center (Phase 8) — typed alerts from real signals.
+    alert_center = build_alerts(df, sectors, events_map)
+    # AI Insights (Phase 11) — rule-based Hebrew briefing from the day's data.
+    market_overview["insights"] = insights_mod.generate_insights(market_overview, df, alert_center)
+    try:
+        with open(config.MARKET_JSON, "w", encoding="utf-8") as fh:
+            json.dump(market_overview, fh, ensure_ascii=False, indent=2)
+        with open(config.CLOSES_JSON, "w", encoding="utf-8") as fh:
+            json.dump({k: [round(float(x), 2) for x in v if x == x]
+                       for k, v in closes_map.items()}, fh)
+        with open(config.EVENTS_JSON, "w", encoding="utf-8") as fh:
+            json.dump(events_map, fh, ensure_ascii=False)
+        with open(config.ALERTS_CENTER_JSON, "w", encoding="utf-8") as fh:
+            json.dump(alert_center, fh, ensure_ascii=False, indent=2)
+        with open(config.BACKTEST_JSON, "w", encoding="utf-8") as fh:
+            json.dump(backtest_map, fh, ensure_ascii=False, indent=2)
+        # System health (Part 6) — pipeline-level metrics.
+        sec_dist = (df["Sector"].dropna().value_counts().to_dict()
+                    if "Sector" in df else {})
+        system_health = {
+            "scanned": len(df),
+            "signals": int(df["Breakout"].sum()),
+            "data_completeness": round(float(df["Completeness"].mean()), 1),
+            "failed_pulls": failed_pulls,
+            "avg_confidence": round(float(df["Confidence"].mean()), 1),
+            "avg_trust": round(float(df["TrustScore"].mean()), 1),
+            "sector_distribution": {str(k): int(v) for k, v in sec_dist.items()},
+            "date": datetime.now().strftime(config.DATE_FMT),
+        }
+        with open(config.SYSTEM_HEALTH_JSON, "w", encoding="utf-8") as fh:
+            json.dump(system_health, fh, ensure_ascii=False, indent=2)
+    except OSError as exc:
+        print(f"  ! שמירת artifact נכשלה: {exc}")
+
+    # Portfolio analytics (Phase 7) — computed from portfolio.csv holdings.
+    try:
+        portfolio_payload = build_portfolio_payload(sectors=sectors,
+                                                    regime_label=regime.get("label", ""))
+        with open(config.PORTFOLIO_JSON, "w", encoding="utf-8") as fh:
+            json.dump(portfolio_payload, fh, ensure_ascii=False, indent=2)
     except Exception as exc:
-        print(f"  ! נתוני שוק לא זמינים: {exc}")
-        indices, regime = [], {"score": "-", "label": ""}
+        print(f"  ! חישוב התיק נכשל: {exc}")
 
     # Write the full deliverable set (timestamped + latest + index.html).
     write_timestamped_outputs(df, closes_map, notifier.history, backtest_rows,

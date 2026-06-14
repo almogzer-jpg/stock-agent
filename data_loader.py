@@ -28,4 +28,7 @@ def load_ohlcv(symbol: str, period: str = HISTORY_PERIOD):
         return None
     if df is None or df.empty:
         return None
-    return df
+    # Drop rows with no Close (e.g. an incomplete/NaN candle at the start of a
+    # new trading day) so the latest row is always a real, valid session.
+    df = df[df["Close"].notna()]
+    return df if not df.empty else None

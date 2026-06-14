@@ -24,6 +24,27 @@ os.makedirs(OUTPUTS_DIR, exist_ok=True)
 # Static, self-contained dashboard snapshot regenerated every run.
 DASHBOARD_INDEX = os.path.join(BASE_DIR, "dashboard", "index.html")
 
+# Precomputed artifacts so the dashboard loads instantly (zero live calls).
+MARKET_JSON = os.path.join(DATA_DIR, "market_overview.json")   # market + proprietary indicators
+CLOSES_JSON = os.path.join(DATA_DIR, "closes.json")            # recent closes per ticker (charts)
+EVENTS_JSON = os.path.join(DATA_DIR, "events.json")            # earnings/analyst events per ticker
+ALERTS_CENTER_JSON = os.path.join(DATA_DIR, "alerts_center.json")  # typed alerts (Alert Center)
+BACKTEST_JSON = os.path.join(DATA_DIR, "backtest.json")        # per-ticker signal backtest stats
+UNIVERSE_JSON = os.path.join(DATA_DIR, "universe.json")        # market-wide scan results (Market Scanner)
+SYSTEM_HEALTH_JSON = os.path.join(DATA_DIR, "system_health.json")  # pipeline health metrics
+
+# Market Scanner (Part 5): which index universe + how many top names to deeply enrich.
+SCAN_UNIVERSE = "ALL"          # SP500 / NASDAQ100 / ALL
+SCAN_TOP_ENRICH = 40           # deep-enrich (fundamentals/composite/backtest) only the top-N
+
+# Fetch corporate events (earnings dates, analyst actions) for catalysts/alerts.
+# Adds per-ticker yfinance calls — slower; turn off to speed up if needed.
+ENABLE_EVENTS = True
+
+# Portfolio (Phase 7): holdings you edit, analytics computed into JSON.
+PORTFOLIO_CSV = os.path.join(BASE_DIR, "portfolio.csv")
+PORTFOLIO_JSON = os.path.join(DATA_DIR, "portfolio.json")
+
 # --- Data ----------------------------------------------------------------
 # ~2y of daily candles so the 200-day MA / 52-week high are valid.
 HISTORY_PERIOD = "2y"
@@ -36,9 +57,11 @@ RSI_MIN = 50.0            # healthy-momentum RSI band, lower bound
 RSI_MAX = 75.0            # healthy-momentum RSI band, upper bound
 
 # --- Feature flags -------------------------------------------------------
-# Fundamentals call yfinance's per-ticker .info, which is slower and can be
-# rate-limited, so it's off by default. Flip to True to enrich the export.
-ENABLE_FUNDAMENTALS = False
+# Fundamentals (Revenue/EPS/FCF growth, margins, D/E, ROIC, PEG, fwd PE).
+# Cached weekly (they change quarterly) so daily runs stay fast.
+ENABLE_FUNDAMENTALS = True
+FUNDAMENTALS_CACHE = os.path.join(DATA_DIR, "fundamentals_cache.json")
+FUNDAMENTALS_TTL_DAYS = 7
 # News is fetched only for breakout candidates (few calls), so it's cheap.
 ENABLE_NEWS = True
 NEWS_LIMIT = 5
@@ -51,9 +74,9 @@ ENABLE_EMAIL = True
 # button click never spams email; the scheduled daily run still emails.
 if os.environ.get("STOCK_AGENT_DISABLE_EMAIL") == "1":
     ENABLE_EMAIL = False
-# By default the report is emailed only on days with a breakout candidate.
-# Set to True to receive the full report every run (e.g. every weekday).
-EMAIL_ALWAYS = False
+# Email the full report on EVERY run (every weekday morning), not only on
+# days with a breakout candidate.
+EMAIL_ALWAYS = True
 EMAIL_CONFIG_FILE = os.path.join(BASE_DIR, "email_config.json")
 
 # --- Hebrew display labels -----------------------------------------------
@@ -72,9 +95,26 @@ COLUMN_LABELS_HE = {
     "RSI14": "RSI(14)",
     "DailyChange%": "שינוי יומי %",
     "RiskLevel": "רמת סיכון",
+    "Beta": "ביתא",
+    "Volatility": "תנודתיות %",
+    "MaxDrawdown": "ירידה מקס׳ %",
+    "RiskWarnings": "אזהרות סיכון",
     "ScoreSentiment": "ציון סנטימנט",
     "ScoreRisk": "ציון סיכון",
     "ScoreFundamental": "ציון פונדמנטלי",
+    "ExpectedUpside%": "פוטנציאל עלייה %",
+    "Confidence": "ביטחון %",
+    "ConfidenceLevel": "רמת ביטחון",
+    "ScoreNews": "ציון חדשות",
+    "ScoreV2": "ציון סופי v2",
+    "TrustScore": "ציון אמון",
+    "TrustCategory": "רמת אמון",
+    "ContribFund": "תרומת פונדמנטלי",
+    "ContribTech": "תרומת טכני",
+    "ContribSector": "תרומת סקטור",
+    "ContribNews": "תרומת חדשות",
+    "ContribRisk": "תרומת סיכון",
+    "Completeness": "שלמות נתונים",
     "AvgVol20": "נפח ממוצע 20",
     "CurVol": "נפח נוכחי",
     "VolRatio": "יחס נפח",
@@ -82,11 +122,15 @@ COLUMN_LABELS_HE = {
     "DistFromHigh%": "מרחק משיא %",
     "Breakout": "פריצה",
     "Score": "ציון",
-    # Fundamentals (when enabled)
-    "MarketCap": "שווי שוק",
-    "TrailingPE": "מכפיל רווח",
-    "ForwardPE": "מכפיל עתידי",
-    "ProfitMargin": "שולי רווח",
-    "RevenueGrowth": "צמיחת הכנסות",
+    # Fundamentals
     "Sector": "סקטור",
+    "MarketCap": "שווי שוק",
+    "RevenueGrowth": "צמיחת הכנסות %",
+    "EPSGrowth": "צמיחת רווח למניה %",
+    "FCFGrowth": "צמיחת תזרים חופשי %",
+    "OperatingMargin": "שולי תפעול %",
+    "DebtToEquity": "חוב/הון",
+    "ROIC": "ROIC %",
+    "PEG": "PEG",
+    "ForwardPE": "מכפיל עתידי",
 }

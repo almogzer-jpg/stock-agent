@@ -24,6 +24,12 @@ stock-agent/
 ├── news/               # כותרות חדשות + ציון סנטימנט
 ├── alerts/             # התראות למסוף/לוג + מייל
 ├── backtesting/        # בדיקת אות היסטורית (תשואה עתידית)
+├── proprietary.py      # מדדים קנייניים מחושבים (Fear&Greed, Breadth, Capital Flow, Upside, Confidence)
+├── portfolio.py        # ניתוח תיק (Phase 7) + portfolio.csv (ההחזקות שלך)
+├── explain.py          # הסברי הזדמנות (למה כן/לא, קטליזטורים, סיכונים)
+├── events.py           # אירועים (דוחות, שינויי דירוג) מ-yfinance
+├── insights.py         # תובנות AI יומיות בעברית (מבוסס כללים)
+├── alerts/center.py    # מרכז התראות (פריצה/נפח/דוחות/דירוג/רוטציה)
 ├── assistant.py        # עוזר חכם חינמי (שו"ת בעברית על הנתונים, ללא API)
 └── dashboard/          # ממשק Streamlit Pro (תֵמה כהה, Plotly, RTL)
     ├── app.py          #   הלוח האינטראקטיבי (כולל עמוד "🤖 עוזר" + כפתור רענון)

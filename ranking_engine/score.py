@@ -1,56 +1,72 @@
 # -*- coding: utf-8 -*-
-"""0-100 quality/momentum scoring engine."""
+"""0-100 quality/momentum scoring engine (with transparent breakdown)."""
 from config import VOLUME_SPIKE, RSI_MIN, RSI_MAX
+
+# Component weights (sum to 100) — exposed for the UI's score transparency.
+WEIGHTS = {"trend": 25, "proximity": 20, "rsi": 20, "volume": 20, "short_term": 15}
+
+# Hebrew labels for the components (shown in the "how is the score built" panel).
+COMPONENT_LABELS_HE = {
+    "trend": "מבנה מגמה (מול ממוצעים)",
+    "proximity": "קרבה לשיא 52 שבועות",
+    "rsi": "מומנטום RSI",
+    "volume": "אישור נפח",
+    "short_term": "מצב קצר-טווח (מול ממוצע 20)",
+}
+
+
+def _components_raw(m: dict) -> dict:
+    """Raw (unrounded) point contributions of each scoring component."""
+    # Trend structure (25)
+    trend = 0.0
+    if m["Price"] > m["MA50"]:
+        trend += 8
+    if m["Price"] > m["MA200"]:
+        trend += 9
+    if m["MA50"] > m["MA200"]:           # "golden" alignment
+        trend += 8
+
+    # Proximity to 52-week high (20): 0% away -> 20; 20%+ -> 0
+    proximity = max(0.0, 20.0 * (1.0 - m["DistFromHigh%"] / 20.0))
+
+    # RSI momentum (20)
+    rsi = m["RSI14"]
+    if RSI_MIN <= rsi <= RSI_MAX:
+        rsi_pts = 20.0
+    elif 40 <= rsi < RSI_MIN:
+        rsi_pts = 10.0
+    elif RSI_MAX < rsi <= 80:
+        rsi_pts = 8.0
+    else:
+        rsi_pts = 0.0
+
+    # Volume confirmation (20): 1.0x->0, 1.5x->20
+    vr = m["VolRatio"]
+    if vr >= VOLUME_SPIKE:
+        vol = 20.0
+    elif vr >= 1.0:
+        vol = 20.0 * (vr - 1.0) / (VOLUME_SPIKE - 1.0)
+    else:
+        vol = 0.0
+
+    # Short-term posture (15)
+    short = 15.0 if m["Price"] > m["MA20"] else 0.0
+
+    return {"trend": trend, "proximity": proximity, "rsi": rsi_pts,
+            "volume": vol, "short_term": short}
+
+
+def score_breakdown(m: dict) -> dict:
+    """Rounded component points for display (transparency)."""
+    return {k: round(v, 1) for k, v in _components_raw(m).items()}
 
 
 def score_stock(m: dict) -> int:
-    """Compute a 0-100 score from a metrics dict.
+    """Compute the 0-100 final (technical-momentum) score.
 
-    Weighted blend of the breakout ingredients plus longer-term trend health,
-    so strong-trend names still rank even without a fresh volume spike.
-
-    Weights (sum to 100):
-        25  trend structure  (price vs 50/200-day MAs, 50>200 alignment)
-        20  proximity to 52-week high
-        20  RSI momentum band
-        20  volume confirmation
-        15  short-term posture (price vs 20-day MA)
+    Sums the RAW components (so the result is identical to before this refactor —
+    no ranking drift). The Final Score is this technical/momentum blend;
+    Fundamental / Sector / News / Risk are independent lenses shown alongside it.
     """
-    score = 0.0
-
-    # --- Trend structure (25 pts) ---
-    if m["Price"] > m["MA50"]:
-        score += 8
-    if m["Price"] > m["MA200"]:
-        score += 9
-    if m["MA50"] > m["MA200"]:          # "golden" alignment of the averages
-        score += 8
-
-    # --- Proximity to 52-week high (20 pts) ---
-    # 0% away -> full 20; 20%+ away -> 0 (linear in between).
-    dist = m["DistFromHigh%"]
-    score += max(0.0, 20.0 * (1.0 - dist / 20.0))
-
-    # --- RSI momentum (20 pts) ---
-    rsi = m["RSI14"]
-    if RSI_MIN <= rsi <= RSI_MAX:
-        score += 20                      # squarely in the healthy band
-    elif 40 <= rsi < RSI_MIN:
-        score += 10                      # building momentum
-    elif RSI_MAX < rsi <= 80:
-        score += 8                       # strong but getting overbought
-    # weak (<40) or extreme (>80): 0 pts
-
-    # --- Volume confirmation (20 pts) ---
-    vr = m["VolRatio"]
-    if vr >= VOLUME_SPIKE:
-        score += 20                      # clear volume spike
-    elif vr >= 1.0:
-        score += 20.0 * (vr - 1.0) / (VOLUME_SPIKE - 1.0)  # 1.0x->0, 1.5x->20
-    # below-average volume: 0 pts
-
-    # --- Short-term posture (15 pts) ---
-    if m["Price"] > m["MA20"]:
-        score += 15
-
-    return int(round(max(0.0, min(100.0, score))))
+    total = sum(_components_raw(m).values())
+    return int(round(max(0.0, min(100.0, total))))
