@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+import streamlit.components.v1 as components
 
 import config
 import market
@@ -28,7 +29,9 @@ from news.sentiment import score_headlines
 from assistant import answer as assistant_answer
 from explain import explain as explain_stock
 import trust as trust_engine
-from dashboard.theme import DARK_CSS, style_fig, GREEN, AMBER, RED, BLUE, CARD, MUTED, TEXT
+from dashboard.theme import (DARK_CSS, style_fig, GREEN, AMBER, RED, BLUE, CARD, MUTED, TEXT,
+                             PRIMARY, POSITIVE, WARNING, NEGATIVE, BG, BORDER, ELEV,
+                             score_color, regime_color, sparkline_svg, score_bar)
 
 st.set_page_config(page_title="Stock Agent Pro", page_icon="📈", layout="wide")
 st.markdown(DARK_CSS, unsafe_allow_html=True)
@@ -167,6 +170,34 @@ df = load_results()
 mkt = load_market()
 closes = load_closes()
 events = load_events()
+
+
+def _is_mobile() -> bool:
+    """True on a narrow screen (?m=1) — auto-detected via a tiny JS probe.
+
+    On a phone (innerWidth < 500) the probe reloads once with ?m=1; on desktop
+    it does nothing. ?m=0 forces desktop. Desktop code path is unchanged.
+    """
+    qp = st.query_params
+    if "m" in qp:
+        return str(qp.get("m")) == "1"
+    components.html(
+        """<script>
+          const u = new URL(window.parent.location.href);
+          if (!u.searchParams.has('m') && window.parent.innerWidth < 500) {
+            u.searchParams.set('m', '1');
+            window.parent.location.replace(u.toString());
+          }
+        </script>""", height=0)
+    return False
+
+
+# Phase 16: branch to the dedicated mobile experience on narrow screens.
+if _is_mobile():
+    from dashboard import mobile as mobile_ui
+    mobile_ui.render(df, mkt)
+    st.stop()
+
 positive = df[df["_group"] == "positive"]
 watch = df[df["_group"] == "watch"]
 avoid = df[df["_group"] == "avoid"]
@@ -195,6 +226,9 @@ page = st.sidebar.radio(
 )
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
 st.sidebar.divider()
+if st.sidebar.button("📱 תצוגת מובייל", use_container_width=True):
+    st.query_params["m"] = "1"
+    st.rerun()
 if st.sidebar.button("🔄 רענן נתונים עכשיו", use_container_width=True,
                      help="מריץ סריקה מחדש (כ‑30–60 שניות). ללא שליחת מייל."):
     with st.spinner("מריץ סריקה מחדש…"):
@@ -284,89 +318,220 @@ def opportunity_card(rank, r):
 # PAGE: 60-second home (Market Overview + Top Opportunities)
 # ===========================================================================
 
+def kpi_html(ac, ico, val, lab, sub, tip=""):
+    """One institutional KPI card (icon, big number, label, sub, color, tooltip)."""
+    return (f"<div class='kpi' style='--ac:{ac}' title='{tip}'><span class='k-dot'></span>"
+            f"<div class='k-ico'>{ico}</div><div class='k-val'>{val}</div>"
+            f"<div class='k-lab'>{lab}</div><div class='k-sub'>{sub}</div></div>")
+
+
+def _sector_raw(r):
+    """Raw 0-100 sector score for a stock (EN sector → HE → market score)."""
+    secs = {s.get("sector"): s.get("score") for s in mkt.get("sectors", [])}
+    return secs.get(market.SECTOR_EN_TO_HE.get(r.get("Sector")))
+
+
+def regime_gauge(score, label):
+    """Premium angular gauge for the market regime."""
+    if not isinstance(score, (int, float)):
+        st.caption("מצב שוק: אין נתון.")
+        return
+    col = regime_color(score)
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number", value=score,
+        number={"font": {"color": col, "size": 46}},
+        gauge={
+            "axis": {"range": [0, 100], "tickcolor": MUTED, "tickwidth": 1},
+            "bar": {"color": col, "thickness": 0.30},
+            "bgcolor": "rgba(0,0,0,0)", "borderwidth": 0,
+            "steps": [{"range": [0, 40], "color": "#2a1320"},
+                      {"range": [40, 60], "color": "#2c2a12"},
+                      {"range": [60, 100], "color": "#0f2e1c"}],
+            "threshold": {"line": {"color": col, "width": 4}, "thickness": 0.85, "value": score},
+        },
+    ))
+    style_fig(fig, 200)
+    fig.update_layout(margin=dict(l=20, r=20, t=8, b=0))
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def action_card_html(idx, h):
+    """HTML for one 'what should I do today' action card from a decision dict."""
+    pr = {1: "עדיפות 1", 2: "עדיפות 2", 3: "עדיפות 3"}.get(idx, "")
+    verb = {"Increase": "הגדל", "Reduce": "הקטן", "Exit": "צא מ-", "Hold": "החזק"}.get(h["action"], h["action"])
+    ac = NEGATIVE if h.get("priority") == "גבוהה" else (WARNING if h.get("priority") == "בינונית" else PRIMARY)
+    benefit = {"Reduce": "מקרב לפיזור היעד ומפחית ריכוז",
+               "Exit": "מסיר חשיפה לא-אטרקטיבית",
+               "Increase": "מגדיל חשיפה לאיכות"}.get(h["action"], "מיישר את התיק ליעד")
+    return (f"<div class='act' style='--ac:{ac}'>"
+            f"<div class='a-pr'>🎯 {pr} · {h.get('priority','')}</div>"
+            f"<div class='a-ti'>{verb} {h['ticker']} → {h['target_pct']}% "
+            f"<span style='color:{MUTED};font-weight:500'>(כעת {h['current_pct']}%)</span></div>"
+            f"<div class='a-row'><b>למה:</b> {h.get('reasoning','')}</div>"
+            f"<div class='a-row'><b>השפעת סיכון:</b> {h.get('risk_impact','')}</div>"
+            f"<div class='a-row'><b>תועלת צפויה:</b> {benefit}</div>"
+            f"<div class='a-row'><b>ביטחון:</b> {h.get('confidence','—')}%</div></div>")
+
+
+def opp_card(rank, r):
+    """Institutional opportunity card: sparkline + score bars + meta + reasons."""
+    info = classify(r)
+    tk = r["Ticker"]
+    chg = r.get("DailyChange%", 0) or 0
+    ccol = POSITIVE if chg >= 0 else NEGATIVE
+    spark = sparkline_svg(chart_series(tk))
+    trust = r.get("TrustScore")
+    risk = r.get("ScoreRisk")
+    risk_health = None if (risk is None or risk != risk) else 100 - risk
+    bars = (score_bar("טכני", r.get("Score")) + score_bar("פונדמנטלי", r.get("ScoreFundamental"))
+            + score_bar("סקטור", _sector_raw(r)) + score_bar("חדשות", r.get("ScoreNews"))
+            + score_bar("ניהול סיכון", risk_health) + score_bar("אמון", trust))
+    ex = explain_stock(r, events.get(tk))
+    why = {"positive": ex["why_buy"], "watch": ex["why_watch"] or ex["why_buy"],
+           "avoid": ex["why_avoid"]}[ex["group"]]
+    whys = "".join(f"<li>{x}</li>" for x in (why or [])[:2]) or "<li>—</li>"
+    rsks = "".join(f"<li>{x}</li>" for x in ex["risks"][:2]) or "<li>—</li>"
+    cats = "".join(f"<li>{x}</li>" for x in ex["catalysts"][:2]) or "<li>—</li>"
+    trust_disp = fmt(int(trust) if isinstance(trust, (int, float)) and trust == trust else None)
+    st.markdown(
+        f"""<div class="opp" style="--ac:{info['color']}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><span class="o-tick">#{rank} {tk}</span> <span class="o-co">{r['Name']}</span></div>
+            <div style="text-align:left">{spark}
+              <div class="o-rec" style="color:{info['color']}">{info['emoji']} {info['label']}</div></div>
+          </div>
+          <div class="o-meta">
+            <span>ציון V2 <b>{int(r['ScoreV2'])}</b></span>
+            <span>אמון <b>{trust_disp}</b></span>
+            <span>סיכון <b>{fmt(r.get('RiskLevel'))}</b></span>
+            <span>פוטנציאל <b style="color:{POSITIVE}">{fmt(r.get('ExpectedUpside%'),'%')}</b></span>
+            <span>${fmt(r.get('Price'))} <span style="color:{ccol}">({'+' if chg>=0 else ''}{chg}%)</span></span>
+            <span>{fmt(r.get('Sector'))}</span>
+          </div>
+          <div class="o-cols">
+            <div>{bars}</div>
+            <div><b style="color:{info['color']}">למה מעניין</b><ul>{whys}</ul>
+                 <b style="color:{NEGATIVE}">סיכונים עיקריים</b><ul>{rsks}</ul></div>
+            <div><b style="color:{PRIMARY}">אירועים / קטליזטורים</b><ul>{cats}</ul></div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+
 if page.startswith("🏠"):
     regime = mkt.get("regime", {})
     fng = mkt.get("fear_greed", {})
     breadth = mkt.get("breadth", {})
     indices = mkt.get("indices", [])
     ins = mkt.get("insights", {})
+    pf = load_portfolio()
+    alerts = load_alert_center()
+    health = load_system_health()
 
-    # --- AI Insights briefing (Phase 11) ---
-    if ins:
-        import re
-        def _b(s):  # markdown **bold** -> HTML bold (we're inside an HTML card)
-            return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s or "")
-        st.markdown(
-            f"""<div class="card" style="border-right:5px solid {BLUE}">
-              <div style="font-size:18px;font-weight:800">📝 תובנות היום <span style="color:{MUTED};font-size:12px">· מופק אוטומטית</span></div>
-              <div style="color:{TEXT};margin-top:6px;line-height:1.7">
-                <p>🌐 <b>שוק:</b> {_b(ins.get('market',''))}</p>
-                <p>💎 <b>הזדמנויות:</b> {_b(ins.get('opportunities',''))}</p>
-                <p>⚠️ <b>סיכונים:</b> {_b(ins.get('risks',''))}</p>
-                <p>🔄 <b>רוטציה:</b> {_b(ins.get('rotation',''))}</p>
-              </div>
-            </div>""", unsafe_allow_html=True)
+    # ---------- Section 1: Executive KPI strip ----------
+    reg_s, reg_l = regime.get("score"), regime.get("label", "—")
+    fg_s, fg_l = fng.get("score"), fng.get("label", "")
+    fg_c = (NEGATIVE if isinstance(fg_s, (int, float)) and fg_s < 45
+            else POSITIVE if isinstance(fg_s, (int, float)) and fg_s > 55 else WARNING)
+    crit = [a for a in alerts if a.get("severity") in ("קריטית", "גבוהה")]
+    hp = (pf.get("health") or {}).get("score") if not pf.get("empty") else None
+    tr = health.get("avg_trust")
 
-    # --- Market Overview ---
-    st.markdown("### 🌐 סקירת שוק")
-    reg_score = regime.get("score")
-    reg_label = regime.get("label", "—")
-    reg_color = (GREEN if isinstance(reg_score, (int, float)) and reg_score >= 60
-                 else RED if isinstance(reg_score, (int, float)) and reg_score < 40 else AMBER)
+    def _kpi(ac, ico, val, lab, sub, tip):
+        return (f"<div class='kpi' style='--ac:{ac}' title='{tip}'><span class='k-dot'></span>"
+                f"<div class='k-ico'>{ico}</div><div class='k-val'>{val}</div>"
+                f"<div class='k-lab'>{lab}</div><div class='k-sub'>{sub}</div></div>")
 
-    top = st.columns([2, 1, 1])
-    with top[0]:
-        st.markdown(
-            f"""<div class="card">
-              <div style="color:{MUTED}">מצב שוק (Market Regime)</div>
-              <div style="font-size:34px;font-weight:800;color:{reg_color}">{fmt(reg_score)} · {reg_label}</div>
-              <div style="color:{MUTED};font-size:13px;margin-top:6px">
-                <b>למה?</b> מבוסס על S&P 500 מול ממוצעים נעים (200/50) ורמת VIX.
-                רוחב שוק: {fmt(breadth.get('above50'),'%')} מהמניות מעל ממוצע 50,
-                {fmt(breadth.get('above200'),'%')} מעל ממוצע 200,
-                {fmt(breadth.get('advancers'))}/{fmt(breadth.get('decliners'))} עולות/יורדות.
-              </div>
-            </div>""", unsafe_allow_html=True)
-        # Indices strip
-        cells = []
-        for ix in indices:
-            cp = ix.get("change_pct")
-            col = MUTED if cp is None else (GREEN if cp >= 0 else RED)
-            sign = "+" if (cp is not None and cp >= 0) else ""
-            cells.append(f"<span style='margin-left:20px'><b style='color:{TEXT}'>{ix['name']}</b> "
-                         f"{fmt(ix.get('price'))} <span style='color:{col}'>{sign}{fmt(cp)}%</span></span>")
-        st.markdown(f"<div class='card'>{''.join(cells)}</div>", unsafe_allow_html=True)
-        # S&P trend
+    kpis = [
+        _kpi(regime_color(reg_s), "🧭", fmt(reg_s), "מצב שוק", reg_l,
+             "ציון 0-100 ממגמת S&P 500, רמת VIX ורוחב שוק"),
+        _kpi(fg_c, "😶‍🌫️", fmt(fg_s), "פחד / חמדנות", fg_l,
+             "מדד קנייני: VIX + רוחב + מומנטום + יחס עולות/יורדות"),
+        _kpi(POSITIVE, "💎", len(positive), "הזדמנויות", f"{n_break} פריצות · {len(watch)} מעקב",
+             "מספר המניות בסטטוס חיובי היום"),
+        _kpi(NEGATIVE if crit else MUTED, "🔔", len(crit), "התראות קריטיות", f"מתוך {len(alerts)} סה\"כ",
+             "התראות בחומרה גבוהה/קריטית"),
+        _kpi(score_color(hp), "💼", fmt(hp), "בריאות תיק", "פיזור · ריכוז · סיכון" if hp is not None else "אין תיק",
+             "ציון בריאות התיק 0-100"),
+        _kpi(score_color(tr), "🛡️", fmt(round(tr) if isinstance(tr, (int, float)) else None), "ציון אמון",
+             "ממוצע מערכת", "ממוצע ציון האמון על פני המניות שנסרקו"),
+    ]
+    st.markdown(f"<div class='kpi-grid'>{''.join(kpis)}</div>", unsafe_allow_html=True)
+
+    # ---------- Section 2: Market Regime + What should I do today ----------
+    c = st.columns([1.05, 1.95], gap="large")
+    with c[0]:
+        st.markdown("#### 🧭 מצב שוק (Market Regime)")
+        regime_gauge(reg_s, reg_l)
         spx = mkt.get("spx_hist", [])
-        if spx:
-            fig = go.Figure(go.Scatter(y=spx, line_color=GREEN, fill="tozeroy"))
-            fig.update_layout(title="S&P 500 · 6 חודשים")
-            st.plotly_chart(style_fig(fig, 220), use_container_width=True)
-    with top[1]:
-        st.markdown("<div class='card' style='text-align:center'>"
-                    "<div style='color:#9fb3d1'>מד פחד / חמדנות</div>"
-                    "<div style='font-size:11px;color:#6b86ad'>מדד קנייני מחושב</div></div>",
-                    unsafe_allow_html=True)
-        fear_greed_gauge(fng)
-    with top[2]:
-        st.metric("🟢 מומלצות", len(positive))
-        st.metric("🚀 פריצה", n_break)
-        st.metric("🟡 מעקב", len(watch))
-        st.metric("🔴 הימנעות", len(avoid))
+        spx_up = len(spx) > 20 and spx[-1] >= sum(spx) / len(spx)
+        vix = next((i.get("price") for i in indices if i.get("symbol") == "^VIX"), None)
+        vix_low = isinstance(vix, (int, float)) and vix < 20
+        br = breadth.get("above200")
+        br_pos = isinstance(br, (int, float)) and br >= 50
 
-    with st.expander("ℹ️ איך מחושב מד הפחד/חמדנות?"):
+        def _chip(ok, label):
+            cc = POSITIVE if ok else NEGATIVE
+            return f"<span class='badge' style='color:{cc};background:{cc}1a;margin:3px 3px 0 0'>{'✓' if ok else '✕'} {label}</span>"
+        st.markdown("<div>" + _chip(spx_up, "S&P 500 מעל המגמה")
+                    + _chip(vix_low, f"VIX נמוך ({fmt(vix)})")
+                    + _chip(br_pos, f"רוחב חיובי ({fmt(br, '%')})")
+                    + f"<div class='ic-sub' style='margin-top:8px'>גורמים תורמים — נגזרים מ-S&P מול ממוצעים 200/50 ורמת VIX.</div></div>",
+                    unsafe_allow_html=True)
+    with c[1]:
+        st.markdown("#### ✅ מה לעשות היום?")
+        decisions = pf.get("decisions") or {}
+        holds = [h for h in decisions.get("holdings", []) if h.get("action") != "Hold"]
+        holds.sort(key=lambda h: {"גבוהה": 0, "בינונית": 1, "נמוכה": 2}.get(h.get("priority"), 3))
+        if holds:
+            grid = "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:12px'>"
+            grid += "".join(action_card_html(i, h) for i, h in enumerate(holds[:3], start=1))
+            st.markdown(grid + "</div>", unsafe_allow_html=True)
+            extras = decisions.get("rebalancing_actions", []) or decisions.get("today", [])
+            extras = [e for e in extras if not e.startswith(("🟡", "🟢", "🔴"))][:3]
+            if extras:
+                st.markdown("<div class='ic-sub' style='margin-top:10px'>" +
+                            "".join(f"• {e}<br>" for e in extras) + "</div>", unsafe_allow_html=True)
+        else:
+            top3 = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(3)
+            grid = "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:12px'>"
+            for i, (_, r) in enumerate(top3.iterrows(), start=1):
+                info = classify(r)
+                grid += (f"<div class='act' style='--ac:{PRIMARY}'><div class='a-pr'>🎯 עדיפות {i}</div>"
+                         f"<div class='a-ti'>בחן {r['Ticker']}</div>"
+                         f"<div class='a-row'><b>למה:</b> {info['summary']}</div>"
+                         f"<div class='a-row'><b>ציון V2:</b> {int(r['ScoreV2'])} · <b>ביטחון:</b> {fmt(r.get('Confidence'))}%</div></div>")
+            st.markdown(grid + "</div>", unsafe_allow_html=True)
+            st.caption("אין תיק פעיל — להפעלת פעולות תיק, מלא portfolio.csv.")
+
+    # ---------- Section 3: Markets strip + S&P trend ----------
+    st.markdown("#### 🌐 שווקים")
+    cells = []
+    for ix in indices:
+        cp = ix.get("change_pct")
+        col = MUTED if cp is None else (POSITIVE if cp >= 0 else NEGATIVE)
+        sign = "+" if (cp is not None and cp >= 0) else ""
+        cells.append(f"<span style='margin-left:24px'><b style='color:{TEXT}'>{ix['name']}</b> "
+                     f"{fmt(ix.get('price'))} <span style='color:{col}'>{sign}{fmt(cp)}%</span></span>")
+    st.markdown(f"<div class='ic-card' style='padding:14px 20px'>{''.join(cells)}</div>", unsafe_allow_html=True)
+    spx = mkt.get("spx_hist", [])
+    if spx:
+        fig = go.Figure(go.Scatter(y=spx, line_color=PRIMARY, fill="tozeroy", fillcolor="rgba(0,194,255,0.10)"))
+        fig.update_layout(title="S&P 500 · מגמת 6 חודשים")
+        st.plotly_chart(style_fig(fig, 210), use_container_width=True)
+    with st.expander("ℹ️ איך מחושבים מצב השוק ומד הפחד/חמדנות?"):
         st.write(fng.get("method", "—"))
         st.write("**רוחב שוק:** " + breadth.get("method", "—"))
 
     st.divider()
 
-    # --- Top Opportunities ---
-    st.markdown("### 💎 ההזדמנויות הטובות ביותר היום")
+    # ---------- Section 4: Top opportunities (cards + drill-down) ----------
+    st.markdown("### 💎 ההזדמנויות המובילות היום")
     ranked = positive.sort_values("ScoreV2", ascending=False) if not positive.empty \
         else df.sort_values("ScoreV2", ascending=False)
     if ranked.empty:
         st.caption("אין הזדמנויות חיוביות היום.")
     else:
+        analyzed = st.session_state.setdefault("analyzed", set())
         t3, t5, t10 = st.tabs(["Top 3", "Top 5", "Top 10"])
         for tab, k in [(t3, 3), (t5, 5), (t10, 10)]:
             with tab:
@@ -374,7 +539,27 @@ if page.startswith("🏠"):
                 if shown.empty:
                     st.caption("אין מספיק מניות.")
                 for rank, (_, r) in enumerate(shown.iterrows(), start=1):
-                    opportunity_card(rank, r)
+                    tk = r["Ticker"]
+                    opp_card(rank, r)
+                    b = st.columns([1, 1, 6])
+                    if b[0].button("🔍 ניתוח", key=f"an_{k}_{tk}"):
+                        analyzed.discard(tk) if tk in analyzed else analyzed.add(tk)
+                        st.rerun()
+                    if b[1].button("➕ לתיק", key=f"add_{k}_{tk}"):
+                        st.toast(f"להוספת {tk} לתיק: ערוך portfolio.csv (Ticker,Quantity,AverageCost) ולחץ רענון.", icon="➕")
+                    if tk in analyzed:
+                        ex = explain_stock(r, events.get(tk))
+                        full_why = "".join(f"<li>{x}</li>" for x in (ex["why_buy"] or ex["why_watch"] or [])[:5]) or "<li>—</li>"
+                        full_rsk = "".join(f"<li>{x}</li>" for x in ex["risks"][:5]) or "<li>—</li>"
+                        full_cat = "".join(f"<li>{x}</li>" for x in ex["catalysts"][:5]) or "<li>—</li>"
+                        st.markdown(
+                            f"""<div class='ic-card' style='--ac:{classify(r)['color']}'>
+                              <div class='ic-title'>🔍 ניתוח מעמיק · {tk}</div>
+                              <div class='o-cols' style='margin-top:6px'>
+                                <div><b style='color:{POSITIVE}'>מדוע</b><ul style='padding-right:16px;color:{MUTED}'>{full_why}</ul></div>
+                                <div><b style='color:{NEGATIVE}'>סיכונים</b><ul style='padding-right:16px;color:{MUTED}'>{full_rsk}</ul></div>
+                                <div><b style='color:{PRIMARY}'>קטליזטורים / אירועים</b><ul style='padding-right:16px;color:{MUTED}'>{full_cat}</ul></div>
+                              </div></div>""", unsafe_allow_html=True)
         st.caption("פוטנציאל עלייה וביטחון = מדדים קנייניים מחושבים (ראו עמוד 'מניות ופירוט' להסבר).")
 
 
@@ -749,70 +934,111 @@ elif page == "💼 תיק":
     if pf.get("empty"):
         st.info("אין החזקות עדיין. הוסף שורות בטבלה למטה ולחץ 'שמור והרץ'.")
     else:
-        # --- Headline analytics ---
+        # --- Section 1: Executive KPI strip ---
         bm = pf.get("benchmark", {})
-        c = st.columns(4)
-        c[0].metric("💰 שווי תיק", f"${pf['total_value']:,.0f}",
-                    f"{pf['total_pl_pct']:+.2f}% (${pf['total_pl']:,.0f})")
-        c[1].metric("📅 שינוי יומי", f"{pf['daily_change_pct']:+.2f}%")
-        c[2].metric("📈 חודשי", f"{pf['monthly_change_pct']:+.2f}%")
-        ytd_delta = None
-        if bm.get("ret_ytd") is not None and pf.get("ytd_pct") is not None:
-            ytd_delta = f"{pf['ytd_pct'] - bm['ret_ytd']:+.2f}% מול S&P"
-        c[3].metric("🗓️ YTD", f"{fmt(pf.get('ytd_pct'),'%')}", ytd_delta)
+        prisk = pf.get("risk", {})
+        h = pf.get("health", {})
+        hs = h.get("score")
+        dch = pf.get("daily_change_pct", 0) or 0
+        wbeta = prisk.get("weighted_beta")
+        effn = prisk.get("effective_positions")
+        conc = prisk.get("concentration_risk")
+        beta_c = NEGATIVE if isinstance(wbeta, (int, float)) and wbeta > 1.2 else POSITIVE
+        conc_c = (NEGATIVE if isinstance(conc, (int, float)) and conc >= 66
+                  else WARNING if isinstance(conc, (int, float)) and conc >= 40 else POSITIVE)
+        kp = [
+            kpi_html(PRIMARY, "💰", f"${pf['total_value']:,.0f}", "שווי תיק",
+                     f"רווח כולל {pf['total_pl_pct']:+.1f}%", "שווי שוק נוכחי של ההחזקות"),
+            kpi_html(POSITIVE if dch >= 0 else NEGATIVE, "📅", f"{dch:+.2f}%", "שינוי יומי",
+                     f"מול S&P {bm.get('daily', 0):+.2f}%", "שינוי יומי מול הבנצ׳מרק"),
+            kpi_html(score_color(hs), "🩺", fmt(hs), "בריאות תיק", "פיזור · ריכוז · סיכון",
+                     "ציון בריאות התיק 0-100"),
+            kpi_html(beta_c, "📊", fmt(wbeta), "ביתא תיק", "רגישות לשוק",
+                     "ביתא משוקללת מול S&P 500"),
+            kpi_html(POSITIVE if isinstance(effn, (int, float)) and effn >= 4 else WARNING, "🧩",
+                     fmt(effn), "פיזור", "פוזיציות אפקטיביות", "1/HHI — כמה פוזיציות שקולות זה למעשה"),
+            kpi_html(conc_c, "🎯", fmt(conc), "ריכוז", "0=מפוזר · 100=מרוכז", "ציון ריכוז התיק 0-100"),
+        ]
+        st.markdown(f"<div class='kpi-grid'>{''.join(kp)}</div>", unsafe_allow_html=True)
 
-        # --- Health + exposures ---
-        hcol, ecol = st.columns([1, 2])
-        with hcol:
-            h = pf.get("health", {})
-            hs = h.get("score")
-            hcolor = GREEN if (hs or 0) >= 66 else (AMBER if (hs or 0) >= 40 else RED)
+        # --- Section 2: Allocation + health ---
+        st.markdown("#### 📊 הקצאה ובריאות")
+        _donut = [PRIMARY, POSITIVE, WARNING, NEGATIVE, "#a78bfa", "#f472b6", "#22d3ee"]
+        cc = st.columns([1.1, 1, 1])
+        with cc[0]:
+            exp_s = pf["exposures"].get("sector", {})
+            if exp_s:
+                fig = go.Figure(go.Pie(labels=list(exp_s.keys()), values=list(exp_s.values()),
+                                       hole=0.58, marker=dict(colors=_donut)))
+                fig.update_traces(textinfo="label+percent", textfont_size=11)
+                fig.update_layout(title="הקצאה לפי סקטור", showlegend=False)
+                st.plotly_chart(style_fig(fig, 250), use_container_width=True)
+        with cc[1]:
+            exp_r = pf["exposures"].get("risk", {})
+            if exp_r:
+                fig = go.Figure(go.Pie(labels=list(exp_r.keys()), values=list(exp_r.values()),
+                                       hole=0.58, marker=dict(colors=[POSITIVE, WARNING, NEGATIVE, "#7f1d1d"])))
+                fig.update_traces(textinfo="label+percent", textfont_size=11)
+                fig.update_layout(title="חשיפה לפי סיכון", showlegend=False)
+                st.plotly_chart(style_fig(fig, 250), use_container_width=True)
+        with cc[2]:
             fig = go.Figure(go.Indicator(
                 mode="gauge+number", value=hs or 0,
-                number={"font": {"color": TEXT}},
-                gauge={"axis": {"range": [0, 100]}, "bar": {"color": hcolor}}))
-            style_fig(fig, 200)
-            st.markdown("**🩺 ציון בריאות התיק**")
+                number={"font": {"color": score_color(hs), "size": 34}},
+                gauge={"axis": {"range": [0, 100]}, "bar": {"color": score_color(hs), "thickness": 0.3},
+                       "bgcolor": "rgba(0,0,0,0)", "borderwidth": 0,
+                       "steps": [{"range": [0, 40], "color": "#2a1320"},
+                                 {"range": [40, 66], "color": "#2c2a12"},
+                                 {"range": [66, 100], "color": "#0f2e1c"}]}))
+            style_fig(fig, 250)
+            fig.update_layout(title="בריאות תיק")
             st.plotly_chart(fig, use_container_width=True)
-            for f in h.get("factors", []):
-                st.caption(f"• {f}")
-        with ecol:
-            e1, e2, e3 = st.columns(3)
-            for col, title, key in [(e1, "סקטורים", "sector"),
-                                    (e2, "סיכון", "risk"), (e3, "שווי שוק", "cap")]:
-                exp = pf["exposures"].get(key, {})
-                if exp:
-                    fig = go.Figure(go.Pie(labels=list(exp.keys()), values=list(exp.values()),
-                                           hole=0.5))
-                    fig.update_layout(title=title, showlegend=False)
-                    fig.update_traces(textinfo="label+percent", textfont_size=10)
-                    col.plotly_chart(style_fig(fig, 220), use_container_width=True)
+        if h.get("factors"):
+            st.caption(" · ".join(h["factors"]))
 
-        # --- Portfolio risk (Part 2) ---
-        prisk = pf.get("risk", {})
-        if prisk:
-            st.markdown("##### 🛡️ סיכון תיק")
-            rc = st.columns(4)
-            rc[0].metric("ביתא תיק", fmt(prisk.get("weighted_beta")))
-            rc[1].metric("תנודתיות משוקללת", fmt(prisk.get("weighted_volatility"), "%"))
-            rc[2].metric("ריכוז (0–100)", fmt(prisk.get("concentration_risk")))
-            rc[3].metric("פוזיציות אפקטיביות", fmt(prisk.get("effective_positions")))
-            for w in prisk.get("warnings", []):
-                st.markdown(f"<div class='card' style='border-right:4px solid {AMBER};padding:8px 12px'>"
-                            f"⚠️ {w}</div>", unsafe_allow_html=True)
+        # --- Section 3: Risk contribution + correlation ---
+        st.markdown("#### 🛡️ תרומת סיכון וקורלציות")
+        rcc = st.columns(2)
+        posdf = pd.DataFrame(pf["positions"])
+        with rcc[0]:
+            if {"ticker", "weight", "beta"}.issubset(posdf.columns):
+                rd = posdf.dropna(subset=["beta"]).copy()
+                rd["contrib"] = (rd["weight"] / 100.0 * rd["beta"]).round(3)
+                rd = rd.sort_values("contrib")
+                bcol = [NEGATIVE if v > 0.3 else (WARNING if v > 0.15 else POSITIVE) for v in rd["contrib"]]
+                fig = go.Figure(go.Bar(x=rd["contrib"], y=rd["ticker"], orientation="h",
+                                       marker_color=bcol,
+                                       text=[f"{v:.2f}" for v in rd["contrib"]], textposition="auto"))
+                fig.update_layout(title="תרומת סיכון (משקל × ביתא)")
+                st.plotly_chart(style_fig(fig, 300), use_container_width=True)
+                st.caption("אומדן תרומת כל החזקה לסיכון התיק = משקל × ביתא.")
+        with rcc[1]:
             corr = pf.get("correlation", {}).get("matrix", {})
             if corr and len(corr) >= 2:
                 tk = list(corr.keys())
                 z = [[corr[a].get(b, 0) for b in tk] for a in tk]
-                fig = go.Figure(go.Heatmap(z=z, x=tk, y=tk, zmin=-1, zmax=1,
-                                           colorscale="RdYlGn_r",
+                fig = go.Figure(go.Heatmap(z=z, x=tk, y=tk, zmin=-1, zmax=1, colorscale="RdYlGn_r",
                                            text=z, texttemplate="%{text:.2f}", textfont_size=10))
                 fig.update_layout(title="מטריצת קורלציה (תשואות יומיות)")
-                st.plotly_chart(style_fig(fig, 360), use_container_width=True)
-            hp = pf.get("correlation", {}).get("high_pairs", [])
-            if hp:
-                st.caption("זוגות מתואמים גבוה (ריכוז סמוי): " +
-                           " · ".join(f"{p['a']}–{p['b']} ({p['corr']})" for p in hp))
+                st.plotly_chart(style_fig(fig, 300), use_container_width=True)
+
+        # --- Section 4: Highlights — concentration / hidden corr / actions ---
+        hi = st.columns(3)
+        warns = prisk.get("warnings", [])
+        hi[0].markdown(f"<div class='card' style='border-right:5px solid {NEGATIVE}'>"
+                       f"<div class='ic-title'>🎯 ריכוזים</div>" +
+                       ("".join(f"<div class='ic-sub'>⚠️ {w}</div>" for w in warns)
+                        or "<div class='ic-sub'>אין ריכוז חריג</div>") + "</div>", unsafe_allow_html=True)
+        hp = pf.get("correlation", {}).get("high_pairs", [])
+        hi[1].markdown(f"<div class='card' style='border-right:5px solid {WARNING}'>"
+                       f"<div class='ic-title'>🔗 קורלציות סמויות</div>" +
+                       ("".join(f"<div class='ic-sub'>{p['a']}–{p['b']} ({p['corr']})</div>" for p in hp)
+                        or "<div class='ic-sub'>אין זוגות מתואמים גבוה</div>") + "</div>", unsafe_allow_html=True)
+        today_acts = (pf.get("decisions") or {}).get("today", [])[:4]
+        hi[2].markdown(f"<div class='card' style='border-right:5px solid {PRIMARY}'>"
+                       f"<div class='ic-title'>✅ פעולות מוצעות</div>" +
+                       ("".join(f"<div class='ic-sub'>{a}</div>" for a in today_acts)
+                        or "<div class='ic-sub'>אין פעולות</div>") + "</div>", unsafe_allow_html=True)
 
         # --- Holdings table ---
         st.markdown("##### 📋 החזקות")

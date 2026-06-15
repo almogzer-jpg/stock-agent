@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock Agent Pro · Mobile Command Center</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.1.0/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#08111f;color:#E6EDF7;font-family:'Inter','Segoe UI',sans-serif;direction:rtl;line-height:1.45}
+  .stk{background:#0b1220;border-bottom:1px solid #233456;padding:11px 14px;font-size:13px;position:sticky;top:0;z-index:9}
+  .stk b{color:#fff}
+  .body{padding:12px;padding-bottom:78px;overflow-y:auto;height:100%}
+  .tape{background:#0b1220;border-bottom:1px solid #1f3257;overflow:hidden;white-space:nowrap;padding:6px 0;font-size:12px}
+  .tape-in{display:inline-block;animation:marq 26s linear infinite}
+  .tk{margin:0 14px}.up{color:#00E676}.dn{color:#FF5252}
+  @keyframes marq{from{transform:translateX(0)}to{transform:translateX(50%)}}
+  .mk2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+  .mc{background:linear-gradient(180deg,#16284d,#102040);border:1px solid #1f3257;border-top:3px solid var(--ac);border-radius:14px;padding:11px 12px}
+  .mc .ico{font-size:16px;color:var(--ac)}.mc .v{font-size:28px;font-weight:800;color:var(--ac);line-height:1.05}
+  .mc .l{color:#94A3B8;font-size:11px;font-weight:600}.mc .s{color:#94A3B8;font-size:10px}
+  .panel{background:linear-gradient(180deg,#16284d,#102040);border:1px solid #1f3257;border-radius:15px;padding:13px;margin-bottom:11px}
+  .pt{font-size:14px;font-weight:800;margin:0 0 9px;display:flex;gap:7px;align-items:center}
+  .gr{display:flex;gap:12px;align-items:center;justify-content:center}
+  .chip{display:inline-flex;gap:3px;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin:3px 2px 0 0;color:#00E676;background:rgba(0,230,118,.12)}
+  .heat{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .tile{border-radius:10px;padding:8px;border:1px solid;text-align:center}
+  .tile .nm{font-size:10px;font-weight:700}.tile .sc{font-size:18px;font-weight:800}
+  .g{background:rgba(0,230,118,.16);border-color:rgba(0,230,118,.5);color:#bff7da}
+  .a{background:rgba(255,193,7,.15);border-color:rgba(255,193,7,.45);color:#ffe39a}
+  .r{background:rgba(255,82,82,.15);border-color:rgba(255,82,82,.45);color:#ffc2c2}
+  .act{background:#0f1d39;border:1px solid #1f3257;border-right:4px solid var(--ac);border-radius:12px;padding:10px 11px;margin-bottom:7px;font-size:13px}
+  .act .t{font-weight:800;font-size:14px}.act .m{color:#94A3B8;margin-top:3px;font-size:12px}
+  .opp{background:#0f1d39;border:1px solid #1f3257;border-right:4px solid var(--ac);border-radius:12px;padding:11px;margin-bottom:8px}
+  .ot{display:flex;justify-content:space-between;align-items:center}.tick{font-size:16px;font-weight:800}.co{color:#94A3B8;font-size:11px}
+  .om{font-size:12px;color:#94A3B8;margin-top:5px}.om b{color:#E6EDF7}
+  .alert{font-size:13px}
+  .nav{position:fixed;bottom:0;left:0;right:0;height:62px;background:#0b1220;border-top:1px solid #233456;display:flex;justify-content:space-around;align-items:center}
+  .nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:#94A3B8;text-decoration:none}
+  .nav a.on{color:#00C2FF}.nav i{font-size:21px}
+</style>
+</head>
+<body>
+  <div class="stk"><i class="ti ti-robot"></i> <b>Stock Agent</b> · מצב שוק <b style="color:#00E676">95</b> (Risk-On) · פחד/חמדנות 60</div>
+  <div class="tape"><span class="tape-in" id="tape"></span></div>
+  <div class="body">
+    <div class="mk2">
+      <div class="mc" style="--ac:#00E676"><div class="ico"><i class="ti ti-compass"></i></div><div class="v">95</div><div class="l">מצב שוק</div><div class="s">שורי (Risk-On)</div></div>
+      <div class="mc" style="--ac:#FFC107"><div class="ico"><i class="ti ti-heartbeat"></i></div><div class="v">54</div><div class="l">בריאות תיק</div><div class="s">ריכוז גבוה</div></div>
+      <div class="mc" style="--ac:#00C2FF"><div class="ico"><i class="ti ti-diamond"></i></div><div class="v">4</div><div class="l">הזדמנויות</div><div class="s">0 פריצות</div></div>
+      <div class="mc" style="--ac:#FF5252"><div class="ico"><i class="ti ti-bell-ringing"></i></div><div class="v">1</div><div class="l">התראות קריטיות</div><div class="s">מתוך 13</div></div>
+    </div>
+
+    <div class="panel" style="text-align:center">
+      <div class="pt" style="justify-content:center"><i class="ti ti-compass" style="color:#00E676"></i> Market Regime</div>
+      <svg width="150" height="150" viewBox="0 0 180 150"><circle cx="90" cy="90" r="62" fill="none" stroke="#0a1830" stroke-width="13"/><circle id="ring" cx="90" cy="90" r="62" fill="none" stroke="#00E676" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 90 90)"/><text x="90" y="86" text-anchor="middle" font-size="44" font-weight="800" fill="#00E676">95</text><text x="90" y="108" text-anchor="middle" font-size="13" fill="#94A3B8">Risk-On</text></svg>
+      <div><span class="chip"><i class="ti ti-check"></i> S&P מעל מגמה</span><span class="chip"><i class="ti ti-check"></i> VIX 17.7</span><span class="chip"><i class="ti ti-check"></i> רוחב 55%</span></div>
+    </div>
+
+    <div class="panel" style="--ac:#00C2FF;border-right:5px solid #00C2FF">
+      <div class="pt"><i class="ti ti-checklist" style="color:#00C2FF"></i> מה לעשות היום?</div>
+      <div class="act" style="--ac:#FF5252"><div class="t">הקטן NVDA → 10%</div><div class="m">פוזיציה 29% · השפעה: מפחית חשיפה · ביטחון 65%</div></div>
+      <div class="act" style="--ac:#FF5252"><div class="t">הקטן JPM → 15%</div><div class="m">פוזיציה 22% · ביטחון 71%</div></div>
+      <div class="act" style="--ac:#FFC107;margin-bottom:0"><div class="t">הקטן AAPL → 5%</div><div class="m">שווי נמוך · ביטחון 74%</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="pt"><i class="ti ti-layout-grid" style="color:#00C2FF"></i> מפת חום סקטוריאלית</div>
+      <div class="heat">
+        <div class="tile g"><div class="nm">Technology</div><div class="sc">81</div></div>
+        <div class="tile g"><div class="nm">Real Estate</div><div class="sc">75</div></div>
+        <div class="tile g"><div class="nm">Industrials</div><div class="sc">72</div></div>
+        <div class="tile g"><div class="nm">Healthcare</div><div class="sc">67</div></div>
+        <div class="tile g"><div class="nm">Financials</div><div class="sc">66</div></div>
+        <div class="tile a"><div class="nm">Energy</div><div class="sc">42</div></div>
+        <div class="tile a"><div class="nm">Utilities</div><div class="sc">41</div></div>
+        <div class="tile r"><div class="nm">Comm.</div><div class="sc">29</div></div>
+        <div class="tile r"><div class="nm">Cyclical</div><div class="sc">22</div></div>
+      </div>
+    </div>
+
+    <div class="pt"><i class="ti ti-diamond" style="color:#00C2FF"></i> 3 ההזדמנויות המובילות</div>
+    <div class="opp" style="--ac:#00E676"><div class="ot"><div><span class="tick">LLY</span> <span class="co">Eli Lilly</span></div><div style="color:#00E676;font-weight:800;font-size:12px"><i class="ti ti-trending-up"></i> מגמה חזקה</div></div><div class="om">V2 <b>78</b> · אמון <b>55</b> · סיכון <b>נמוך</b> · <span class="dn">-2.41%</span></div></div>
+    <div class="opp" style="--ac:#00E676"><div class="ot"><div><span class="tick">JPM</span> <span class="co">JP Morgan</span></div><div style="color:#00E676;font-weight:800;font-size:12px"><i class="ti ti-trending-up"></i> מגמה חזקה</div></div><div class="om">V2 <b>76</b> · אמון <b>75</b> · סיכון <b>נמוך</b> · <span class="up">+2.31%</span></div></div>
+    <div class="opp" style="--ac:#00E676"><div class="ot"><div><span class="tick">AMD</span> <span class="co">Adv. Micro Devices</span></div><div style="color:#00E676;font-weight:800;font-size:12px"><i class="ti ti-trending-up"></i> מגמה חזקה</div></div><div class="om">V2 <b>74</b> · אמון <b>60</b> · סיכון <b style="color:#FF5252">גבוה מאוד</b> · <span class="up">+4.73%</span></div></div>
+
+    <div class="panel" style="border-right:5px solid #FF5252"><div class="pt"><i class="ti ti-bell-ringing" style="color:#FF5252"></i> התראות קריטיות</div><div class="alert"><b style="color:#FF5252">TSLA</b> — סיכון גבוה ומתחת לממוצע 200</div></div>
+  </div>
+  <div class="nav">
+    <a class="on"><i class="ti ti-home"></i>בית</a>
+    <a><i class="ti ti-diamond"></i>הזדמנויות</a>
+    <a><i class="ti ti-briefcase"></i>תיק</a>
+    <a><i class="ti ti-bell"></i>התראות</a>
+  </div>
+<script>
+  window.addEventListener('load',function(){
+    var idx=[['S&P','7,431','+0.5%',1],['NDX','25,889','+0.31%',1],['VIX','17.68','-9.05%',0],['LLY','1,133','-2.41%',0],['JPM','320.72','+2.31%',1],['AMD','511.57','+4.73%',1],['NVDA','205.19','+0.16%',1]];
+    var row=idx.map(function(t){return '<span class="tk"><b>'+t[0]+'</b> '+t[1]+' <span class="'+(t[3]?'up':'dn')+'">'+t[2]+'</span></span>';}).join('');
+    document.getElementById('tape').innerHTML=row+row;
+    var c=2*Math.PI*62,el=document.getElementById('ring');el.style.transition='stroke-dasharray 1.1s cubic-bezier(.2,.8,.2,1)';setTimeout(function(){el.setAttribute('stroke-dasharray',(c*0.95)+' '+c);},150);
+  });
+</script>
+</body>
+</html>
