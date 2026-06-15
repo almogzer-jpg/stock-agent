@@ -1,8 +1,22 @@
 # Secrets — never commit your email credentials
 email_config.json
 
-# Generated outputs
-data/
+# Generated outputs — ignore everything in data/ EXCEPT the snapshot the
+# Streamlit Cloud deploy needs to render instantly (no live scan at boot).
+data/*
+!data/results.csv
+!data/market_overview.json
+!data/closes.json
+!data/events.json
+!data/alerts_center.json
+!data/backtest.json
+!data/system_health.json
+!data/portfolio.json
+!data/universe.json
+# keep ignoring logs, excel, caches and the timestamped outputs/
+data/outputs/
+data/*.log
+data/*.xlsx
 
 # Python
 __pycache__/

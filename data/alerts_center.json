@@ -1,0 +1,104 @@
+[
+  {
+    "type": "אזהרת סיכון",
+    "scope": "TSLA",
+    "severity": "גבוהה",
+    "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
+  },
+  {
+    "type": "זינוק נפח",
+    "scope": "ADBE",
+    "severity": "בינונית",
+    "message": "ADBE — נפח מסחר פי 3.57 מהממוצע"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Buy → Buy (Jefferies)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — שדרוג: Neutral → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "מידע",
+    "message": "PG — כיסוי חדש:  → Market Perform (Bernstein)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — אישרור: Outperform → Outperform (Mizuho)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — אישרור: Buy → Buy (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — כיסוי חדש:  → Buy (China Renaissance)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Neutral → Neutral (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Buy → Buy (Loop Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — reit: Buy → Buy (TD Cowen)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — אישרור: Buy → Buy (TD Cowen)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — reit: Buy → Buy (Needham)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "TSLA",
+    "severity": "מידע",
+    "message": "TSLA — reit: Sell → Sell (GLJ Research)"
+  },
+  {
+    "type": "רוטציית סקטורים",
+    "scope": "טכנולוגיה",
+    "severity": "מידע",
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 81, חוזק יחסי +4.67%)"
+  },
+  {
+    "type": "רוטציית סקטורים",
+    "scope": "צריכה מחזורית",
+    "severity": "מידע",
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 22, חוזק יחסי -1.61%)"
+  }
+]
