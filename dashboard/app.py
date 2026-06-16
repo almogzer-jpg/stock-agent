@@ -29,7 +29,7 @@ from news.sentiment import score_headlines
 from explain import explain as explain_stock
 import trust as trust_engine
 from dashboard.theme import (DARK_CSS, style_fig, GREEN, AMBER, RED, BLUE, CARD, MUTED, TEXT,
-                             PRIMARY, POSITIVE, WARNING, NEGATIVE, BG, BORDER, ELEV,
+                             SECONDARY, PRIMARY, POSITIVE, WARNING, NEGATIVE, BG, BORDER, ELEV,
                              score_color, regime_color, sparkline_svg, score_bar)
 
 st.set_page_config(page_title="Stock Agent Pro", page_icon="📈", layout="wide")
@@ -242,10 +242,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Cross-page navigation request (e.g. "ניתוח חברה" button) — applied BEFORE the
+# nav widget is instantiated, since a widget's value can't be set after creation.
+if st.session_state.get("_pending_nav"):
+    st.session_state["nav"] = st.session_state.pop("_pending_nav")
+
 page = st.sidebar.radio(
     "תצוגה",
     ["🏠 ראשי", "🔎 ניתוח חברה", "💎 הזדמנויות", "🗺️ סקטורים", "🚨 התראות",
      "📊 אינטליגנציית שוק", "⚙️ הגדרות"],
+    key="nav",
 )
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
 st.sidebar.divider()
@@ -576,92 +582,258 @@ if page.startswith("🏠"):
 # ===========================================================================
 
 elif page == "💎 הזדמנויות":
-    st.markdown("### 💎 הזדמנויות — גילוי מרחבי השוק (ציונים · מומנטום · ערך · מובילי סקטור)")
+    st.markdown("### 💎 הזדמנויות — מסוף גילוי הזדמנויות")
     uni = load_universe()
     if not uni:
         st.info("הסריקה הרחבה עדיין לא רצה. הרץ במסוף: `python scanner.py ALL` (כ‑1.5 דקות), ואז רענן.")
     else:
-        c = st.columns(4)
-        c[0].metric("מניות נסרקו", uni.get("scanned"))
-        c[1].metric("הועשרו (Top)", uni.get("enriched"))
-        c[2].metric("יקום", uni.get("universe"))
-        c[3].metric("זמן סריקה", f"{uni.get('elapsed_sec')}s")
-        st.caption("שלב א׳ (כל היקום): טכני/סיכון/מומנטום מהמחירים. שלב ב׳ (Top): פונדמנטל/composite/בקטסט.")
+        from dashboard import views as VW
+        lookup = VW.build_lookup(uni)
+        nc = VW.names_cache()
 
-        rk = uni.get("rankings", {})
-        rnames = [("opportunities", "🏆 הזדמנויות"), ("undervalued", "💰 מוערכות בחסר"),
-                  ("momentum", "🚀 מומנטום"), ("high_quality", "⭐ איכות גבוהה"),
-                  ("turnarounds", "🔄 תפניות")]
-        st.markdown("#### דירוגי Top 10")
-        rcols = st.columns(5)
-        for i, (k, label) in enumerate(rnames):
-            with rcols[i]:
-                st.markdown(f"**{label}**")
-                for t in (rk.get(k) or [])[:10]:
-                    st.markdown(f"<div style='font-size:13px'>{t}</div>", unsafe_allow_html=True)
-                if not rk.get(k):
-                    st.caption("—")
+        TIP_SCORE = ("ציון משוקלל 0-100 המשלב פונדמנטל/איכות, תמחור, מומנטום טכני, חוזק סקטור וסיכון. "
+                     "80-100 יוצא דופן · 70-79 חזק · 60-69 טוב · 50-59 מעקב · מתחת ל-50 חלש.")
+        TIP_VAL = "ציון תמחור: 100 זול מאוד · 70-99 אטרקטיבי · 40-69 הוגן · 0-39 יקר."
+        TIP_QUAL = "איכות: צמיחת הכנסות/רווח, רווחיות, ROIC, חוזק מאזן ורמת חוב."
+        TIP_MOM = "מומנטום: תשואת המחיר ב-3 חודשים. רוקטה=חזק מאוד, עולה=חיובי, ניטרלי, יורד=שלילי."
+        TIP_RISK = "סיכון מחושב מ-Beta, תנודתיות, ירידה מקסימלית וגורמי ריכוז."
 
-        sd = uni.get("sector_distribution", {})
-        if sd:
-            fig = go.Figure(go.Bar(x=list(sd.values()), y=list(sd.keys()), orientation="h",
-                                   marker_color=BLUE))
-            fig.update_layout(title="התפלגות סקטורים (הזדמנויות)")
-            st.plotly_chart(style_fig(fig, 300), use_container_width=True)
+        def _i(x):
+            return str(int(x)) if isinstance(x, (int, float)) and x == x else "—"
+
+        def _num(x):
+            return x if isinstance(x, (int, float)) and x == x else None
+
+        # ---------- Top summary bar (4 premium KPI cards) ----------
+        hi = VW.kpi_highlights(uni, mkt)
+
+        def _kc(ico, val, lab, sub, ac, tip):
+            return (f"<div class='kpi' style='--ac:{ac}' title='{tip}'><div class='k-ico'>{ico}</div>"
+                    f"<div style='font-size:19px;font-weight:800;color:{ac};line-height:1.15'>{val}</div>"
+                    f"<div class='k-lab'>{lab}</div><div class='k-sub'>{sub}</div></div>")
+        kc = []
+        s, bm, hs, uv = hi["strongest"], hi["best_mom"], hi["high_score"], hi["undervalued"]
+        if s:
+            kc.append(_kc("🏆", s["sector_he"], "הסקטור החזק ביותר", f"ציון ממוצע {_i(s['avg_score'])}",
+                          POSITIVE, "הסקטור עם החוזק והציון הממוצע הגבוהים ביותר."))
+        if bm:
+            m = bm.get("Ret3m")
+            kc.append(_kc("🚀", bm["Ticker"], "מומנטום מוביל",
+                          f"{VW.momentum_emoji(m)} {'+' if (m or 0) >= 0 else ''}{_i(m)}% (3ח׳)", PRIMARY,
+                          "המניה עם תשואת 3 החודשים הגבוהה ביותר."))
+        if hs:
+            kc.append(_kc("⭐", hs["Ticker"], "הציון הגבוה ביותר", f"Score V2: {_i(hs.get('ScoreV2'))}",
+                          VW.score_band_color(hs.get("ScoreV2")), TIP_SCORE))
+        if uv:
+            kc.append(_kc("💎", uv["Ticker"], "המוערכת ביותר בחסר", f"ציון תמחור: {_i(uv.get('Valuation'))}",
+                          WARNING, TIP_VAL))
+        st.markdown(f"<div class='kpi-grid' style='grid-template-columns:repeat(4,1fr)'>{''.join(kc)}</div>",
+                    unsafe_allow_html=True)
+
+        # ---------- Score V2 explanation ----------
+        st.markdown(
+            f"<div class='ic-card' style='border-right:5px solid {PRIMARY}'>"
+            f"<div class='ic-title'>ℹ️ מהו ציון Score V2?</div>"
+            f"<div class='ic-sub'>ציון משוקלל 0–100 המשלב: פונדמנטל/איכות · תמחור · מומנטום טכני · חוזק סקטור · סיכון.</div>"
+            f"<div class='ic-sub' style='margin-top:5px'>"
+            f"<span style='color:#22c55e'>80–100 יוצא דופן</span> · "
+            f"<span style='color:#38bdf8'>70–79 חזק</span> · "
+            f"<span style='color:#facc15'>60–69 טוב</span> · "
+            f"<span style='color:#fb923c'>50–59 מעקב</span> · "
+            f"<span style='color:#ef4444'>מתחת ל-50 חלש</span></div></div>", unsafe_allow_html=True)
+
+        # ---------- shared helpers ----------
+        TAG_SUBSTR = {"פריצה": "פריצה", "מומנטום חזק": "מומנטום חזק", "מוערכת בחסר": "מוערך",
+                      "איכות גבוהה": "איכות גבוהה", "תפנית": "תפנית", "רוטציה סקטוריאלית": "רוטציה"}
+
+        def _reason(r):
+            bits = []
+            m = _num(r.get("Ret3m"))
+            if m is not None:
+                bits.append("מומנטום חזק מאוד" if m >= 50 else "מומנטום חיובי" if m >= 15
+                            else "מומנטום שלילי" if m < 0 else "מומנטום מתון")
+            if _num(r.get("SectorScore")) is not None and r["SectorScore"] >= 66:
+                bits.append("סקטור מוביל")
+            if _num(r.get("ScoreFundamental")) is not None and r["ScoreFundamental"] >= 70:
+                bits.append("איכות גבוהה")
+            val = _num(r.get("Valuation"))
+            if val is not None:
+                bits.append("אך התמחור יקר" if val < 40 else "ובתמחור אטרקטיבי" if val >= 65 else "")
+            if r.get("RiskLevel") in ("גבוה", "גבוה מאוד"):
+                bits.append(f"בסיכון {r['RiskLevel']}")
+            bits = [b for b in bits if b]
+            return ", ".join(bits) + "." if bits else "ציון משוקלל יציב."
+
+        def _otype(tags):
+            return tags[0] if isinstance(tags, list) and tags else "—"
+
+        def _badge(text, color):
+            return f"<span class='tbadge' style='color:{color}'>{text}</span>"
+
+        def _go(tk, keyp):
+            if st.button("🔎 ניתוח מניה", key=f"{keyp}_{tk}", use_container_width=True):
+                st.session_state["dd_ticker"] = tk
+                st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                st.rerun()
+
+        def _full_card(r):
+            tk = r["Ticker"]
+            nm = VW.company_name(tk, lookup, nc)
+            sv = _num(r.get("ScoreV2"))
+            scol = VW.score_band_color(sv)
+            rb = VW.risk_badge(r.get("RiskLevel"))
+            sec_he = market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—")
+            mom = _num(r.get("Ret3m"))
+            val = _num(r.get("Valuation"))
+            qual = _num(r.get("ScoreFundamental"))
+            mom_c = POSITIVE if (mom or 0) >= 0 else NEGATIVE
+            mom_s = f"{VW.momentum_emoji(mom)} {'+' if (mom or 0) >= 0 else ''}{_i(mom)}%"
+            badges = (_badge(sec_he, PRIMARY) + _badge(f"Score V2 {_i(sv)}", scol)
+                      + _badge(f"{rb[0]} {rb[1]} / {rb[2]}", rb[3]))
+            return (f"<div class='ocard' title='לחץ \"ניתוח מניה\" לדוח מלא' style='border-right:5px solid {scol}'>"
+                    f"<div class='oc-head'><div class='oc-av' style='background:{scol}'>{tk[:2]}</div>"
+                    f"<div><div class='oc-tk'>{tk}</div><div class='oc-name'>{nm}</div></div></div>"
+                    f"<div class='oc-badges'>{badges}</div>"
+                    f"<div class='oc-metric'><span>איכות <span class='info' title='{TIP_QUAL}'>?</span></span>"
+                    f"<b style='color:{score_color(qual) if qual is not None else MUTED}'>{_i(qual)}</b></div>"
+                    f"<div class='oc-metric'><span>תמחור <span class='info' title='{TIP_VAL}'>?</span></span>"
+                    f"<b style='color:{score_color(val) if val is not None else MUTED}'>{_i(val)}</b></div>"
+                    f"<div class='oc-metric'><span>מומנטום 3ח׳ <span class='info' title='{TIP_MOM}'>?</span></span>"
+                    f"<b style='color:{mom_c}'>{mom_s}</b></div>"
+                    f"<div class='oc-reason'>{_reason(r)}</div></div>")
+
+        def _panel_item(r):
+            tk = r["Ticker"]
+            nm = VW.company_name(tk, lookup, nc)
+            sv = _num(r.get("ScoreV2"))
+            scol = VW.score_band_color(sv)
+            rb = VW.risk_badge(r.get("RiskLevel"))
+            sec_he = market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—")
+            return (f"<div class='pitem' style='--ac:{scol}'>"
+                    f"<div class='pi-tk'>{tk}</div><div class='pi-name'>{nm}</div>"
+                    f"<div class='oc-badges' style='margin:6px 0'>{_badge(sec_he, PRIMARY)}"
+                    f"{_badge('V2 ' + _i(sv), scol)}{_badge(rb[0] + ' ' + rb[1], rb[3])}</div>"
+                    f"<div class='oc-reason' style='font-size:12px'>{_reason(r)}</div></div>")
 
         opps = pd.DataFrame(uni.get("opportunities", []))
-        st.markdown("#### 🔎 סינון הזדמנויות")
         if opps.empty:
             st.caption("אין הזדמנויות מועשרות.")
         else:
-            f = st.columns(4)
-            secs = sorted([s for s in opps.get("Sector", pd.Series()).dropna().unique()])
-            sel_sec = f[0].multiselect("סקטור", secs)
-            min_score = f[1].slider("ScoreV2 מינ׳", 0, 100, 0)
-            risk_opt = f[2].selectbox("סיכון מקס׳", ["הכל", "נמוך", "בינוני", "גבוה", "גבוה מאוד"])
-            cap_opt = f[3].selectbox("שווי שוק", ["הכל", "Large (>$10B)", "Mid/Small (<$10B)"])
-            g = st.columns(3)
-            min_val = g[0].slider("שווי (Valuation) מינ׳", 0, 100, 0)
-            min_mom = g[1].slider("מומנטום 3ח׳ מינ׳ %", -50, 100, -50)
-            min_qual = g[2].slider("איכות (פונדמנטלי) מינ׳", 0, 100, 0)
+            # ---------- Filter bar ----------
+            secs = sorted([x for x in opps.get("Sector", pd.Series()).dropna().unique()])
+            with st.expander("⚙️ סינון", expanded=True):
+                if st.button("🧹 נקה סינון"):
+                    for kk in ("f_sec", "f_risk", "f_score", "f_mom", "f_val", "f_tags"):
+                        st.session_state.pop(kk, None)
+                    st.rerun()
+                a = st.columns(3)
+                sel_sec = a[0].selectbox("סקטור", ["הכל"] + secs, key="f_sec")
+                sel_risk = a[1].multiselect("רמת סיכון", ["נמוך", "בינוני", "גבוה", "גבוה מאוד"], key="f_risk")
+                sel_tags = a[2].multiselect("סוג הזדמנות", list(TAG_SUBSTR.keys()), key="f_tags")
+                b = st.columns(3)
+                min_score = b[0].slider("ציון מינימלי (Score V2)", 0, 100, 60, 5, key="f_score")
+                min_mom = b[1].slider("מומנטום מינימלי 3 חודשים", -50, 250, 0, 5, format="%d%%", key="f_mom")
+                min_val = b[2].slider("ציון תמחור מינימלי", 0, 100, 40, 5, key="f_val")
+                st.caption("Score V2: ציון משוקלל · מומנטום: תשואת 3 ח׳ · תמחור: 100 זול / 0 יקר · איכות: צמיחה+רווחיות+ROIC.")
+                st.button("✅ החל סינון")  # filters are live; this just re-runs
 
-            order = {"נמוך": 0, "בינוני": 1, "גבוה": 2, "גבוה מאוד": 3}
             v = opps.copy()
-            if sel_sec:
-                v = v[v["Sector"].isin(sel_sec)]
+            if sel_sec != "הכל":
+                v = v[v["Sector"] == sel_sec]
+            if sel_risk:
+                v = v[v["RiskLevel"].isin(sel_risk)]
             v = v[v["ScoreV2"].fillna(0) >= min_score]
-            if risk_opt != "הכל":
-                v = v[v["RiskLevel"].map(lambda x: order.get(x, 9)) <= order[risk_opt]]
-            if "Valuation" in v:
-                v = v[v["Valuation"].fillna(0) >= min_val]
             if "Ret3m" in v:
                 v = v[v["Ret3m"].fillna(-999) >= min_mom]
-            if "ScoreFundamental" in v:
-                v = v[v["ScoreFundamental"].fillna(0) >= min_qual]
-            if cap_opt != "הכל" and "MarketCap" in v:
-                mc = v["MarketCap"].fillna(0)
-                v = v[mc >= 10e9] if cap_opt.startswith("Large") else v[mc < 10e9]
+            if "Valuation" in v:
+                v = v[v["Valuation"].fillna(0) >= min_val]
+            if sel_tags:
+                subs = [TAG_SUBSTR[t] for t in sel_tags]
+                v = v[v["tags"].apply(lambda ts: isinstance(ts, list)
+                                      and any(any(su in t for t in ts) for su in subs))]
+            v = v.sort_values("ScoreV2", ascending=False)
+            st.markdown(f"**מציג {len(v)} מניות מתוך {len(opps)}**")
 
-            sec_rank = {s["sector"]: i for i, s in enumerate(
-                sorted(mkt.get("sectors", []), key=lambda x: -x.get("score", 0)), 1)}
+            # ---------- Filtered result cards ----------
+            if v.empty:
+                st.caption("אין מניות שעוברות את הסינון. נסה להרחיב את התנאים.")
+            for cs in range(0, min(len(v), 9), 3):
+                cols = st.columns(3)
+                for j, (_, r) in enumerate(v.iloc[cs:cs + 3].iterrows()):
+                    with cols[j]:
+                        st.markdown(_full_card(r), unsafe_allow_html=True)
+                        _go(r["Ticker"], "gf")
 
-            def srank(en):
-                return sec_rank.get(market.SECTOR_EN_TO_HE.get(en))
+        # ---------- Five Top-10 panels ----------
+        st.divider()
+        st.markdown("#### 🏅 פאנלים מובילים")
+        panels = [("⭐ איכות גבוהה", "high_quality"), ("🚀 מומנטום חזק", "momentum"),
+                  ("💎 מוערכות בחסר", "undervalued"), ("🏆 ציונים מובילים", "opportunities"),
+                  ("❤️ הזדמנויות נסתרות", "turnarounds")]
+        pcols = st.columns(5)
+        for i, (label, key) in enumerate(panels):
+            with pcols[i]:
+                st.markdown(f"**{label}**")
+                tickers = (uni.get("rankings", {}).get(key) or [])[:6]
+                if not tickers:
+                    st.caption("—")
+                for t in tickers:
+                    r = lookup.get(t, {"Ticker": t})
+                    st.markdown(_panel_item(r), unsafe_allow_html=True)
+                    _go(t, f"gp{i}")
 
-            show = [{"סימול": r["Ticker"], "שם": r.get("Name"), "סקטור": r.get("Sector"),
-                     "דירוג סקטור": srank(r.get("Sector")), "ScoreV2": r.get("ScoreV2"),
-                     "סיכון": r.get("RiskScore"), "שווי": r.get("Valuation"),
-                     "מומנטום 3ח׳ %": r.get("Ret3m"), "הצלחה היסט׳": r.get("HistWinRate"),
-                     "ביטחון": r.get("Confidence"),
-                     "תגיות": " · ".join(r["tags"]) if isinstance(r.get("tags"), list) else ""}
-                    for _, r in v.iterrows()]
-            st.markdown(f"**{len(show)} הזדמנויות** (מתוך {uni.get('enriched')} מועשרות)")
-            st.dataframe(pd.DataFrame(show), use_container_width=True, hide_index=True, column_config={
-                "ScoreV2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "שווי": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "הצלחה היסט׳": st.column_config.NumberColumn(format="%.0f%%")})
-        st.caption("הסינון על ההזדמנויות המועשרות (Top שעברו פונדמנטל). דירוג מומנטום מכסה את כל היקום.")
+        # ---------- Sector heatmap (Finviz-style treemap) ----------
+        sec_rows = VW.sector_intel(uni, mkt)
+        if sec_rows:
+            st.divider()
+            st.markdown("#### 🗺️ מפת חום סקטוריאלית")
+            st.caption("גודל = מספר הזדמנויות · צבע = Score V2 ממוצע (ירוק חזק · אדום חלש).")
+            labels = [f"{r['sector_he']}<br>{_i(r['avg_score'])}" for r in sec_rows]
+            fig = go.Figure(go.Treemap(
+                labels=labels, parents=[""] * len(sec_rows),
+                values=[r["n"] for r in sec_rows],
+                marker=dict(colors=[r["avg_score"] if r["avg_score"] is not None else 0 for r in sec_rows],
+                            colorscale=[[0, "#ef4444"], [0.4, "#fb923c"], [0.55, "#facc15"],
+                                        [0.7, "#22c55e"], [1, "#16a34a"]],
+                            cmin=0, cmax=100, line=dict(width=2, color=BG)),
+                textinfo="label", textfont=dict(size=15, color="#06121f"),
+                hovertemplate="%{label}<br>הזדמנויות: %{value}<extra></extra>"))
+            st.plotly_chart(style_fig(fig, 340), use_container_width=True)
 
+            # ---------- Sector intelligence table ----------
+            st.markdown("#### 📊 טבלת אינטליגנציית סקטורים")
+            reco_he = {"Overweight": "הגדלת משקל", "Neutral": "ניטרלי", "Underweight": "הקטנת משקל"}
+            reco_col = {"Overweight": POSITIVE, "Neutral": WARNING, "Underweight": NEGATIVE}
+            risk_col = {"נמוך": POSITIVE, "בינוני": WARNING, "גבוה": "#fb923c", "גבוה מאוד": NEGATIVE}
+
+            def _bar(val, color, mx=100):
+                p = max(0, min(100, (val or 0) / mx * 100))
+                return (f"<div class='miniprog'><div style='width:{p:.0f}%;background:{color}'></div></div>")
+            head = "".join(f"<th>{h}</th>" for h in
+                           ["#", "סקטור", "הזדמנויות", "חברה מובילה", "Score V2 ממוצע", "תמחור ממוצע",
+                            "מומנטום 3ח׳", "סיכון ממוצע", "המלצה"])
+            body = ""
+            for i, r in enumerate(sec_rows, 1):
+                acol = score_color(r["avg_score"]) if isinstance(r["avg_score"], (int, float)) else MUTED
+                vcol = score_color(r["avg_val"]) if isinstance(r["avg_val"], (int, float)) else MUTED
+                m3 = r.get("ret_3m")
+                mcol = POSITIVE if isinstance(m3, (int, float)) and m3 >= 0 else NEGATIVE
+                ms = (f"{'+' if m3 >= 0 else ''}{m3}%" if isinstance(m3, (int, float)) else "—")
+                rk = r.get("avg_risk")
+                body += (f"<tr><td>{i}</td>"
+                         f"<td><span class='tbadge' style='color:{PRIMARY}'>{r['sector_he']}</span></td>"
+                         f"<td><b>{r['n']}</b></td>"
+                         f"<td><b>{r['top']}</b></td>"
+                         f"<td><div style='display:flex;align-items:center;gap:8px'>{_bar(r['avg_score'], acol)}"
+                         f"<b style='color:{acol}'>{_i(r['avg_score'])}</b></div></td>"
+                         f"<td><div style='display:flex;align-items:center;gap:8px'>{_bar(r['avg_val'], vcol)}"
+                         f"<b style='color:{vcol}'>{_i(r['avg_val'])}</b></div></td>"
+                         f"<td><span style='color:{mcol}'>{ms}</span></td>"
+                         f"<td><span style='color:{risk_col.get(rk, MUTED)}'>{rk or '—'}</span></td>"
+                         f"<td><span class='tbadge' style='color:{reco_col[r['reco']]}'>{reco_he[r['reco']]}</span></td></tr>")
+            st.markdown(f"<table class='sectbl'><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>",
+                        unsafe_allow_html=True)
+            st.caption("המלצה נגזרת מחוזק הסקטור (Overweight ≥66 · Underweight <40) — דטרמיניסטי.")
 elif page == "🗺️ סקטורים":
     st.markdown("### 🗺️ אינטליגנציית סקטורים")
     sectors = mkt.get("sectors", [])
@@ -747,7 +919,8 @@ elif page == "🔎 ניתוח חברה":
     st.markdown("### 🔎 ניתוח חברה — Company Deep Dive")
     st.caption("הזן סימול מניה לקבלת ניתוח השקעה מלא. נתונים חיים מ-Yahoo Finance · " + deepdive.DISCLAIMER)
     q = st.columns([2, 1, 4])
-    tkin = q[0].text_input("סימול", value="AAPL", label_visibility="collapsed",
+    st.session_state.setdefault("dd_ticker", "AAPL")
+    tkin = q[0].text_input("סימול", key="dd_ticker", label_visibility="collapsed",
                            placeholder="לדוגמה: NVDA, AAPL, LLY, PLTR").strip().upper()
     q[1].button("🔎 נתח", use_container_width=True)
     q[2].caption("דוגמאות: NVDA · AAPL · LLY · PLTR · MSFT · GOOGL")

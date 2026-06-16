@@ -219,6 +219,50 @@ INSTITUTIONAL_CSS = f"""
   details summary {{ direction:rtl; text-align:right; font-weight:700; }}
   .stPlotlyChart {{ margin-bottom:6px; }}
 
+  /* ---------- Opportunities: ranking cards + sector table ---------- */
+  .rcard {{ background:#0f1d39; border:1px solid {BORDER}; border-right:3px solid var(--ac,{PRIMARY});
+            border-radius:10px; padding:8px 10px; margin-bottom:7px; transition:transform .12s; }}
+  .rcard:hover {{ transform:translateX(-3px); border-color:{PRIMARY}; }}
+  .rtk {{ font-weight:800; font-size:14px; }}
+  .rco {{ color:{MUTED}; font-size:11px; margin-right:6px; }}
+  .rmeta {{ font-size:12px; color:{SECONDARY}; margin-top:2px; }}
+  .rmeta b {{ font-size:12px; }}
+  .sectbl {{ width:100%; border-collapse:collapse; font-size:13px; }}
+  .sectbl th {{ text-align:right; color:{SECONDARY}; font-weight:700; font-size:12px;
+                padding:8px 10px; border-bottom:1px solid {BORDER}; white-space:nowrap; }}
+  .sectbl td {{ padding:9px 10px; border-bottom:1px solid {BORDER}; color:{TEXT}; }}
+  .sectbl tr:hover td {{ background:#0f1d39; }}
+  .secbadge {{ display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px;
+               border:1px solid currentColor; }}
+  .miniprog {{ height:7px; background:#0a1830; border:1px solid {BORDER}; border-radius:5px; overflow:hidden; min-width:70px; }}
+  .miniprog > div {{ height:100%; border-radius:5px; }}
+
+  /* ---------- Opportunity cards (terminal style) ---------- */
+  .ocard {{ background:#0f1f3d; border:1px solid {BORDER}; border-radius:18px; padding:14px 15px;
+            margin-bottom:10px; box-shadow:0 4px 16px rgba(0,0,0,.30); transition:all .18s ease;
+            position:relative; }}
+  .ocard:hover {{ border-color:{PRIMARY}; box-shadow:0 0 0 1px {PRIMARY}, 0 8px 28px rgba(0,194,255,.18);
+                  transform:translateY(-2px); }}
+  .oc-head {{ display:flex; gap:10px; align-items:center; }}
+  .oc-av {{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:13px; color:#06121f; flex:none; }}
+  .oc-tk {{ font-size:22px; font-weight:800; line-height:1.05; letter-spacing:-.5px; }}
+  .oc-name {{ color:{SECONDARY}; font-size:13px; margin-top:1px; }}
+  .oc-badges {{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 8px; }}
+  .tbadge {{ font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px;
+             border:1px solid currentColor; display:inline-flex; align-items:center; gap:4px; }}
+  .oc-reason {{ color:{TEXT}; font-size:12.5px; line-height:1.6; margin-top:2px; }}
+  .oc-metric {{ display:flex; justify-content:space-between; font-size:12.5px; color:{SECONDARY}; margin:3px 0; }}
+  .oc-metric b {{ font-size:12.5px; }}
+  .info {{ color:{MUTED}; font-size:11px; cursor:help; border:1px solid {BORDER}; border-radius:50%;
+           padding:0 5px; margin-right:3px; }}
+  /* compact item for Top-10 panels */
+  .pitem {{ background:#0f1f3d; border:1px solid {BORDER}; border-right:3px solid var(--ac,{PRIMARY});
+            border-radius:12px; padding:9px 11px; margin-bottom:8px; transition:all .15s; }}
+  .pitem:hover {{ border-color:{PRIMARY}; box-shadow:0 0 0 1px {PRIMARY}33; }}
+  .pi-tk {{ font-size:16px; font-weight:800; }}
+  .pi-name {{ color:{SECONDARY}; font-size:11.5px; margin-top:1px; }}
+
   /* ---------- Loading skeleton ---------- */
   .skeleton {{ background:linear-gradient(90deg,{CARD} 25%,{ELEV} 37%,{CARD} 63%);
       background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:10px; }}

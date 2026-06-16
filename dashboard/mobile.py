@@ -15,6 +15,7 @@ import streamlit as st
 import config
 import market
 from ranking_engine.interpret import classify
+from dashboard import views as VW
 from dashboard.theme import GREEN, AMBER, RED, BLUE, CARD, MUTED, TEXT
 
 MOBILE_CSS = f"""
@@ -84,6 +85,7 @@ def render(df, mkt):
     """Entry point: render the full mobile experience."""
     st.markdown(MOBILE_CSS, unsafe_allow_html=True)
     alerts = _load(config.ALERTS_CENTER_JSON, [])
+    uni = _load(config.UNIVERSE_JSON, {})
 
     df = df.copy()
     df["_g"] = [classify(r)["group"] for _, r in df.iterrows()]
@@ -100,7 +102,7 @@ def render(df, mkt):
         f"<b style='color:{rcol}'>{reg_s}</b> ({regime.get('label', '')}) · "
         f"פחד/חמדנות {fng.get('score', '—')}</div>", unsafe_allow_html=True)
 
-    tabs = st.tabs(["🏠 בית", "💎 הזדמנויות", "🔔 התראות"])
+    tabs = st.tabs(["🏠 בית", "💎 הזדמנויות", "🗺️ סקטורים", "🔔 התראות"])
 
     # ---------- HOME ----------
     with tabs[0]:
@@ -145,8 +147,27 @@ def render(df, mkt):
         for _, r in shown.iterrows():
             _opp_card(r)
 
-    # ---------- ALERTS ----------
+    # ---------- SECTORS (cards) ----------
     with tabs[2]:
+        st.markdown("#### 🗺️ סקטורים")
+        sec_rows = VW.sector_intel(uni, mkt) if uni else []
+        if not sec_rows:
+            st.caption("הסריקה הרחבה עדיין לא רצה (scanner.py).")
+        reco_he = {"Overweight": "הגדלת משקל", "Neutral": "ניטרלי", "Underweight": "הקטנת משקל"}
+        reco_col = {"Overweight": GREEN, "Neutral": AMBER, "Underweight": RED}
+        for r in sec_rows:
+            rc = reco_col.get(r["reco"], MUTED)
+            top = r["top"] + ("" if r["top_name"] == r["top"] else f" · {r['top_name']}")
+            st.markdown(f"<div class='mcard' style='border-right:6px solid {rc}'>"
+                        f"<div style='font-size:16px;font-weight:800'>{r['sector_he']}</div>"
+                        f"<div class='mco'>{r['n']} הזדמנויות · ScoreV2 ממוצע "
+                        f"<b>{r['avg_score'] if r['avg_score'] is not None else '—'}</b></div>"
+                        f"<div class='mco'>מובילה: {top}</div>"
+                        f"<div style='color:{rc};font-weight:700;margin-top:4px'>{reco_he.get(r['reco'], '')}</div>"
+                        f"</div>", unsafe_allow_html=True)
+
+    # ---------- ALERTS ----------
+    with tabs[3]:
         st.markdown("#### 🔔 התראות")
         if not alerts:
             st.caption("אין התראות.")
