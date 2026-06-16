@@ -123,8 +123,8 @@ INSTITUTIONAL_CSS = f"""
       margin-bottom:16px; box-shadow:0 6px 20px rgba(0,0,0,.28);
       animation:fadeUp .4s ease both; }}
   .ic-card:hover {{ border-color:{PRIMARY}55; }}
-  .ic-title {{ font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px; }}
-  .ic-sub {{ color:{MUTED}; font-size:13px; }}
+  .ic-title {{ font-size:17px; font-weight:800; display:flex; align-items:center; gap:8px; }}
+  .ic-sub {{ color:{MUTED}; font-size:14px; line-height:1.65; }}
 
   /* ---------- KPI grid ---------- */
   .kpi-grid {{ display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:18px; }}
@@ -145,8 +145,8 @@ INSTITUTIONAL_CSS = f"""
 
   /* ---------- Score / progress bars ---------- */
   .sbar {{ margin:7px 0; }}
-  .sbar-h {{ display:flex; justify-content:space-between; font-size:13px; color:{MUTED}; margin-bottom:3px; }}
-  .sbar-h b {{ font-size:13px; }}
+  .sbar-h {{ display:flex; justify-content:space-between; font-size:14px; color:{MUTED}; margin-bottom:3px; }}
+  .sbar-h b {{ font-size:14px; }}
   .sbar-t {{ height:8px; background:#0a1830; border:1px solid {BORDER}; border-radius:6px; overflow:hidden; }}
   .sbar-f {{ height:100%; border-radius:6px; animation:grow .7s cubic-bezier(.2,.8,.2,1) both; }}
 

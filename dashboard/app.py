@@ -53,6 +53,23 @@ def fmt(v, suffix="", dash="—"):
     return f"{v}{suffix}"
 
 
+NA_ = "אין נתון זמין"
+
+
+def _num_or(s):
+    """Parse the leading number out of a formatted string (e.g. '+3.46%') → float|None."""
+    import re
+    if isinstance(s, (int, float)):
+        return s if s == s else None
+    m = re.search(r"-?\d+\.?\d*", str(s).replace(",", ""))
+    return float(m.group()) if m else None
+
+
+def _disp(v):
+    """Display helper: None → 'אין נתון זמין'."""
+    return NA_ if v is None else v
+
+
 # ===========================================================================
 # Cached loaders — read precomputed artifacts (instant, no network)
 # ===========================================================================
@@ -111,6 +128,13 @@ def load_system_health() -> dict:
         with open(config.SYSTEM_HEALTH_JSON, encoding="utf-8") as fh:
             return json.load(fh)
     return {}
+
+
+@st.cache_data(ttl=1800, show_spinner=False)
+def deepdive_fetch(ticker: str):
+    """Live per-ticker data pull for the Company Deep Dive (cached 30 min)."""
+    import deepdive
+    return deepdive.fetch_bundle(ticker)
 
 
 @st.cache_data(ttl=120, show_spinner=False)
@@ -221,7 +245,7 @@ st.markdown(
 
 page = st.sidebar.radio(
     "תצוגה",
-    ["🏠 ראשי (60 שניות)", "🔭 סורק שוק", "🤖 עוזר", "📈 מניות ופירוט", "🗺️ סקטורים",
+    ["🏠 ראשי (60 שניות)", "🔭 סורק שוק", "🔎 ניתוח חברה", "🤖 עוזר", "📈 מניות ופירוט", "🗺️ סקטורים",
      "💼 תיק", "🧭 החלטות תיק", "🛡️ אמון ואימות", "🔔 התראות", "📰 חדשות", "📊 בקטסט"],
 )
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
@@ -1296,5 +1320,216 @@ elif page == "📊 בקטסט":
     else:
         st.dataframe(backtest, use_container_width=True, hide_index=True)
         st.caption("אחוז הצלחה = שיעור האיתותים שהניבו תשואה חיובית בטווח שנמדד.")
+
+elif page == "🔎 ניתוח חברה":
+    import deepdive
+    from deepdive_report import to_html
+    from indicators.technical import rsi as _rsi
+
+    st.markdown("### 🔎 ניתוח חברה — Company Deep Dive")
+    st.caption("הזן סימול מניה לקבלת ניתוח השקעה מלא. נתונים חיים מ-Yahoo Finance · " + deepdive.DISCLAIMER)
+    q = st.columns([2, 1, 4])
+    tkin = q[0].text_input("סימול", value="AAPL", label_visibility="collapsed",
+                           placeholder="לדוגמה: NVDA, AAPL, LLY, PLTR").strip().upper()
+    q[1].button("🔎 נתח", use_container_width=True)
+    q[2].caption("דוגמאות: NVDA · AAPL · LLY · PLTR · MSFT · GOOGL")
+
+    if tkin:
+        with st.spinner(f"מנתח את {tkin}…"):
+            try:
+                bundle = deepdive_fetch(tkin)
+                rep = deepdive.analyze(tkin, sectors=mkt.get("sectors"), bundle=bundle)
+            except Exception as e:
+                rep = {"error": f"שגיאה בניתוח {tkin}: {e}"}
+        if rep.get("error"):
+            st.error(rep["error"])
+        else:
+            o, md, fin = rep["overview"], rep["market_data"], rep["financials"]
+            val, sc, tech, rk = rep["valuation"], rep["scores"], rep["technicals"], rep["risk"]
+            op, pc, th = rep["opinion"], rep["pros_cons"], rep["thesis"]
+            hist = bundle.get("hist")
+
+            # ---- Summary card (Hebrew description, larger & clearer) ----
+            desc_he = o.get("summary_he")
+            sec_line = f"{o['sector_he']} · {o['industry']} · {o.get('geography','')}"
+            if desc_he:
+                body = (f"<div style='color:{TEXT};font-size:16px;line-height:1.95;margin-top:12px'>{desc_he}</div>"
+                        f"<div class='ic-sub' style='margin-top:8px'>תורגם אוטומטית מאנגלית · המקור המלא למטה</div>")
+            else:
+                body = (f"<div style='color:{TEXT};font-size:16px;line-height:1.95;margin-top:12px'>{o.get('he_line','')}</div>"
+                        f"<div class='ic-sub' style='margin-top:8px'>תרגום אוטומטי לא זמין כרגע — התיאור המלא באנגלית למטה</div>")
+            st.markdown(f"<div class='ic-card'>"
+                        f"<div class='ic-title' style='font-size:24px'>{o['name']} "
+                        f"<span style='color:{MUTED};font-size:16px'>· {tkin}</span></div>"
+                        f"<div class='ic-sub' style='font-size:15px'>{sec_line}</div>"
+                        f"{body}</div>", unsafe_allow_html=True)
+            if isinstance(o["summary"], str) and o["summary"] != NA_:
+                with st.expander("📄 תיאור מקורי (אנגלית)"):
+                    st.write(o["summary"])
+
+            # ---- KPI strip ----
+            v2 = sc["final_v2"]["value"]
+            r1y = _num_or(md["ret_1y"])
+            kk = [
+                kpi_html(PRIMARY, "💵", md["price"], "מחיר", md["daily_change"], "מחיר נוכחי ושינוי יומי"),
+                kpi_html(PRIMARY, "🏦", md["market_cap"], "שווי שוק", o["sector"], "שווי שוק"),
+                kpi_html(POSITIVE if (r1y or 0) >= 0 else NEGATIVE, "📈", md["ret_1y"], "תשואה שנה", f"3ח' {md['ret_3m']}", "תשואת 12 חודשים"),
+                kpi_html(score_color(v2), "🎯", v2, "ציון סופי v2", "משוקלל", "הציון המשוקלל של המערכת"),
+                kpi_html(score_color(sc["trust"]["value"]), "🛡️", sc["trust"]["value"], "ציון אמון", sc["trust"]["category"], "כמה לסמוך על הניתוח"),
+                kpi_html(NEGATIVE if (rk["risk_score"] or 0) >= 66 else (WARNING if (rk["risk_score"] or 0) >= 33 else POSITIVE), "⚠️", rk["risk_score"], "ציון סיכון", rk["category"], "גבוה = מסוכן יותר"),
+            ]
+            st.markdown(f"<div class='kpi-grid'>{''.join(kk)}</div>", unsafe_allow_html=True)
+
+            # ---- Returns strip ----
+            rets = [("שבוע", md["ret_1w"]), ("חודש", md["ret_1m"]), ("3 ח'", md["ret_3m"]),
+                    ("6 ח'", md["ret_6m"]), ("YTD", md["ytd"]), ("שנה", md["ret_1y"]), ("3 שנים", md["ret_3y"])]
+            chips = "".join(f"<span style='margin-left:18px'><b style='color:{MUTED}'>{lbl}</b> "
+                            f"<b style='color:{POSITIVE if (_num_or(v) or 0)>=0 else NEGATIVE}'>{v}</b></span>" for lbl, v in rets)
+            st.markdown(f"<div class='ic-card' style='padding:12px 18px'>{chips}</div>", unsafe_allow_html=True)
+
+            # ---- Price chart with MAs + support/resistance ----
+            if hist is not None and "Close" in hist.columns:
+                c = hist["Close"].dropna().tail(252)
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(y=c.values, x=list(range(len(c))), name="מחיר", line_color=PRIMARY))
+                for n, col in [(20, WARNING), (50, "#a78bfa"), (200, MUTED)]:
+                    if len(c) >= n:
+                        fig.add_trace(go.Scatter(y=c.rolling(n).mean().values, x=list(range(len(c))),
+                                                 name=f"MA{n}", line=dict(width=1.3, color=col)))
+                sr = tech["support_resistance"]
+                if sr.get("support"):
+                    fig.add_hline(y=sr["support"], line_dash="dot", line_color=POSITIVE,
+                                  annotation_text=f"תמיכה {sr['support']}")
+                if sr.get("resistance"):
+                    fig.add_hline(y=sr["resistance"], line_dash="dot", line_color=NEGATIVE,
+                                  annotation_text=f"התנגדות {sr['resistance']}")
+                fig.update_layout(title=f"{tkin} · מחיר + ממוצעים נעים (שנה)")
+                st.plotly_chart(style_fig(fig, 320), use_container_width=True)
+
+                # Volume / RSI / MACD
+                ch = st.columns(3)
+                vv = hist["Volume"].dropna().tail(120)
+                fv = go.Figure(go.Bar(y=vv.values, x=list(range(len(vv))), marker_color=PRIMARY))
+                fv.update_layout(title="נפח מסחר (120 ימים)")
+                ch[0].plotly_chart(style_fig(fv, 220), use_container_width=True)
+
+                rsis = _rsi(c, 14).dropna().tail(180)
+                fr = go.Figure(go.Scatter(y=rsis.values, x=list(range(len(rsis))), line_color=WARNING))
+                fr.add_hline(y=70, line_dash="dot", line_color=NEGATIVE)
+                fr.add_hline(y=30, line_dash="dot", line_color=POSITIVE)
+                fr.update_layout(title="RSI(14)", yaxis_range=[0, 100])
+                ch[1].plotly_chart(style_fig(fr, 220), use_container_width=True)
+
+                mser = tech["macd"].get("_series")
+                if mser:
+                    ml, sg, hh = mser["macd"].tail(180), mser["signal"].tail(180), mser["hist"].tail(180)
+                    fm = go.Figure()
+                    fm.add_trace(go.Bar(y=hh.values, x=list(range(len(hh))), name="היסטוגרמה",
+                                        marker_color=[POSITIVE if v >= 0 else NEGATIVE for v in hh.values]))
+                    fm.add_trace(go.Scatter(y=ml.values, x=list(range(len(ml))), name="MACD", line_color=PRIMARY))
+                    fm.add_trace(go.Scatter(y=sg.values, x=list(range(len(sg))), name="Signal", line_color=WARNING))
+                    fm.update_layout(title="MACD")
+                    ch[2].plotly_chart(style_fig(fm, 220), use_container_width=True)
+
+            # ---- Financials + Valuation tables ----
+            def _tbl(rows):
+                return "<table style='width:100%;border-collapse:collapse'>" + "".join(
+                    f"<tr><td style='color:{MUTED};padding:7px 8px;border-bottom:1px solid {BORDER};font-size:14.5px'>{k}</td>"
+                    f"<td style='text-align:left;padding:7px 8px;border-bottom:1px solid {BORDER};font-weight:600;font-size:14.5px'>{v}</td></tr>"
+                    for k, v in rows) + "</table>"
+            fcol = st.columns(2)
+            fcol[0].markdown("#### 💰 דוחות כספיים")
+            fcol[0].markdown("<div class='ic-card'>" + _tbl([
+                ("הכנסות", fin["revenue"]), ("צמיחת הכנסות", fin["revenue_growth"]),
+                ("רווח גולמי / שולי", f"{fin['gross_profit']} · {fin['gross_margin']}"),
+                ("רווח תפעולי / שולי", f"{fin['operating_income']} · {fin['operating_margin']}"),
+                ("רווח נקי / שולי", f"{fin['net_income']} · {fin['net_margin']}"),
+                ("רווח למניה / צמיחה", f"{fin['eps']} · {fin['eps_growth']}"),
+                ("FCF / שולי", f"{fin['fcf']} · {fin['fcf_margin']}"),
+                ("חוב / מזומן", f"{fin['debt']} · {fin['cash']}"),
+                ("חוב/הון · ROE · ROIC", f"{fin['debt_to_equity']} · {fin['roe']} · {fin['roic']}"),
+            ]) + "</div>", unsafe_allow_html=True)
+            fcol[1].markdown("#### ⚖️ תמחור")
+            vcolor = score_color(val["score"])
+            fcol[1].markdown(f"<div class='ic-card'>" + _tbl([
+                ("מכפיל עתידי", val["forward_pe"]), ("מכפיל נוכחי", val["trailing_pe"]),
+                ("PEG", val["peg"]), ("מחיר/מכירות", val["price_sales"]),
+                ("EV/EBITDA", val["ev_ebitda"]), ("מחיר/FCF", val["price_fcf"]),
+            ]) + f"<div style='margin-top:10px;font-weight:800;color:{vcolor}'>{val['label']}</div></div>",
+                unsafe_allow_html=True)
+
+            # ---- Score breakdown ----
+            st.markdown("#### 🎯 ציוני Stock Agent")
+            rh = sc["risk"]["value"]
+            bars = (score_bar("ציון סופי v2", v2) + score_bar("טכני", sc["technical"]["value"])
+                    + score_bar("פונדמנטלי", _num_or(sc["fundamental"]["value"]))
+                    + score_bar("סקטור", _num_or(sc["sector"]["value"]))
+                    + score_bar("חדשות", _num_or(sc["news"]["value"]))
+                    + score_bar("ניהול סיכון", (None if not isinstance(rh, (int, float)) else 100 - rh))
+                    + score_bar("אמון", sc["trust"]["value"]))
+            st.markdown(f"<div class='ic-card'>{bars}<div class='ic-sub' style='margin-top:8px'>{sc['final_v2']['explain']}</div></div>",
+                        unsafe_allow_html=True)
+
+            # ---- Technical analysis ----
+            st.markdown("#### 📐 ניתוח טכני")
+            ma = tech["moving_averages"]
+            tsub = tech["sub_scores"]
+            tc = st.columns([1.3, 1])
+            tc[0].markdown(f"<div class='ic-card'>"
+                           f"<div>מגמה: <b style='color:{PRIMARY}'>{tech['trend']}</b> · מומנטום: <b>{tech['momentum']}</b> · "
+                           f"RSI: <b>{tech['rsi']}</b> · ATR: <b>{tech['atr']}</b> · Cross: <b>{tech['cross']}</b></div>"
+                           f"<div class='ic-sub' style='margin-top:6px'>MA20 {ma['ma20']} · MA50 {ma['ma50']} · "
+                           f"MA100 {ma['ma100']} · MA200 {ma['ma200']}</div>"
+                           f"<div class='ic-sub'>תמיכה {_disp(tech['support_resistance'].get('support'))} · "
+                           f"התנגדות {_disp(tech['support_resistance'].get('resistance'))} · "
+                           f"מרחק משיא {_disp(tech['high_low'].get('dist_from_high'))}%</div>"
+                           f"<div style='margin-top:8px;color:{TEXT};font-size:13px;line-height:1.6'>{tech['opinion']}</div></div>",
+                           unsafe_allow_html=True)
+            tc[1].markdown("<div class='ic-card'>" + score_bar("מגמה", tsub["trend"]) + score_bar("מומנטום", tsub["momentum"])
+                           + score_bar("נפח", tsub["volume"]) + score_bar("תנודתיות (רגוע=גבוה)", tsub["volatility"]) + "</div>",
+                           unsafe_allow_html=True)
+
+            # ---- Thesis ----
+            st.markdown("#### 🧠 תזת השקעה")
+            tt = st.columns(3)
+            for col, key, lbl, color in [(tt[0], "bull", "🟢 תרחיש שורי", POSITIVE),
+                                         (tt[1], "base", "🔵 תרחיש בסיס", PRIMARY),
+                                         (tt[2], "bear", "🔴 תרחיש דובי", NEGATIVE)]:
+                col.markdown(f"<div class='ic-card' style='border-right:5px solid {color}'>"
+                             f"<div class='ic-title' style='color:{color}'>{lbl}</div>"
+                             f"<div class='ic-sub'>{th[key]}</div></div>", unsafe_allow_html=True)
+
+            # ---- Pros / Cons ----
+            pcc = st.columns(2)
+            pcc[0].markdown(f"<div class='ic-card' style='border-right:5px solid {POSITIVE}'>"
+                            f"<div class='ic-title' style='color:{POSITIVE}'>✅ למה להשקיע</div>"
+                            + "".join(f"<div class='ic-sub'>• {x}</div>" for x in pc["pros"]) + "</div>", unsafe_allow_html=True)
+            pcc[1].markdown(f"<div class='ic-card' style='border-right:5px solid {NEGATIVE}'>"
+                            f"<div class='ic-title' style='color:{NEGATIVE}'>⚠️ למה לא</div>"
+                            + "".join(f"<div class='ic-sub'>• {x}</div>" for x in pc["cons"]) + "</div>", unsafe_allow_html=True)
+
+            # ---- Competitive / Regulation (honest) ----
+            cr = st.columns(2)
+            cr[0].markdown(f"<div class='ic-card'><div class='ic-title'>🏰 מיצוב תחרותי</div>"
+                           f"<div class='ic-sub'>{rep['competitive']['note']}</div></div>", unsafe_allow_html=True)
+            cr[1].markdown(f"<div class='ic-card'><div class='ic-title'>⚖️ רגולציה וסיכוני סקטור</div>"
+                           f"<div class='ic-sub'>{rep['regulation_risks']['label']}</div>"
+                           + "".join(f"<div class='ic-sub'>• {x}</div>" for x in rep['regulation_risks']['sector_risks'])
+                           + "</div>", unsafe_allow_html=True)
+
+            # ---- Final opinion ----
+            st.markdown("#### 🏁 דעה סופית")
+            st.markdown(f"<div class='ic-card' style='border-right:6px solid {PRIMARY}'>"
+                        f"<div style='font-size:24px;font-weight:800;color:{PRIMARY}'>{op['recommendation']}</div>"
+                        f"<div style='margin-top:6px'>{op['attractive']}</div>"
+                        f"<div class='ic-sub' style='margin-top:6px'>טווח הקצאה מוצע: <b style='color:{TEXT}'>{op['allocation_pct']}%</b> · "
+                        f"פרופיל משקיע: {op['investor_profile']}</div>"
+                        f"<div class='ic-sub'>מה ישנה את ההמלצה: {op['what_changes']}</div></div>", unsafe_allow_html=True)
+
+            # ---- Export ----
+            st.download_button("📥 הורד דוח HTML", data=to_html(rep),
+                               file_name=f"deepdive_{tkin}.html", mime="text/html")
+            st.caption("עובדות: Yahoo Finance · ציונים: מנועי המערכת · תזה/דעה: מבוססת כללים על נתונים אמיתיים. "
+                       + deepdive.DISCLAIMER)
 
 st.caption("לצרכי מידע בלבד, אין לראות בכך ייעוץ השקעות.")

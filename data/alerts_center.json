@@ -25,27 +25,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — כיסוי חדש:  → Market Perform (Bernstein)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "UNH",
     "severity": "מידע",
     "message": "UNH — אישרור: Outperform → Outperform (Mizuho)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש:  → Buy (China Renaissance)"
   },
   {
     "type": "שינוי דירוג",
@@ -55,21 +37,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "COST",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Buy → Buy (Loop Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — reit: Buy → Buy (TD Cowen)"
+    "message": "NVDA — כיסוי חדש:  → Buy (China Renaissance)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,9 +49,39 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "מידע",
+    "message": "PG — כיסוי חדש:  → Market Perform (Bernstein)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — אישרור: Buy → Buy (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Buy → Buy (Loop Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
     "message": "GOOGL — reit: Buy → Buy (Needham)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — reit: Buy → Buy (TD Cowen)"
   },
   {
     "type": "שינוי דירוג",

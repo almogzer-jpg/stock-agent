@@ -7,5 +7,6 @@ streamlit>=1.30.0    # Dashboard UI
 plotly>=5.18.0       # Interactive charts in the dashboard
 matplotlib>=3.7.0    # Sparkline charts for the email/report
 lxml>=5.0.0          # Parse index constituents (Wikipedia) for the universe
+deep-translator>=1.11.0  # Auto-translate company summaries to Hebrew (best-effort, optional)
 pytest>=8.0.0        # Test suite (dev)
 pytest-cov>=4.1.0    # Test coverage (dev)
