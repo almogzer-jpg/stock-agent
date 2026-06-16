@@ -11,7 +11,6 @@ data/*
 !data/alerts_center.json
 !data/backtest.json
 !data/system_health.json
-!data/portfolio.json
 !data/universe.json
 # keep ignoring logs, excel, caches and the timestamped outputs/
 data/outputs/

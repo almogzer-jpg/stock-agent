@@ -26,7 +26,6 @@ from ranking_engine.factor_scores import factor_scores
 from ranking_engine.score import score_breakdown, COMPONENT_LABELS_HE
 from news.headlines import get_headlines
 from news.sentiment import score_headlines
-from assistant import answer as assistant_answer
 from explain import explain as explain_stock
 import trust as trust_engine
 from dashboard.theme import (DARK_CSS, style_fig, GREEN, AMBER, RED, BLUE, CARD, MUTED, TEXT,
@@ -245,8 +244,8 @@ st.markdown(
 
 page = st.sidebar.radio(
     "תצוגה",
-    ["🏠 ראשי (60 שניות)", "🔭 סורק שוק", "🔎 ניתוח חברה", "🤖 עוזר", "📈 מניות ופירוט", "🗺️ סקטורים",
-     "💼 תיק", "🧭 החלטות תיק", "🛡️ אמון ואימות", "🔔 התראות", "📰 חדשות", "📊 בקטסט"],
+    ["🏠 ראשי", "🔎 ניתוח חברה", "💎 הזדמנויות", "🗺️ סקטורים", "🚨 התראות",
+     "📊 אינטליגנציית שוק", "⚙️ הגדרות"],
 )
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
 st.sidebar.divider()
@@ -447,7 +446,6 @@ if page.startswith("🏠"):
     breadth = mkt.get("breadth", {})
     indices = mkt.get("indices", [])
     ins = mkt.get("insights", {})
-    pf = load_portfolio()
     alerts = load_alert_center()
     health = load_system_health()
 
@@ -457,7 +455,7 @@ if page.startswith("🏠"):
     fg_c = (NEGATIVE if isinstance(fg_s, (int, float)) and fg_s < 45
             else POSITIVE if isinstance(fg_s, (int, float)) and fg_s > 55 else WARNING)
     crit = [a for a in alerts if a.get("severity") in ("קריטית", "גבוהה")]
-    hp = (pf.get("health") or {}).get("score") if not pf.get("empty") else None
+    br_score = (breadth or {}).get("score")
     tr = health.get("avg_trust")
 
     def _kpi(ac, ico, val, lab, sub, tip):
@@ -474,8 +472,8 @@ if page.startswith("🏠"):
              "מספר המניות בסטטוס חיובי היום"),
         _kpi(NEGATIVE if crit else MUTED, "🔔", len(crit), "התראות קריטיות", f"מתוך {len(alerts)} סה\"כ",
              "התראות בחומרה גבוהה/קריטית"),
-        _kpi(score_color(hp), "💼", fmt(hp), "בריאות תיק", "פיזור · ריכוז · סיכון" if hp is not None else "אין תיק",
-             "ציון בריאות התיק 0-100"),
+        _kpi(score_color(br_score), "🌐", fmt(br_score), "רוחב שוק", "% מהמניות במגמה",
+             "מדד רוחב שוק 0-100 — כמה מהמניות במגמה חיובית"),
         _kpi(score_color(tr), "🛡️", fmt(round(tr) if isinstance(tr, (int, float)) else None), "ציון אמון",
              "ממוצע מערכת", "ממוצע ציון האמון על פני המניות שנסרקו"),
     ]
@@ -502,30 +500,18 @@ if page.startswith("🏠"):
                     + f"<div class='ic-sub' style='margin-top:8px'>גורמים תורמים — נגזרים מ-S&P מול ממוצעים 200/50 ורמת VIX.</div></div>",
                     unsafe_allow_html=True)
     with c[1]:
-        st.markdown("#### ✅ מה לעשות היום?")
-        decisions = pf.get("decisions") or {}
-        holds = [h for h in decisions.get("holdings", []) if h.get("action") != "Hold"]
-        holds.sort(key=lambda h: {"גבוהה": 0, "בינונית": 1, "נמוכה": 2}.get(h.get("priority"), 3))
-        if holds:
-            grid = "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:12px'>"
-            grid += "".join(action_card_html(i, h) for i, h in enumerate(holds[:3], start=1))
-            st.markdown(grid + "</div>", unsafe_allow_html=True)
-            extras = decisions.get("rebalancing_actions", []) or decisions.get("today", [])
-            extras = [e for e in extras if not e.startswith(("🟡", "🟢", "🔴"))][:3]
-            if extras:
-                st.markdown("<div class='ic-sub' style='margin-top:10px'>" +
-                            "".join(f"• {e}<br>" for e in extras) + "</div>", unsafe_allow_html=True)
-        else:
-            top3 = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(3)
-            grid = "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:12px'>"
-            for i, (_, r) in enumerate(top3.iterrows(), start=1):
-                info = classify(r)
-                grid += (f"<div class='act' style='--ac:{PRIMARY}'><div class='a-pr'>🎯 עדיפות {i}</div>"
-                         f"<div class='a-ti'>בחן {r['Ticker']}</div>"
-                         f"<div class='a-row'><b>למה:</b> {info['summary']}</div>"
-                         f"<div class='a-row'><b>ציון V2:</b> {int(r['ScoreV2'])} · <b>ביטחון:</b> {fmt(r.get('Confidence'))}%</div></div>")
-            st.markdown(grid + "</div>", unsafe_allow_html=True)
-            st.caption("אין תיק פעיל — להפעלת פעולות תיק, מלא portfolio.csv.")
+        st.markdown("#### 💎 הזדמנויות לבחינה היום")
+        top3 = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(3)
+        grid = "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:12px'>"
+        for i, (_, r) in enumerate(top3.iterrows(), start=1):
+            info = classify(r)
+            grid += (f"<div class='act' style='--ac:{info['color']}'><div class='a-pr'>🎯 עדיפות {i}</div>"
+                     f"<div class='a-ti'>בחן {r['Ticker']}</div>"
+                     f"<div class='a-row'><b>למה:</b> {info['summary']}</div>"
+                     f"<div class='a-row'><b>ציון V2:</b> {int(r['ScoreV2'])} · <b>סיכון:</b> {fmt(r.get('RiskLevel'))} · "
+                     f"<b>ביטחון:</b> {fmt(r.get('Confidence'))}%</div></div>")
+        st.markdown(grid + "</div>", unsafe_allow_html=True)
+        st.caption("לניתוח מעמיק של מניה — עבור ללשונית 🔎 ניתוח חברה.")
 
     # ---------- Section 3: Markets strip + S&P trend ----------
     st.markdown("#### 🌐 שווקים")
@@ -565,12 +551,10 @@ if page.startswith("🏠"):
                 for rank, (_, r) in enumerate(shown.iterrows(), start=1):
                     tk = r["Ticker"]
                     opp_card(rank, r)
-                    b = st.columns([1, 1, 6])
+                    b = st.columns([1, 5])
                     if b[0].button("🔍 ניתוח", key=f"an_{k}_{tk}"):
                         analyzed.discard(tk) if tk in analyzed else analyzed.add(tk)
                         st.rerun()
-                    if b[1].button("➕ לתיק", key=f"add_{k}_{tk}"):
-                        st.toast(f"להוספת {tk} לתיק: ערוך portfolio.csv (Ticker,Quantity,AverageCost) ולחץ רענון.", icon="➕")
                     if tk in analyzed:
                         ex = explain_stock(r, events.get(tk))
                         full_why = "".join(f"<li>{x}</li>" for x in (ex["why_buy"] or ex["why_watch"] or [])[:5]) or "<li>—</li>"
@@ -591,8 +575,8 @@ if page.startswith("🏠"):
 # PAGE: AI assistant
 # ===========================================================================
 
-elif page == "🔭 סורק שוק":
-    st.markdown("### 🔭 סורק שוק — מנוע גילוי הזדמנויות מרחבי השוק")
+elif page == "💎 הזדמנויות":
+    st.markdown("### 💎 הזדמנויות — גילוי מרחבי השוק (ציונים · מומנטום · ערך · מובילי סקטור)")
     uni = load_universe()
     if not uni:
         st.info("הסריקה הרחבה עדיין לא רצה. הרץ במסוף: `python scanner.py ALL` (כ‑1.5 דקות), ואז רענן.")
@@ -678,224 +662,6 @@ elif page == "🔭 סורק שוק":
                 "הצלחה היסט׳": st.column_config.NumberColumn(format="%.0f%%")})
         st.caption("הסינון על ההזדמנויות המועשרות (Top שעברו פונדמנטל). דירוג מומנטום מכסה את כל היקום.")
 
-elif page == "🤖 עוזר":
-    st.markdown("#### 🤖 עוזר חכם — שאל שאלה על המניות שלך")
-    st.caption("דוגמאות: \"מה המניות הכי חזקות?\" · \"מה הציון של NVDA?\" · "
-               "\"כמה מועמדות לפריצה?\" · \"מה מצב השוק?\"")
-    if "chat" not in st.session_state:
-        st.session_state.chat = [("assistant",
-            "שלום! 👋 שאל אותי בעברית על תוצאות הסריקה.")]
-    for role, msg in st.session_state.chat:
-        with st.chat_message(role, avatar=("🤖" if role == "assistant" else "🙂")):
-            st.markdown(msg, unsafe_allow_html=True)
-    q = st.chat_input("הקלד שאלה בעברית…")
-    if q:
-        st.session_state.chat.append(("user", q))
-        with st.chat_message("user", avatar="🙂"):
-            st.markdown(q)
-        ans = assistant_answer(q, df, mkt)
-        st.session_state.chat.append(("assistant", ans))
-        with st.chat_message("assistant", avatar="🤖"):
-            st.markdown(ans, unsafe_allow_html=True)
-
-
-# ===========================================================================
-# PAGE: stocks + detail
-# ===========================================================================
-
-elif page == "📈 מניות ופירוט":
-    st.markdown("#### 📋 כל המניות — שקיפות ציונים")
-    sectors_data = mkt.get("sectors", [])
-    rows = []
-    for rank, (_, r) in enumerate(df.iterrows(), start=1):
-        info = classify(r)
-        rows.append({
-            "דירוג": rank, "סימול": r["Ticker"], "שם": r["Name"],
-            "מחיר": r["Price"], "שינוי %": r["DailyChange%"],
-            "סופי v2": int(r["ScoreV2"]),
-            "טכני": int(r["Score"]),
-            "פונדמנטלי": r.get("ScoreFundamental"),
-            "סקטור": market.sector_score_for(r.get("Sector"), sectors_data),
-            "סיכון": r.get("ScoreRisk"),
-            "המלצה": f"{info['emoji']} {info['label']}",
-            "מגמה": chart_series(r["Ticker"]),
-        })
-    bar = lambda: st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d")
-    st.dataframe(
-        pd.DataFrame(rows), use_container_width=True, hide_index=True,
-        column_config={
-            "מחיר": st.column_config.NumberColumn(format="$%.2f"),
-            "שינוי %": st.column_config.NumberColumn(format="%.2f%%"),
-            "סופי v2": bar(), "טכני": bar(), "פונדמנטלי": bar(),
-            "סקטור": bar(), "סיכון": bar(),
-            "מגמה": st.column_config.LineChartColumn(width="small"),
-        },
-    )
-    st.caption("ציון סופי = הציון הטכני-מומנטום שמדרג. פונדמנטלי/סקטור/סיכון = עדשות "
-               "משלימות (0–100). ציון חדשות מוצג בכרטיס המניה (נמשך בזמן אמת).")
-    st.divider()
-    st.markdown("#### 🔍 כרטיס מניה")
-    sym = st.selectbox("בחר מניה", df["Ticker"].tolist())
-    r = df[df["Ticker"] == sym].iloc[0]
-    info = classify(r)
-    heads, news_sent = get_news_sentiment(sym)
-    series = chart_series(sym)
-    fs = factor_scores(r, closes=series, fundamentals=r, news_sent=news_sent)
-
-    left, right = st.columns([3, 2])
-    with left:
-        st.markdown(f"### {info['emoji']} {sym} — {r['Name']}")
-        st.markdown(f"<div style='color:{info['color']};font-weight:bold;font-size:17px'>{info['summary']}</div>"
-                    f"<div style='color:{MUTED};margin-bottom:8px'>{info['detail']}</div>",
-                    unsafe_allow_html=True)
-        if series:
-            fig = go.Figure(go.Scatter(y=series, line_color=BLUE, fill="tozeroy"))
-            st.plotly_chart(style_fig(fig, 260), use_container_width=True)
-        action = {"positive": "✅ קנייה / מעקב חיובי", "watch": "🟡 מעקב",
-                  "avoid": "🔴 להימנעות"}[info["group"]]
-        st.markdown(f"<div class='card'><b>פעולה מוצעת:</b> {action} · "
-                    f"פוטנציאל עלייה {fmt(r.get('ExpectedUpside%'),'%')} · "
-                    f"ביטחון {fmt(r.get('Confidence'))} ({fmt(r.get('ConfidenceLevel'))})</div>",
-                    unsafe_allow_html=True)
-        # Structured explanation (Phase 5)
-        ex = explain_stock(r, events.get(sym))
-        e1, e2 = st.columns(2)
-        with e1:
-            st.markdown("**✅ למה כן (Why Buy)**")
-            for x in ex["why_buy"]:
-                st.markdown(f"- {x}")
-            if ex["why_watch"]:
-                st.markdown("**🟡 למה במעקב**")
-                for x in ex["why_watch"]:
-                    st.markdown(f"- {x}")
-        with e2:
-            st.markdown("**🔴 למה לא (Why Avoid)**")
-            for x in (ex["why_avoid"] or ["אין סיבות הימנעות בולטות."]):
-                st.markdown(f"- {x}")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("**⚡ קטליזטורים (Key Catalysts)**")
-            for x in ex["catalysts"]:
-                st.markdown(f"- {x}")
-        with c2:
-            st.markdown("**⚠️ סיכונים (Key Risks)**")
-            for x in ex["risks"]:
-                st.markdown(f"- {x}")
-    sec_score = market.sector_score_for(r.get("Sector"), mkt.get("sectors", []))
-    with right:
-        axes = ["טכני", "פונדמנטלי", "סקטור", "חדשות", "ביטחון"]
-        vals = [fs["technical"], fs["fundamental"] or 0, sec_score or 0,
-                fs["news"] or 50, 100 - fs["risk"]]
-        fig = go.Figure(go.Scatterpolar(r=vals + [vals[0]], theta=axes + [axes[0]],
-                                        fill="toself", line_color=GREEN))
-        fig.update_layout(polar=dict(radialaxis=dict(range=[0, 100])))
-        st.plotly_chart(style_fig(fig, 300), use_container_width=True)
-
-    st.markdown("##### 🎯 פירוט הציונים")
-    m = st.columns(6)
-    v2 = int(r["ScoreV2"]); v1 = int(r["Score"]); delta = v2 - v1
-    m[0].metric("⭐ סופי v2", v2, f"{delta:+d} מול טכני")
-    m[1].metric("טכני (v1)", fmt(fs["technical"]))
-    m[2].metric("פונדמנטלי", fmt(fs["fundamental"], dash="אין נתון"))
-    m[3].metric("סקטור", fmt(sec_score, dash="אין נתון"))
-    m[4].metric("חדשות", fmt(fs["news"]))
-    m[5].metric("סיכון", fmt(fs["risk"]))
-
-    # Composite v2 contribution breakdown (sums to the v2 score).
-    st.markdown("**🧮 מרכיבי הציון הסופי v2** (פונדמנטלי 35% · טכני 25% · סקטור 20% · חדשות 10% · סיכון 10%)")
-    contrib = {"פונדמנטלי": r.get("ContribFund"), "טכני": r.get("ContribTech"),
-               "סקטור": r.get("ContribSector"), "חדשות": r.get("ContribNews"),
-               "ניהול סיכון": r.get("ContribRisk")}
-    bars = "".join(
-        f"<div style='margin:3px 0'>{name}: <b>{fmt(v,' נק׳')}</b>"
-        f"<div style='background:#233456;border-radius:4px;height:8px;width:100%'>"
-        f"<div style='background:{GREEN};height:8px;border-radius:4px;"
-        f"width:{min(100,(v or 0)/35*100):.0f}%'></div></div></div>"
-        for name, v in contrib.items())
-    st.markdown(f"<div class='card'>{bars}"
-                f"<div style='margin-top:8px;color:{MUTED};font-size:13px'>"
-                f"סכום = <b>{v2}</b> = הציון הסופי · שלמות נתונים {fmt(r.get('Completeness'),'%')}</div></div>",
-                unsafe_allow_html=True)
-    with st.expander("🔎 פירוק הציון הטכני (רכיב מתוך v2)"):
-        bd = score_breakdown(r)
-        for k, val in bd.items():
-            st.markdown(f"- **{COMPONENT_LABELS_HE.get(k, k)}:** {val} נק׳")
-        st.caption(f"סכום הרכיבים הטכניים = {int(round(sum(bd.values())))} = הציון הטכני (25% מ-v2).")
-
-    # Risk Intelligence panel (Part 2): beta / volatility / max drawdown.
-    st.markdown("##### 🛡️ פרופיל סיכון")
-    rk = st.columns(4)
-    rk[0].metric("ביתא", fmt(r.get("Beta"), dash="אין נתון"))
-    rk[1].metric("תנודתיות שנתית", fmt(r.get("Volatility"), "%", dash="אין נתון"))
-    rk[2].metric("ירידה מקסימלית", fmt(r.get("MaxDrawdown"), "%", dash="אין נתון"))
-    rk[3].metric("רמת סיכון", fmt(r.get("RiskLevel")))
-    rw = r.get("RiskWarnings")
-    if isinstance(rw, str) and rw.strip():
-        st.markdown("<div class='card' style='border-right:4px solid " + RED + "'>⚠️ " +
-                    rw.replace(" · ", "<br>⚠️ ") + "</div>", unsafe_allow_html=True)
-    st.caption("ביתא = רגישות לשוק (S&P 500) · תנודתיות שנתית · ירידה מקסימלית = הנפילה "
-               "הגדולה ביותר מהשיא בשנה האחרונה. ציון הסיכון מזין את הציון הסופי v2.")
-
-    # "Why should I trust this recommendation?" (Part 4 — backtest validation)
-    bt = load_backtest().get(sym)
-    st.markdown("##### 🤔 למה לסמוך על ההמלצה?")
-    if bt and bt.get("occurrences"):
-        cset = {"גבוה": GREEN, "בינוני": AMBER, "נמוך": RED}.get(bt.get("confidence"), MUTED)
-        b = st.columns(4)
-        b[0].metric("מופעים דומים בעבר", bt["occurrences"])
-        b[1].metric("אחוז הצלחה", fmt(bt.get("win_rate"), "%"))
-        b[2].metric("תשואה ממוצעת", fmt(bt.get("avg_return"), "%"))
-        b[3].metric("OOS הצלחה", fmt(bt.get("oos_win_rate"), "%", dash="—"))
-        st.markdown(
-            f"<div class='card'>רמת ביטחון: <b style='color:{cset}'>{bt.get('confidence')}</b> · "
-            f"תשואה חציונית {fmt(bt.get('median_return'), '%')} · "
-            f"החזקה ממוצעת {fmt(bt.get('avg_holding'))} ימים · "
-            f"מול בנצ׳מרק {fmt(bt.get('benchmark_rel'), '%', dash='—')} · "
-            f"ירידה מקס׳ {fmt(bt.get('max_drawdown'), '%')}</div>", unsafe_allow_html=True)
-        rw = r.get("RiskWarnings")
-        if isinstance(rw, str) and rw.strip():
-            st.markdown(f"**סיכונים עיקריים:** {rw}")
-        if bt["occurrences"] < 4:
-            st.caption("⚠️ מדגם קטן (פחות מ‑4 מופעים) — האות לא אומת מספיק; להתייחס בזהירות.")
-        st.caption("מבוסס על סימולציית עסקאות היסטוריות של אות הפריצה (כניסה באות; יציאה בשבירת "
-                   "ממוצע 50 יום או עד 20 ימי מסחר), כולל אימות Out-of-Sample (30% אחרונים).")
-    else:
-        st.caption("אין מספיק איתותים היסטוריים למניה זו — לא ניתן לאמת את האות סטטיסטית. "
-                   "להתייחס בזהירות יתרה.")
-
-    # Fundamental metrics panel (real yfinance data; 'אין נתון' if missing).
-    def _cap(v):
-        if not isinstance(v, (int, float)) or v != v:
-            return "אין נתון"
-        for unit, div in [("T", 1e12), ("B", 1e9), ("M", 1e6)]:
-            if abs(v) >= div:
-                return f"${v/div:.2f}{unit}"
-        return f"${v:.0f}"
-    st.markdown("##### 🧮 נתונים פונדמנטליים")
-    sec = r.get("Sector")
-    st.caption(f"סקטור: {sec if isinstance(sec,str) and sec else 'אין נתון'} · "
-               f"שווי שוק: {_cap(r.get('MarketCap'))}")
-    fdefs = [("צמיחת הכנסות", "RevenueGrowth", "%"), ("צמיחת רווח למניה", "EPSGrowth", "%"),
-             ("צמיחת תזרים חופשי", "FCFGrowth", "%"), ("שולי תפעול", "OperatingMargin", "%"),
-             ("חוב/הון", "DebtToEquity", "x"), ("ROIC", "ROIC", "%"),
-             ("PEG", "PEG", ""), ("מכפיל עתידי", "ForwardPE", "")]
-    fcols = st.columns(4)
-    for i, (lbl, key, suf) in enumerate(fdefs):
-        fcols[i % 4].metric(lbl, fmt(r.get(key), suf, dash="אין נתון"))
-
-    st.caption("💡 הציונים הקנייניים מחושבים מנתונים אמיתיים. פוטנציאל עלייה: "
-               "מודל פנימי (מרחק משיא × ציון טכני + תנודתיות). ביטחון: הסכמת אותות + איכות נתונים + בקטסט.")
-    if heads:
-        st.markdown("**כותרות אחרונות:**")
-        for h in heads[:5]:
-            st.markdown(f"- {h['title']}  <span style='color:{MUTED}'>· {h['publisher']}</span>",
-                        unsafe_allow_html=True)
-
-
-# ===========================================================================
-# PAGE: sectors
-# ===========================================================================
-
 elif page == "🗺️ סקטורים":
     st.markdown("### 🗺️ אינטליגנציית סקטורים")
     sectors = mkt.get("sectors", [])
@@ -949,335 +715,8 @@ elif page == "🗺️ סקטורים":
 # PAGE: alerts / news / backtest
 # ===========================================================================
 
-elif page == "💼 תיק":
-    st.markdown("### 💼 ניהול תיק")
-    pf = load_portfolio()
-    st.caption("הנתונים נטענים מ‑portfolio.csv. ערוך למטה את ההחזקות שלך, או העלה CSV "
-               "(עמודות: Ticker, Quantity, AverageCost).")
-
-    if pf.get("empty"):
-        st.info("אין החזקות עדיין. הוסף שורות בטבלה למטה ולחץ 'שמור והרץ'.")
-    else:
-        # --- Section 1: Executive KPI strip ---
-        bm = pf.get("benchmark", {})
-        prisk = pf.get("risk", {})
-        h = pf.get("health", {})
-        hs = h.get("score")
-        dch = pf.get("daily_change_pct", 0) or 0
-        wbeta = prisk.get("weighted_beta")
-        effn = prisk.get("effective_positions")
-        conc = prisk.get("concentration_risk")
-        beta_c = NEGATIVE if isinstance(wbeta, (int, float)) and wbeta > 1.2 else POSITIVE
-        conc_c = (NEGATIVE if isinstance(conc, (int, float)) and conc >= 66
-                  else WARNING if isinstance(conc, (int, float)) and conc >= 40 else POSITIVE)
-        kp = [
-            kpi_html(PRIMARY, "💰", f"${pf['total_value']:,.0f}", "שווי תיק",
-                     f"רווח כולל {pf['total_pl_pct']:+.1f}%", "שווי שוק נוכחי של ההחזקות"),
-            kpi_html(POSITIVE if dch >= 0 else NEGATIVE, "📅", f"{dch:+.2f}%", "שינוי יומי",
-                     f"מול S&P {bm.get('daily', 0):+.2f}%", "שינוי יומי מול הבנצ׳מרק"),
-            kpi_html(score_color(hs), "🩺", fmt(hs), "בריאות תיק", "פיזור · ריכוז · סיכון",
-                     "ציון בריאות התיק 0-100"),
-            kpi_html(beta_c, "📊", fmt(wbeta), "ביתא תיק", "רגישות לשוק",
-                     "ביתא משוקללת מול S&P 500"),
-            kpi_html(POSITIVE if isinstance(effn, (int, float)) and effn >= 4 else WARNING, "🧩",
-                     fmt(effn), "פיזור", "פוזיציות אפקטיביות", "1/HHI — כמה פוזיציות שקולות זה למעשה"),
-            kpi_html(conc_c, "🎯", fmt(conc), "ריכוז", "0=מפוזר · 100=מרוכז", "ציון ריכוז התיק 0-100"),
-        ]
-        st.markdown(f"<div class='kpi-grid'>{''.join(kp)}</div>", unsafe_allow_html=True)
-
-        # --- Section 2: Allocation + health ---
-        st.markdown("#### 📊 הקצאה ובריאות")
-        _donut = [PRIMARY, POSITIVE, WARNING, NEGATIVE, "#a78bfa", "#f472b6", "#22d3ee"]
-        cc = st.columns([1.1, 1, 1])
-        with cc[0]:
-            exp_s = pf["exposures"].get("sector", {})
-            if exp_s:
-                fig = go.Figure(go.Pie(labels=list(exp_s.keys()), values=list(exp_s.values()),
-                                       hole=0.58, marker=dict(colors=_donut)))
-                fig.update_traces(textinfo="label+percent", textfont_size=11)
-                fig.update_layout(title="הקצאה לפי סקטור", showlegend=False)
-                st.plotly_chart(style_fig(fig, 250), use_container_width=True)
-        with cc[1]:
-            exp_r = pf["exposures"].get("risk", {})
-            if exp_r:
-                fig = go.Figure(go.Pie(labels=list(exp_r.keys()), values=list(exp_r.values()),
-                                       hole=0.58, marker=dict(colors=[POSITIVE, WARNING, NEGATIVE, "#7f1d1d"])))
-                fig.update_traces(textinfo="label+percent", textfont_size=11)
-                fig.update_layout(title="חשיפה לפי סיכון", showlegend=False)
-                st.plotly_chart(style_fig(fig, 250), use_container_width=True)
-        with cc[2]:
-            fig = go.Figure(go.Indicator(
-                mode="gauge+number", value=hs or 0,
-                number={"font": {"color": score_color(hs), "size": 34}},
-                gauge={"axis": {"range": [0, 100]}, "bar": {"color": score_color(hs), "thickness": 0.3},
-                       "bgcolor": "rgba(0,0,0,0)", "borderwidth": 0,
-                       "steps": [{"range": [0, 40], "color": "#2a1320"},
-                                 {"range": [40, 66], "color": "#2c2a12"},
-                                 {"range": [66, 100], "color": "#0f2e1c"}]}))
-            style_fig(fig, 250)
-            fig.update_layout(title="בריאות תיק")
-            st.plotly_chart(fig, use_container_width=True)
-        if h.get("factors"):
-            st.caption(" · ".join(h["factors"]))
-
-        # --- Section 3: Risk contribution + correlation ---
-        st.markdown("#### 🛡️ תרומת סיכון וקורלציות")
-        rcc = st.columns(2)
-        posdf = pd.DataFrame(pf["positions"])
-        with rcc[0]:
-            if {"ticker", "weight", "beta"}.issubset(posdf.columns):
-                rd = posdf.dropna(subset=["beta"]).copy()
-                rd["contrib"] = (rd["weight"] / 100.0 * rd["beta"]).round(3)
-                rd = rd.sort_values("contrib")
-                bcol = [NEGATIVE if v > 0.3 else (WARNING if v > 0.15 else POSITIVE) for v in rd["contrib"]]
-                fig = go.Figure(go.Bar(x=rd["contrib"], y=rd["ticker"], orientation="h",
-                                       marker_color=bcol,
-                                       text=[f"{v:.2f}" for v in rd["contrib"]], textposition="auto"))
-                fig.update_layout(title="תרומת סיכון (משקל × ביתא)")
-                st.plotly_chart(style_fig(fig, 300), use_container_width=True)
-                st.caption("אומדן תרומת כל החזקה לסיכון התיק = משקל × ביתא.")
-        with rcc[1]:
-            corr = pf.get("correlation", {}).get("matrix", {})
-            if corr and len(corr) >= 2:
-                tk = list(corr.keys())
-                z = [[corr[a].get(b, 0) for b in tk] for a in tk]
-                fig = go.Figure(go.Heatmap(z=z, x=tk, y=tk, zmin=-1, zmax=1, colorscale="RdYlGn_r",
-                                           text=z, texttemplate="%{text:.2f}", textfont_size=10))
-                fig.update_layout(title="מטריצת קורלציה (תשואות יומיות)")
-                st.plotly_chart(style_fig(fig, 300), use_container_width=True)
-
-        # --- Section 4: Highlights — concentration / hidden corr / actions ---
-        hi = st.columns(3)
-        warns = prisk.get("warnings", [])
-        hi[0].markdown(f"<div class='card' style='border-right:5px solid {NEGATIVE}'>"
-                       f"<div class='ic-title'>🎯 ריכוזים</div>" +
-                       ("".join(f"<div class='ic-sub'>⚠️ {w}</div>" for w in warns)
-                        or "<div class='ic-sub'>אין ריכוז חריג</div>") + "</div>", unsafe_allow_html=True)
-        hp = pf.get("correlation", {}).get("high_pairs", [])
-        hi[1].markdown(f"<div class='card' style='border-right:5px solid {WARNING}'>"
-                       f"<div class='ic-title'>🔗 קורלציות סמויות</div>" +
-                       ("".join(f"<div class='ic-sub'>{p['a']}–{p['b']} ({p['corr']})</div>" for p in hp)
-                        or "<div class='ic-sub'>אין זוגות מתואמים גבוה</div>") + "</div>", unsafe_allow_html=True)
-        today_acts = (pf.get("decisions") or {}).get("today", [])[:4]
-        hi[2].markdown(f"<div class='card' style='border-right:5px solid {PRIMARY}'>"
-                       f"<div class='ic-title'>✅ פעולות מוצעות</div>" +
-                       ("".join(f"<div class='ic-sub'>{a}</div>" for a in today_acts)
-                        or "<div class='ic-sub'>אין פעולות</div>") + "</div>", unsafe_allow_html=True)
-
-        # --- Holdings table ---
-        st.markdown("##### 📋 החזקות")
-        pos = pd.DataFrame(pf["positions"])
-        cols = ["ticker", "name", "quantity", "avg_cost", "price", "market_value",
-                "pl", "pl_pct", "weight", "beta", "volatility", "sector"]
-        view = pos[[c for c in cols if c in pos.columns]].copy()
-        view.columns = ["סימול", "שם", "כמות", "מחיר ממוצע", "מחיר נוכחי",
-                        "שווי שוק", "רווח/הפסד", "רווח %", "משקל %", "ביתא", "תנודתיות", "סקטור"][:len(view.columns)]
-        st.dataframe(view, use_container_width=True, hide_index=True, column_config={
-            "מחיר ממוצע": st.column_config.NumberColumn(format="$%.2f"),
-            "מחיר נוכחי": st.column_config.NumberColumn(format="$%.2f"),
-            "שווי שוק": st.column_config.NumberColumn(format="$%.0f"),
-            "רווח/הפסד": st.column_config.NumberColumn(format="$%.0f"),
-            "רווח %": st.column_config.NumberColumn(format="%.1f%%"),
-            "משקל %": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%.0f"),
-        })
-
-        # --- Portfolio alerts ---
-        if pf.get("alerts"):
-            st.markdown("##### 🔔 התראות תיק")
-            for a in pf["alerts"]:
-                col = RED if a["severity"] == "גבוהה" else AMBER
-                st.markdown(f"<div class='card' style='border-right:4px solid {col};padding:8px 12px'>"
-                            f"<b style='color:{col}'>{a['scope']}</b> · {a['message']}</div>",
-                            unsafe_allow_html=True)
-
-    # --- Edit holdings ---
-    st.divider()
-    st.markdown("##### ✏️ עריכת החזקות")
-    current = pd.read_csv(config.PORTFOLIO_CSV) if os.path.exists(config.PORTFOLIO_CSV) \
-        else pd.DataFrame(columns=["Ticker", "Quantity", "AverageCost"])
-    edited = st.data_editor(current, num_rows="dynamic", use_container_width=True,
-                            key="pf_editor")
-    cc = st.columns([1, 1, 3])
-    if cc[0].button("💾 שמור והרץ", use_container_width=True):
-        edited.to_csv(config.PORTFOLIO_CSV, index=False, encoding="utf-8-sig")
-        with st.spinner("מחשב תיק מחדש…"):
-            try:
-                run_scan(); ok = True
-            except Exception:
-                ok = False
-        st.cache_data.clear()
-        st.success("נשמר ועודכן!") if ok else st.error("העדכון נכשל.")
-        st.rerun()
-    up = cc[1].file_uploader("📤 ייבוא CSV", type=["csv"], label_visibility="collapsed")
-    if up is not None:
-        try:
-            imp = pd.read_csv(up)
-            imp.to_csv(config.PORTFOLIO_CSV, index=False, encoding="utf-8-sig")
-            st.success("הקובץ יובא! לחץ 'שמור והרץ' לעדכון.")
-        except Exception as exc:
-            st.error(f"ייבוא נכשל: {exc}")
-
-elif page == "🧭 החלטות תיק":
-    st.markdown("### 🧭 החלטות תיק — מנוע החלטות")
-    pf = load_portfolio()
-    dec = pf.get("decisions", {})
-    if pf.get("empty") or not dec:
-        st.info("אין החזקות/החלטות. הוסף החזקות בטאב 💼 תיק ולחץ 'שמור והרץ'.")
-    else:
-        averb = {"Increase": "🟢 הגדל", "Hold": "🔵 החזק", "Reduce": "🟡 הקטן", "Exit": "🔴 צא"}
-        H = dec["holdings"]
-
-        st.markdown("#### 📌 מה לעשות היום?")
-        for a in (dec.get("today") or ["אין פעולות נדרשות היום."]):
-            st.markdown(f"- {a}")
-
-        if dec.get("constraints"):
-            st.markdown("#### ⚠️ אילוצים שנפרצו")
-            for c in dec["constraints"]:
-                st.markdown(f"<div class='card' style='border-right:4px solid {RED};padding:8px 12px'>"
-                            f"{c}</div>", unsafe_allow_html=True)
-
-        st.divider()
-        st.markdown("#### 📊 הקצאה: נוכחית מול מומלצת")
-        tk = [h["ticker"] for h in H]
-        fig = go.Figure()
-        fig.add_bar(name="נוכחי", x=tk, y=[h["current_pct"] for h in H], marker_color=BLUE)
-        fig.add_bar(name="מומלץ", x=tk, y=[h["target_pct"] for h in H], marker_color=GREEN)
-        fig.update_layout(barmode="group", yaxis_title="% מהתיק")
-        st.plotly_chart(style_fig(fig, 300), use_container_width=True)
-
-        rows = [{"סימול": h["ticker"], "פעולה": averb[h["action"]], "כעת %": h["current_pct"],
-                 "יעד %": h["target_pct"], "עדיפות": h["priority"], "ביטחון": h["confidence"],
-                 "v2": h["score_v2"], "שווי": h.get("valuation"), "סיכון": h["risk_level"],
-                 "השפעת סיכון": h["risk_impact"]} for h in H]
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True, column_config={
-            "ביטחון": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-            "v2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-            "שווי": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d")})
-
-        st.markdown("#### 🔎 הסבר לכל החלטה (Why / נתונים / סיכונים)")
-        for h in H:
-            with st.expander(f"{averb[h['action']]} · {h['ticker']} — {h['name']}  "
-                             f"(כעת {h['current_pct']}% → יעד {h['target_pct']}%)"):
-                st.markdown(f"**למה:** {h['reasoning']}")
-                st.markdown("**נתונים תומכים:** " + " · ".join(h["why"]))
-                st.markdown("**סיכונים שנותרו:** " + " · ".join(h["risks"]))
-
-        st.divider()
-        st.markdown("#### ⚖️ איזון מחדש")
-        rc1, rc2 = st.columns(2)
-        with rc1:
-            st.markdown("**סקטורים בעודף משקל**")
-            ow = dec.get("overweight_sectors", [])
-            for s in ow:
-                st.markdown(f"- {s['sector']} ({s['weight']}%) — {s['reason']}")
-            if not ow:
-                st.caption("אין עודף משקל סקטוריאלי.")
-        with rc2:
-            st.markdown("**סקטורים חזקים בחוסר משקל**")
-            uw = dec.get("underweight_sectors", [])
-            for s in uw:
-                st.markdown(f"- {s['sector']} (ציון {s['score']}, כעת {s['weight']}%)")
-            if not uw:
-                st.caption("אין.")
-        if dec.get("risk_actions"):
-            st.markdown("**🛡️ פעולות הפחתת סיכון**")
-            for a in dec["risk_actions"]:
-                st.markdown(f"- {a}")
-        st.caption("כל החלטה מבוססת על ScoreV2 + סיכון + חוזק סקטור + ריכוז + קורלציה + מצב שוק. "
-                   "לעולם לא ממליץ על ריכוז. לצרכי מידע בלבד, לא ייעוץ.")
-
-elif page == "🛡️ אמון ואימות":
-    st.markdown("### 🛡️ אמון ואימות")
-    sh = load_system_health()
-    bt_all = load_backtest()
-
-    st.markdown("#### 🩺 בריאות מערכת")
-    c = st.columns(6)
-    c[0].metric("מניות נסרקו", sh.get("scanned", "—"))
-    c[1].metric("איתותים", sh.get("signals", "—"))
-    c[2].metric("שלמות נתונים", f"{sh.get('data_completeness', '—')}%")
-    c[3].metric("משיכות שנכשלו", sh.get("failed_pulls", "—"))
-    c[4].metric("ביטחון ממוצע", sh.get("avg_confidence", "—"))
-    c[5].metric("אמון ממוצע", sh.get("avg_trust", "—"))
-    sd = sh.get("sector_distribution", {})
-    if sd:
-        fig = go.Figure(go.Bar(x=list(sd.values()), y=list(sd.keys()),
-                               orientation="h", marker_color=BLUE))
-        fig.update_layout(title="התפלגות הזדמנויות לפי סקטור")
-        st.plotly_chart(style_fig(fig, 240), use_container_width=True)
-
-    st.divider()
-    st.markdown("#### 📋 אמון לכל מניה")
-    emap = {"גבוה": "🟢", "בינוני": "🟡", "נמוך": "🔴"}
-    rows = []
-    for _, r in df.sort_values("TrustScore", ascending=False).iterrows():
-        sr = trust_engine.signal_reliability(r, bt_all.get(r["Ticker"]))
-        rows.append({"סימול": r["Ticker"], "אמון": int(r["TrustScore"]),
-                     "רמה": f"{emap.get(r['TrustCategory'], '')} {r['TrustCategory']}",
-                     "ScoreV2": int(r["ScoreV2"]), "ביטחון": sr["confidence"],
-                     "הצלחה היסט׳": sr["hist_win_rate"], "מופעים": sr["occurrences"],
-                     "עודף מול S&P": sr["excess_return"]})
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True, column_config={
-        "אמון": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-        "ScoreV2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-        "הצלחה היסט׳": st.column_config.NumberColumn(format="%.0f%%"),
-        "עודף מול S&P": st.column_config.NumberColumn(format="%.1f%%")})
-
-    st.divider()
-    st.markdown("#### 🔬 פירוט אמון למניה")
-    sym = st.selectbox("בחר מניה", df["Ticker"].tolist(), key="trust_sym")
-    r = df[df["Ticker"] == sym].iloc[0]
-    ti = trust_engine.trust_score(r, bt_all.get(sym))
-    sr = trust_engine.signal_reliability(r, bt_all.get(sym))
-    g1, g2 = st.columns([1, 2])
-    with g1:
-        col = {"גבוה": GREEN, "בינוני": AMBER, "נמוך": RED}.get(ti["category"], MUTED)
-        st.markdown(f"**ציון אמון: {emap.get(ti['category'], '')} {ti['category']}**")
-        fig = go.Figure(go.Indicator(mode="gauge+number", value=ti["score"],
-                                     number={"font": {"color": TEXT}},
-                                     gauge={"axis": {"range": [0, 100]}, "bar": {"color": col}}))
-        st.plotly_chart(style_fig(fig, 200), use_container_width=True)
-    with g2:
-        m = st.columns(3)
-        m[0].metric("ביטחון", sr["confidence"])
-        m[1].metric("הצלחה היסט׳", fmt(sr["hist_win_rate"], "%", dash="—"))
-        m[2].metric("מופעים", fmt(sr["occurrences"], dash="—"))
-        m2 = st.columns(3)
-        m2[0].metric("תשואה ממוצעת", fmt(sr["avg_return"], "%", dash="—"))
-        m2[1].metric("עודף מול S&P", fmt(sr["excess_return"], "%", dash="—"))
-        m2[2].metric("ירידה מקס׳", fmt(sr["max_drawdown"], "%", dash="—"))
-    e1, e2 = st.columns(2)
-    with e1:
-        st.markdown("**✅ למה לסמוך על ההמלצה?**")
-        for s in ti["strengths"]:
-            st.markdown(f"- {s}")
-    with e2:
-        st.markdown("**⚠️ למה להיזהר?**")
-        for lim in ti["limitations"]:
-            st.markdown(f"- {lim}")
-    with st.expander("פירוק ציון האמון (7 גורמים)"):
-        flabels = {"data_quality": "איכות נתונים", "historical_validation": "אימות היסטורי",
-                   "sample_size": "גודל מדגם", "out_of_sample": "Out-of-Sample",
-                   "fundamental_completeness": "שלמות פונדמנטלית",
-                   "score_consistency": "עקביות ציונים", "risk_model": "מודל סיכון"}
-        for k, v in ti["factors"].items():
-            st.markdown(f"- {flabels.get(k, k)}: {v} נק׳")
-
-    st.divider()
-    st.markdown("#### ⚠️ מגבלות ידועות של המערכת")
-    for lim in ["מקור נתונים יחיד (Yahoo Finance) — ללא גיבוי",
-                "בסורק השוק מועשרות רק Top-40 (לא כל היקום)",
-                "בקטסט במדגם קטן לחלק מהמניות — אימות מוגבל",
-                "סנטימנט חדשות מבוסס מילון בסיסי",
-                "Russell 2000 לא נכלל ביקום",
-                "לצרכי מידע בלבד — לא ייעוץ השקעות"]:
-        st.markdown(f"- {lim}")
-    st.info("הדאשבורד עונה: **מה ההזדמנויות** (🏠/🔭) · **כמה לסמוך** (כאן) · "
-            "**אילו ראיות** (📊 בקטסט) · **אילו סיכונים** (🔔/🛡️).")
-
-elif page == "🔔 התראות":
-    st.markdown("### 🔔 מרכז התראות")
+elif page == "🚨 התראות":
+    st.markdown("### 🚨 מרכז התראות — דוחות · פריצות · זינוקי נפח · חדשות מהותיות")
     center = load_alert_center()
     if not center:
         st.caption("אין התראות פעילות כרגע.")
@@ -1299,27 +738,6 @@ elif page == "🔔 התראות":
                 f"<span style='color:{MUTED};font-size:12px'>· {a['scope']}</span><br>"
                 f"<span style='color:{TEXT}'>{a['message']}</span></div>",
                 unsafe_allow_html=True)
-
-elif page == "📰 חדשות":
-    st.markdown("#### 📰 חדשות אחרונות (מניות מובילות)")
-    for _, r in (positive.head(6) if not positive.empty else df.head(6)).iterrows():
-        heads, sent = get_news_sentiment(r["Ticker"])
-        tone = GREEN if sent["score"] >= 60 else (RED if sent["score"] <= 40 else AMBER)
-        st.markdown(f"<div class='card'><b>{r['Ticker']}</b> — {r['Name']} "
-                    f"<span style='color:{tone}'>· סנטימנט {sent['score']}</span></div>",
-                    unsafe_allow_html=True)
-        for h in heads[:3]:
-            st.markdown(f"- {h['title']}  <span style='color:{MUTED}'>· {h['publisher']}</span>",
-                        unsafe_allow_html=True)
-
-elif page == "📊 בקטסט":
-    st.markdown("#### 📊 ביצועי אות הפריצה בעבר (Backtest אמיתי)")
-    _, backtest = read_outputs()
-    if backtest.empty:
-        st.caption("אין נתוני בקטסט.")
-    else:
-        st.dataframe(backtest, use_container_width=True, hide_index=True)
-        st.caption("אחוז הצלחה = שיעור האיתותים שהניבו תשואה חיובית בטווח שנמדד.")
 
 elif page == "🔎 ניתוח חברה":
     import deepdive
@@ -1531,5 +949,57 @@ elif page == "🔎 ניתוח חברה":
                                file_name=f"deepdive_{tkin}.html", mime="text/html")
             st.caption("עובדות: Yahoo Finance · ציונים: מנועי המערכת · תזה/דעה: מבוססת כללים על נתונים אמיתיים. "
                        + deepdive.DISCLAIMER)
+
+elif page == "📊 אינטליגנציית שוק":
+    st.markdown("### 📊 אינטליגנציית שוק — נתונים ועדויות")
+    st.caption("כל המספרים נגזרים מנתוני שוק/דוחות וממנועי הניקוד הדטרמיניסטיים — ניתנים לשחזור.")
+    sh = load_system_health()
+    k = st.columns(4)
+    k[0].metric("מניות שנסרקו", sh.get("scanned", "—"))
+    k[1].metric("שלמות נתונים", fmt(sh.get("data_completeness"), "%"))
+    k[2].metric("אמון ממוצע", fmt(sh.get("avg_trust")))
+    k[3].metric("משיכות שנכשלו", sh.get("failed_pulls", "—"))
+
+    st.markdown("#### 📈 טבלת מניות מדורגת")
+    cols = ["Ticker", "Name", "ScoreV2", "Score", "ScoreFundamental", "ScoreRisk",
+            "TrustScore", "RiskLevel", "ExpectedUpside%", "Confidence", "DailyChange%"]
+    view = df[[c for c in cols if c in df.columns]].copy().sort_values("ScoreV2", ascending=False)
+    view = view.rename(columns={c: L.get(c, c) for c in view.columns})
+    pcfg = {L[c]: st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d")
+            for c in ("ScoreV2", "Score", "ScoreFundamental", "TrustScore")
+            if c in df.columns and L.get(c) in view.columns}
+    st.dataframe(view, use_container_width=True, hide_index=True, column_config=pcfg)
+    st.caption("ScoreV2 = שקלול פונדמנטלי 35% · טכני 25% · סקטור 20% · חדשות 10% · סיכון 10%.")
+
+    st.markdown("#### 📊 בקטסט — ביצועי אות הפריצה בעבר")
+    _, backtest = read_outputs()
+    if backtest.empty:
+        st.caption("אין נתוני בקטסט.")
+    else:
+        st.dataframe(backtest, use_container_width=True, hide_index=True)
+        st.caption("אחוז הצלחה = שיעור האיתותים שהניבו תשואה חיובית (כולל אימות Out-of-Sample).")
+
+elif page == "⚙️ הגדרות":
+    st.markdown("### ⚙️ הגדרות")
+    st.markdown(f"<div class='ic-card'><div class='ic-title'>📅 מצב הנתונים</div>"
+                f"<div class='ic-sub'>עודכן לאחרונה: <b>{latest}</b></div>"
+                f"<div class='ic-sub'>{len(df)} מניות ברשימת המעקב · מקור: Yahoo Finance (חינמי)</div></div>",
+                unsafe_allow_html=True)
+    if st.button("🔄 רענן נתונים עכשיו", help="מריץ סריקה מחדש (כ‑30–60 שניות). ללא שליחת מייל."):
+        with st.spinner("מריץ סריקה מחדש…"):
+            try:
+                run_scan(); ok = True
+            except Exception:
+                ok = False
+        if ok:
+            st.cache_data.clear(); st.success("עודכן!"); st.rerun()
+        else:
+            st.error("הרענון נכשל.")
+    st.markdown("<div class='ic-card'><div class='ic-title'>ℹ️ אודות</div>"
+                "<div class='ic-sub'>Stock Agent Pro — פלטפורמת אינטליגנציה השקעתית <b>מבוססת-נתונים בלבד</b>. "
+                "<b>ללא AI/LLM וללא המלצות אישיות</b> — כל מסקנה נגזרת מנתוני שוק, דוחות כספיים, מדדים מחושבים "
+                "ומנועי ניקוד דטרמיניסטיים, וניתנת לשחזור.</div>"
+                "<div class='ic-sub'>המערכת עונה: מה קורה · למה · מה הסיכונים · האם החברה אטרקטיבית · זול/הוגן/יקר.</div>"
+                "<div class='ic-sub'>⚠️ מידע בלבד, לא ייעוץ השקעות.</div></div>", unsafe_allow_html=True)
 
 st.caption("לצרכי מידע בלבד, אין לראות בכך ייעוץ השקעות.")

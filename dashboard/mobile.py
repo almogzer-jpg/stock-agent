@@ -83,7 +83,6 @@ def _opp_card(r):
 def render(df, mkt):
     """Entry point: render the full mobile experience."""
     st.markdown(MOBILE_CSS, unsafe_allow_html=True)
-    pf = _load(config.PORTFOLIO_JSON, {})
     alerts = _load(config.ALERTS_CENTER_JSON, [])
 
     df = df.copy()
@@ -101,7 +100,7 @@ def render(df, mkt):
         f"<b style='color:{rcol}'>{reg_s}</b> ({regime.get('label', '')}) · "
         f"פחד/חמדנות {fng.get('score', '—')}</div>", unsafe_allow_html=True)
 
-    tabs = st.tabs(["🏠 בית", "💎 הזדמנויות", "💼 תיק", "🔔 התראות"])
+    tabs = st.tabs(["🏠 בית", "💎 הזדמנויות", "🔔 התראות"])
 
     # ---------- HOME ----------
     with tabs[0]:
@@ -109,16 +108,6 @@ def render(df, mkt):
                     f"<div class='mco'>מצב שוק</div>"
                     f"<div class='big' style='color:{rcol}'>{reg_s} · {regime.get('label', '')}</div>"
                     f"</div>", unsafe_allow_html=True)
-
-        # What should I do today?
-        today = (pf.get("decisions", {}) or {}).get("today", [])
-        st.markdown("#### ✅ מה לעשות היום?")
-        if today:
-            for a in today[:4]:
-                st.markdown(f"<div class='mcard' style='padding:10px 14px'>{a}</div>",
-                            unsafe_allow_html=True)
-        else:
-            st.caption("אין פעולות תיק. ראה הזדמנויות בלשונית 💎.")
 
         # Top 3 opportunities
         st.markdown("#### 💎 3 ההזדמנויות המובילות")
@@ -138,14 +127,6 @@ def render(df, mkt):
                            f"<div class='mco'>סקטור חלש</div><div style='font-size:17px;font-weight:800'>"
                            f"{w['sector']}</div><div>ציון {w['score']}</div></div>", unsafe_allow_html=True)
 
-        # Portfolio health
-        if not pf.get("empty") and pf.get("health"):
-            h = pf["health"]["score"]
-            hcol = GREEN if h >= 66 else (AMBER if h >= 40 else RED)
-            st.markdown(f"<div class='mcard'><div class='mco'>בריאות תיק</div>"
-                        f"<div class='big' style='color:{hcol}'>{h}/100</div></div>",
-                        unsafe_allow_html=True)
-
         # Critical alerts (high severity)
         crit = [a for a in alerts if a.get("severity") == "גבוהה"][:3]
         if crit:
@@ -164,35 +145,8 @@ def render(df, mkt):
         for _, r in shown.iterrows():
             _opp_card(r)
 
-    # ---------- PORTFOLIO ----------
-    with tabs[2]:
-        st.markdown("#### 💼 תיק")
-        if pf.get("empty") or not pf.get("positions"):
-            st.caption("אין החזקות. ערוך portfolio.csv בגרסת המחשב.")
-        else:
-            cc = st.columns(2)
-            cc[0].metric("שווי תיק", f"${pf['total_value']:,.0f}", f"{pf['total_pl_pct']:+.1f}%")
-            cc[1].metric("שינוי יומי", f"{pf.get('daily_change_pct', 0):+.2f}%")
-            # Top holding risk
-            risky = max(pf["positions"], key=lambda p: {"נמוך": 0, "בינוני": 1, "גבוה": 2,
-                                                        "גבוה מאוד": 3}.get(p.get("risk_level"), 0))
-            st.markdown(f"<div class='mcard'><div class='mco'>סיכון ההחזקה הגדולה</div>"
-                        f"<b>{risky['ticker']}</b> · {_fmt(risky.get('risk_level'))} · "
-                        f"משקל {risky.get('weight', 0):.0f}%</div>", unsafe_allow_html=True)
-            # Sector exposure warning
-            warns = (pf.get("risk", {}) or {}).get("warnings", [])
-            for w in warns[:2]:
-                st.markdown(f"<div class='mcard' style='border-right:6px solid {AMBER};padding:10px 14px'>"
-                            f"⚠️ {w}</div>", unsafe_allow_html=True)
-            # Suggested action
-            today = (pf.get("decisions", {}) or {}).get("today", [])
-            if today:
-                st.markdown("#### פעולה מוצעת")
-                st.markdown(f"<div class='mcard' style='border-right:6px solid {BLUE};padding:10px 14px'>"
-                            f"{today[0]}</div>", unsafe_allow_html=True)
-
     # ---------- ALERTS ----------
-    with tabs[3]:
+    with tabs[2]:
         st.markdown("#### 🔔 התראות")
         if not alerts:
             st.caption("אין התראות.")
