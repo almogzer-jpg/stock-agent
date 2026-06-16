@@ -21,8 +21,19 @@ POSITIVE = "#00E676"    # bullish / good
 WARNING = "#FFC107"     # caution
 NEGATIVE = "#FF5252"    # bearish / bad
 TEXT = "#E6EDF7"        # primary text
-MUTED = "#94A3B8"       # secondary text
+SECONDARY = "#B8C4D9"   # secondary text (axis ticks, captions) — WCAG-AA on BG
+MUTED = "#94A3B8"       # muted text (lowest allowed — still AA on BG)
 ELEV = "#16284d"        # slightly elevated surface (gradients/hover)
+
+# Accessible chart line colors (Phase: chart readability) — all ≥3:1 on BG.
+LINE_PRICE = "#00C2FF"
+LINE_MA20 = "#FFC107"
+LINE_MA50 = "#B388FF"
+LINE_MA200 = "#E6EDF7"
+LINE_UP = "#00E676"
+LINE_DOWN = "#FF5252"
+LINE_RSI = "#00C2FF"
+LINE_VOLUME = "#26A69A"
 
 # --- Legacy aliases (so existing tabs + mobile.py keep working) ----------
 GREEN = POSITIVE
@@ -230,19 +241,51 @@ INSTITUTIONAL_CSS = f"""
 DARK_CSS = INSTITUTIONAL_CSS
 
 
+def _rel_luminance(hex_color):
+    """WCAG relative luminance of a #RRGGBB color."""
+    h = hex_color.lstrip("#")
+    rgb = [int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4)]
+    lin = [(c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4) for c in rgb]
+    return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+
+def contrast_ratio(fg, bg=BG):
+    """WCAG contrast ratio between two #RRGGBB colors (1.0–21.0)."""
+    l1, l2 = _rel_luminance(fg), _rel_luminance(bg)
+    hi, lo = max(l1, l2), min(l1, l2)
+    return round((hi + 0.05) / (lo + 0.05), 2)
+
+
+def passes_aa(fg, bg=BG, large=False):
+    """True if fg/bg meets WCAG AA (4.5:1 normal text, 3:1 large/graphical)."""
+    return contrast_ratio(fg, bg) >= (3.0 if large else 4.5)
+
+
 def style_fig(fig, height: int = 300):
-    """Apply the institutional dark theme to a Plotly figure."""
+    """Apply the institutional dark theme to a Plotly figure with WCAG-AA text.
+
+    paper/plot = #08111f, primary font = #E6EDF7, axis ticks = #B8C4D9 (both AA),
+    gridlines = #1f3257, legend/title/hover all high-contrast. No chart text is
+    ever darker than #94A3B8.
+    """
     fig.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Inter, Segoe UI, Arial", color=TEXT, size=12),
-        margin=dict(l=10, r=10, t=34, b=10),
+        paper_bgcolor=BG,
+        plot_bgcolor=BG,
+        font=dict(family="Inter, Segoe UI, Arial", color=TEXT, size=13),
+        title=dict(font=dict(color=TEXT, size=15)),
+        margin=dict(l=14, r=14, t=42, b=14),
         height=height,
-        hoverlabel=dict(bgcolor=CARD, bordercolor=BORDER, font_size=12),
-        legend=dict(orientation="h", y=-0.2),
+        hoverlabel=dict(bgcolor=CARD, bordercolor=PRIMARY, font=dict(color=TEXT, size=12.5)),
+        legend=dict(orientation="h", y=-0.2, font=dict(color=TEXT, size=12.5),
+                    bgcolor="rgba(16,32,64,0.85)", bordercolor=BORDER, borderwidth=1),
         transition=dict(duration=350, easing="cubic-in-out"),
     )
-    fig.update_xaxes(gridcolor=BORDER, zerolinecolor=BORDER)
-    fig.update_yaxes(gridcolor=BORDER, zerolinecolor=BORDER)
+    axis = dict(showgrid=True, gridcolor=BORDER, zerolinecolor=BORDER,
+                linecolor=BORDER, tickfont=dict(color=SECONDARY, size=12),
+                title=dict(font=dict(color=SECONDARY, size=12.5)))
+    fig.update_xaxes(**axis)
+    fig.update_yaxes(**axis)
+    # Any annotations default to the high-contrast primary text color.
+    fig.update_annotations(font=dict(color=TEXT))
     return fig

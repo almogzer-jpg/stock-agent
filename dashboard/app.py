@@ -810,7 +810,7 @@ elif page == "🔎 ניתוח חברה":
                 c = hist["Close"].dropna().tail(252)
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(y=c.values, x=list(range(len(c))), name="מחיר", line_color=PRIMARY))
-                for n, col in [(20, WARNING), (50, "#a78bfa"), (200, MUTED)]:
+                for n, col in [(20, "#FFC107"), (50, "#B388FF"), (200, "#E6EDF7")]:
                     if len(c) >= n:
                         fig.add_trace(go.Scatter(y=c.rolling(n).mean().values, x=list(range(len(c))),
                                                  name=f"MA{n}", line=dict(width=1.3, color=col)))
@@ -827,12 +827,12 @@ elif page == "🔎 ניתוח חברה":
                 # Volume / RSI / MACD
                 ch = st.columns(3)
                 vv = hist["Volume"].dropna().tail(120)
-                fv = go.Figure(go.Bar(y=vv.values, x=list(range(len(vv))), marker_color=PRIMARY))
+                fv = go.Figure(go.Bar(y=vv.values, x=list(range(len(vv))), marker_color="#26A69A"))
                 fv.update_layout(title="נפח מסחר (120 ימים)")
                 ch[0].plotly_chart(style_fig(fv, 220), use_container_width=True)
 
                 rsis = _rsi(c, 14).dropna().tail(180)
-                fr = go.Figure(go.Scatter(y=rsis.values, x=list(range(len(rsis))), line_color=WARNING))
+                fr = go.Figure(go.Scatter(y=rsis.values, x=list(range(len(rsis))), line_color="#00C2FF"))
                 fr.add_hline(y=70, line_dash="dot", line_color=NEGATIVE)
                 fr.add_hline(y=30, line_dash="dot", line_color=POSITIVE)
                 fr.update_layout(title="RSI(14)", yaxis_range=[0, 100])
