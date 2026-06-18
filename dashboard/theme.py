@@ -310,7 +310,15 @@ INSTITUTIONAL_CSS = f"""
                                .opp .o-cols {{ grid-template-columns:1fr; }} }}
   @media (max-width:640px) {{ .kpi-grid {{ grid-template-columns:repeat(2,1fr); }}
       .block-container {{ padding:.5rem !important; }} .kpi .k-val {{ font-size:30px; }}
-      h2 {{ font-size:19px; }} }}
+      h2 {{ font-size:19px; }}
+      /* stack columns full-width on mobile (filters, cards, etc.) */
+      [data-testid="stHorizontalBlock"] {{ flex-wrap:wrap; }}
+      [data-testid="stHorizontalBlock"] > [data-testid="column"] {{ flex:1 1 100% !important; min-width:100% !important; }} }}
+
+  /* filter form card */
+  [data-testid="stForm"] {{ background:linear-gradient(180deg,{ELEV},{CARD}); border:1px solid {BORDER};
+      border-radius:16px; padding:16px 18px; box-shadow:0 4px 14px rgba(0,0,0,.22); }}
+  [data-testid="stForm"] label {{ font-weight:600; }}
 </style>
 """
 

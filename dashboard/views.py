@@ -81,11 +81,14 @@ def kpi_highlights(uni, mkt):
                  if secs else None)
     opps = uni.get("opportunities", [])
 
-    def _top(metric):
+    def _top(metric, lowest=False):
         cand = [o for o in opps if isinstance(o.get(metric), (int, float))]
-        return max(cand, key=lambda o: o[metric]) if cand else None
+        if not cand:
+            return None
+        return min(cand, key=lambda o: o[metric]) if lowest else max(cand, key=lambda o: o[metric])
     return {"strongest": strongest, "best_mom": _top("Ret3m"),
-            "high_score": _top("ScoreV2"), "undervalued": _top("Valuation")}
+            "high_score": _top("ScoreV2"), "undervalued": _top("Valuation"),
+            "lowest_risk": _top("RiskScore", lowest=True)}
 
 
 def ranking_rows(uni: dict, key: str, lookup=None, nc=None, n: int = 10) -> list:

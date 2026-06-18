@@ -604,7 +604,7 @@ elif page == "💎 הזדמנויות":
         def _num(x):
             return x if isinstance(x, (int, float)) and x == x else None
 
-        # ---------- Top summary bar (4 premium KPI cards) ----------
+        # ---------- Top summary bar (5 premium KPI cards) ----------
         hi = VW.kpi_highlights(uni, mkt)
 
         def _kc(ico, val, lab, sub, ac, tip):
@@ -612,22 +612,26 @@ elif page == "💎 הזדמנויות":
                     f"<div style='font-size:19px;font-weight:800;color:{ac};line-height:1.15'>{val}</div>"
                     f"<div class='k-lab'>{lab}</div><div class='k-sub'>{sub}</div></div>")
         kc = []
-        s, bm, hs, uv = hi["strongest"], hi["best_mom"], hi["high_score"], hi["undervalued"]
-        if s:
-            kc.append(_kc("🏆", s["sector_he"], "הסקטור החזק ביותר", f"ציון ממוצע {_i(s['avg_score'])}",
-                          POSITIVE, "הסקטור עם החוזק והציון הממוצע הגבוהים ביותר."))
+        hs, bm, uv, lr, s = (hi["high_score"], hi["best_mom"], hi["undervalued"],
+                             hi.get("lowest_risk"), hi["strongest"])
+        if hs:
+            kc.append(_kc("⭐", hs["Ticker"], "הציון הגבוה ביותר", f"Score V2: {_i(hs.get('ScoreV2'))}",
+                          VW.score_band_color(hs.get("ScoreV2")), TIP_SCORE))
         if bm:
             m = bm.get("Ret3m")
             kc.append(_kc("🚀", bm["Ticker"], "מומנטום מוביל",
                           f"{VW.momentum_emoji(m)} {'+' if (m or 0) >= 0 else ''}{_i(m)}% (3ח׳)", PRIMARY,
                           "המניה עם תשואת 3 החודשים הגבוהה ביותר."))
-        if hs:
-            kc.append(_kc("⭐", hs["Ticker"], "הציון הגבוה ביותר", f"Score V2: {_i(hs.get('ScoreV2'))}",
-                          VW.score_band_color(hs.get("ScoreV2")), TIP_SCORE))
         if uv:
             kc.append(_kc("💎", uv["Ticker"], "המוערכת ביותר בחסר", f"ציון תמחור: {_i(uv.get('Valuation'))}",
                           WARNING, TIP_VAL))
-        st.markdown(f"<div class='kpi-grid' style='grid-template-columns:repeat(4,1fr)'>{''.join(kc)}</div>",
+        if lr:
+            kc.append(_kc("🛡️", lr["Ticker"], "הסיכון הנמוך ביותר", f"ציון סיכון: {_i(lr.get('RiskScore'))}",
+                          POSITIVE, "המניה עם ציון הסיכון הנמוך ביותר (תנודתיות/ביתא/Drawdown)."))
+        if s:
+            kc.append(_kc("🏆", s["sector_he"], "הסקטור החזק ביותר", f"ציון ממוצע {_i(s['avg_score'])}",
+                          "#38bdf8", "הסקטור עם החוזק והציון הממוצע הגבוהים ביותר."))
+        st.markdown(f"<div class='kpi-grid' style='grid-template-columns:repeat(5,1fr)'>{''.join(kc)}</div>",
                     unsafe_allow_html=True)
 
         # ---------- Score V2 explanation ----------
@@ -721,21 +725,34 @@ elif page == "💎 הזדמנויות":
         else:
             # ---------- Filter bar ----------
             secs = sorted([x for x in opps.get("Sector", pd.Series()).dropna().unique()])
-            with st.expander("⚙️ סינון", expanded=True):
-                if st.button("🧹 נקה סינון"):
-                    for kk in ("f_sec", "f_risk", "f_score", "f_mom", "f_val", "f_tags"):
-                        st.session_state.pop(kk, None)
-                    st.rerun()
+            with st.form("opp_filters", border=True):
+                st.markdown("##### 🔎 סינון הזדמנויות")
                 a = st.columns(3)
                 sel_sec = a[0].selectbox("סקטור", ["הכל"] + secs, key="f_sec")
-                sel_risk = a[1].multiselect("רמת סיכון", ["נמוך", "בינוני", "גבוה", "גבוה מאוד"], key="f_risk")
-                sel_tags = a[2].multiselect("סוג הזדמנות", list(TAG_SUBSTR.keys()), key="f_tags")
+                sel_risk = a[1].multiselect("רמת סיכון", ["נמוך", "בינוני", "גבוה", "גבוה מאוד"],
+                                            key="f_risk", placeholder="הכל")
+                sel_tags = a[2].multiselect("סוג הזדמנות", list(TAG_SUBSTR.keys()),
+                                            key="f_tags", placeholder="הכל")
+                SCORE_OPTS = {"הכל": 0, "טוב ומעלה (60+)": 60, "חזק ומעלה (70+)": 70, "יוצא דופן (80+)": 80}
+                MOM_OPTS = {"הכל": -999, "חיובי (0%+)": 0, "חזק (15%+)": 15, "חזק מאוד (50%+)": 50,
+                            "מרשים (100%+)": 100}
+                VAL_OPTS = {"הכל": 0, "לא יקר (40+)": 40, "אטרקטיבי (60+)": 60, "זול מאוד (80+)": 80}
                 b = st.columns(3)
-                min_score = b[0].slider("ציון מינימלי (Score V2)", 0, 100, 60, 5, key="f_score")
-                min_mom = b[1].slider("מומנטום מינימלי 3 חודשים", -50, 250, 0, 5, format="%d%%", key="f_mom")
-                min_val = b[2].slider("ציון תמחור מינימלי", 0, 100, 40, 5, key="f_val")
-                st.caption("Score V2: ציון משוקלל · מומנטום: תשואת 3 ח׳ · תמחור: 100 זול / 0 יקר · איכות: צמיחה+רווחיות+ROIC.")
-                st.button("✅ החל סינון")  # filters are live; this just re-runs
+                min_score = SCORE_OPTS[b[0].selectbox("ציון מינימלי (Score V2)", list(SCORE_OPTS),
+                                                      index=1, key="f_score",
+                                                      help="ציון משוקלל 0-100: פונדמנטל, טכני, סקטור, חדשות וסיכון.")]
+                min_mom = MOM_OPTS[b[1].selectbox("מומנטום מינימלי (3 חודשים)", list(MOM_OPTS),
+                                                  index=0, key="f_mom", help="תשואת המחיר ב-3 החודשים האחרונים.")]
+                min_val = VAL_OPTS[b[2].selectbox("תמחור מינימלי", list(VAL_OPTS),
+                                                  index=0, key="f_val",
+                                                  help="ציון תמחור: 100 = זול מאוד · 40-69 הוגן · מתחת ל-40 יקר.")]
+                bcols = st.columns([1, 1, 3])
+                bcols[0].form_submit_button("✅ החל סינון", type="primary", use_container_width=True)
+                reset = bcols[1].form_submit_button("🧹 איפוס סינון", use_container_width=True)
+            if reset:
+                for kk in ("f_sec", "f_risk", "f_score", "f_mom", "f_val", "f_tags"):
+                    st.session_state.pop(kk, None)
+                st.rerun()
 
             v = opps.copy()
             if sel_sec != "הכל":
@@ -752,35 +769,72 @@ elif page == "💎 הזדמנויות":
                 v = v[v["tags"].apply(lambda ts: isinstance(ts, list)
                                       and any(any(su in t for t in ts) for su in subs))]
             v = v.sort_values("ScoreV2", ascending=False)
-            st.markdown(f"**מציג {len(v)} מניות מתוך {len(opps)}**")
+            top = st.columns([2, 3])
+            top[0].markdown(f"**מציג {len(v)} מניות מתוך {len(opps)}**")
+            view = top[1].radio("תצוגה", ["📊 טבלה", "🗂 כרטיסים"], horizontal=True,
+                                key="opp_view", label_visibility="collapsed")
 
-            # ---------- Filtered result cards ----------
             if v.empty:
                 st.caption("אין מניות שעוברות את הסינון. נסה להרחיב את התנאים.")
-            for cs in range(0, min(len(v), 9), 3):
-                cols = st.columns(3)
-                for j, (_, r) in enumerate(v.iloc[cs:cs + 3].iterrows()):
-                    with cols[j]:
-                        st.markdown(_full_card(r), unsafe_allow_html=True)
-                        _go(r["Ticker"], "gf")
+            elif view == "🗂 כרטיסים":
+                for cs in range(0, min(len(v), 12), 3):
+                    cols = st.columns(3)
+                    for j, (_, r) in enumerate(v.iloc[cs:cs + 3].iterrows()):
+                        with cols[j]:
+                            st.markdown(_full_card(r), unsafe_allow_html=True)
+                            _go(r["Ticker"], "gf")
+            else:
+                # ---------- Professional data grid (default) ----------
+                q = st.text_input("🔎 חיפוש (סימול / חברה / סקטור)", key="opp_search").strip().lower()
+                vv = v
+                if q:
+                    def _match(r):
+                        nm = VW.company_name(r["Ticker"], lookup, nc)
+                        return (q in str(r["Ticker"]).lower() or q in str(nm).lower()
+                                or q in str(r.get("Sector", "")).lower())
+                    vv = v[v.apply(_match, axis=1)]
 
-        # ---------- Five Top-10 panels ----------
-        st.divider()
-        st.markdown("#### 🏅 פאנלים מובילים")
-        panels = [("⭐ איכות גבוהה", "high_quality"), ("🚀 מומנטום חזק", "momentum"),
-                  ("💎 מוערכות בחסר", "undervalued"), ("🏆 ציונים מובילים", "opportunities"),
-                  ("❤️ הזדמנויות נסתרות", "turnarounds")]
-        pcols = st.columns(5)
-        for i, (label, key) in enumerate(panels):
-            with pcols[i]:
-                st.markdown(f"**{label}**")
-                tickers = (uni.get("rankings", {}).get(key) or [])[:6]
-                if not tickers:
-                    st.caption("—")
-                for t in tickers:
-                    r = lookup.get(t, {"Ticker": t})
-                    st.markdown(_panel_item(r), unsafe_allow_html=True)
-                    _go(t, f"gp{i}")
+                def _val_badge(x):
+                    return ("🟢 זול" if x >= 65 else "🟡 הוגן" if x >= 40 else "🔴 יקר") \
+                        if isinstance(x, (int, float)) and x == x else "—"
+
+                def _type_badge(tags):
+                    t = _otype(tags)
+                    for kw, b in [("איכות", "🏆 איכות"), ("מומנטום", "🚀 מומנטום"), ("מוערך", "💎 ערך"),
+                                  ("תפנית", "❤️ נסתרת"), ("פריצה", "🚀 פריצה"), ("רוטציה", "🔄 רוטציה")]:
+                        if kw in t:
+                            return b
+                    return t
+                rows = []
+                for rank, (_, r) in enumerate(vv.iterrows(), 1):
+                    rb = VW.risk_badge(r.get("RiskLevel"))
+                    rows.append({
+                        "דירוג": rank, "סימול": r["Ticker"],
+                        "חברה": VW.company_name(r["Ticker"], lookup, nc),
+                        "סקטור": market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—"),
+                        "Score V2": int(r["ScoreV2"]) if _num(r.get("ScoreV2")) is not None else None,
+                        "מומנטום 3ח׳": round(r["Ret3m"], 1) if _num(r.get("Ret3m")) is not None else None,
+                        "תמחור": _val_badge(r.get("Valuation")), "סיכון": f"{rb[0]} {rb[1]}",
+                        "סוג הזדמנות": _type_badge(r.get("tags")),
+                    })
+                gdf = pd.DataFrame(rows)
+                if gdf.empty:
+                    st.caption("אין תוצאות לחיפוש.")
+                else:
+                    ev = st.dataframe(
+                        gdf, use_container_width=True, hide_index=True, height=460,
+                        on_select="rerun", selection_mode="single-row", key="opp_grid",
+                        column_config={
+                            "Score V2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+                            "מומנטום 3ח׳": st.column_config.NumberColumn(format="%+.1f%%")})
+                    cc = st.columns([3, 1])
+                    cc[0].caption("מיון: לחיצה על כותרת עמודה · לחיצה על שורה → ניתוח מניה אוטומטי.")
+                    cc[1].download_button("📥 ייצוא CSV", gdf.to_csv(index=False).encode("utf-8-sig"),
+                                          file_name="opportunities.csv", mime="text/csv", use_container_width=True)
+                    if getattr(ev, "selection", None) and ev.selection.get("rows"):
+                        st.session_state["dd_ticker"] = gdf.iloc[ev.selection["rows"][0]]["סימול"]
+                        st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                        st.rerun()
 
         # ---------- Sector heatmap (Finviz-style treemap) ----------
         sec_rows = VW.sector_intel(uni, mkt)
