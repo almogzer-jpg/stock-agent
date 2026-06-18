@@ -939,6 +939,7 @@ elif page == "🔎 ניתוח חברה":
             val, sc, tech, rk = rep["valuation"], rep["scores"], rep["technicals"], rep["risk"]
             op, pc, th = rep["opinion"], rep["pros_cons"], rep["thesis"]
             hist = bundle.get("hist")
+            mkt_close = bundle.get("mkt_close")
 
             # ---- Summary card (Hebrew description, larger & clearer) ----
             desc_he = o.get("summary_he")
@@ -971,16 +972,79 @@ elif page == "🔎 ניתוח חברה":
             ]
             st.markdown(f"<div class='kpi-grid'>{''.join(kk)}</div>", unsafe_allow_html=True)
 
-            # ---- Returns strip ----
+            # ---- Performance section (Phase 20) ----
+            import technicals as _tech
+            st.markdown("#### 📈 ביצועי מחיר")
             rets = [("שבוע", md["ret_1w"]), ("חודש", md["ret_1m"]), ("3 ח'", md["ret_3m"]),
                     ("6 ח'", md["ret_6m"]), ("YTD", md["ytd"]), ("שנה", md["ret_1y"]), ("3 שנים", md["ret_3y"])]
-            chips = "".join(f"<span style='margin-left:18px'><b style='color:{MUTED}'>{lbl}</b> "
-                            f"<b style='color:{POSITIVE if (_num_or(v) or 0)>=0 else NEGATIVE}'>{v}</b></span>" for lbl, v in rets)
-            st.markdown(f"<div class='ic-card' style='padding:12px 18px'>{chips}</div>", unsafe_allow_html=True)
+
+            def _pcell(lbl, vstr):
+                val = _num_or(vstr)
+                if val is None:
+                    return f"<div class='pcard' style='--ac:{MUTED}'><div class='pl'>{lbl}</div><div class='pv'>—</div></div>"
+                col = POSITIVE if val > 0.5 else NEGATIVE if val < -0.5 else MUTED
+                ind = "📈" if val >= 2 else "📉" if val <= -2 else "➡️"
+                return (f"<div class='pcard' style='--ac:{col}'><div class='pl'>{lbl}</div>"
+                        f"<div class='pv'>{ind} {vstr}</div></div>")
+            st.markdown(f"<div class='perf-grid'>{''.join(_pcell(l, v) for l, v in rets)}</div>",
+                        unsafe_allow_html=True)
+
+            periods = ["1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "5Y", "MAX", "מותאם"]
+            sel = st.radio("תקופה", periods, index=5, horizontal=True, key="perf_period")
+            cstart = cend = None
+            per = "CUSTOM" if sel == "מותאם" else sel
+            cl = hist["Close"].dropna()
+            if sel == "מותאם" and len(cl):
+                dc = st.columns(2)
+                cstart = dc[0].date_input("📅 מתאריך", value=(cl.index[-1] - pd.Timedelta(days=365)).date(), key="perf_start")
+                cend = dc[1].date_input("📅 עד תאריך", value=cl.index[-1].date(), key="perf_end")
+            perf = _tech.performance(hist["Close"], mkt_close, period=per, start=cstart, end=cend)
+
+            if perf:
+                sret, bret, alpha = perf["stock"], perf["bench"], perf["alpha"]
+                scol = POSITIVE if sret >= 0 else NEGATIVE
+                lab = {"1W": "שבוע", "1M": "חודש", "3M": "3 חודשים", "6M": "6 חודשים", "YTD": "מתחילת השנה",
+                       "1Y": "שנה", "3Y": "3 שנים", "5Y": "5 שנים", "MAX": "מקסימום", "מותאם": "טווח מותאם"}.get(sel, sel)
+                mx = max(abs(sret), abs(bret or 0), abs(alpha or 0)) or 1
+
+                def _cbar(name, val, color):
+                    if val is None:
+                        return f"<div class='cmp'><div class='cl'><span>{name}</span><b>—</b></div></div>"
+                    c2 = POSITIVE if val >= 0 else NEGATIVE
+                    return (f"<div class='cmp'><div class='cl'><span>{name}</span>"
+                            f"<b style='color:{c2}'>{val:+.2f}%</b></div>"
+                            f"<div class='cmptrack'><div class='cmpfill' style='width:{abs(val)/mx*100:.0f}%;background:{color}'></div></div></div>")
+                st.markdown(
+                    f"<div class='ic-card'><div class='ic-sub'>תשואת המניה · {lab}</div>"
+                    f"<div style='font-size:34px;font-weight:800;color:{scol};line-height:1.1'>{sret:+.2f}%</div>"
+                    + _cbar("המניה", sret, PRIMARY) + _cbar("S&P 500", bret, SECONDARY)
+                    + _cbar("Alpha (עודף תשואה)", alpha, POSITIVE if (alpha or 0) >= 0 else NEGATIVE)
+                    + "</div>", unsafe_allow_html=True)
+
+                if alpha is not None:
+                    ins_p = (f"🟢 המניה היכתה את S&P 500 ב-{alpha:+.1f}% בתקופה זו." if alpha >= 2
+                             else f"🔴 המניה פיגרה אחרי הבנצ'מרק ({alpha:+.1f}%)." if alpha <= -2
+                             else f"🟡 ביצוע דומה ל-S&P 500 ({alpha:+.1f}%).")
+                else:
+                    ins_p = "🟢 תשואה חיובית בתקופה." if sret >= 0 else "🔴 תשואה שלילית בתקופה."
+                st.markdown(f"<div class='ic-sub' style='margin:2px 0 8px'>{ins_p}</div>", unsafe_allow_html=True)
+
+                def _mc(lbl2, val, suf=""):
+                    return (f"<div class='pcard' style='--ac:{PRIMARY}'><div class='pl'>{lbl2}</div>"
+                            f"<div class='pv' style='color:{TEXT}'>{(str(val) + suf) if val is not None else '—'}</div></div>")
+                st.markdown("<div class='perf-grid' style='grid-template-columns:repeat(4,1fr)'>"
+                            + _mc("CAGR", perf["cagr"], "%") + _mc("תנודתיות", perf["vol"], "%")
+                            + _mc("ירידה מקס׳", perf["maxdd"], "%") + _mc("Sharpe", perf["sharpe"])
+                            + "</div>", unsafe_allow_html=True)
+                st.caption("CAGR/תנודתיות/Sharpe/ירידה מקסימלית — מחושבים לתקופה הנבחרת. לצרכי מידע בלבד.")
 
             # ---- Price chart with MAs + support/resistance ----
             if hist is not None and "Close" in hist.columns:
-                c = hist["Close"].dropna().tail(252)
+                c = hist["Close"].dropna()
+                if perf is not None:
+                    c = c[(c.index >= perf["start"]) & (c.index <= perf["end"])]
+                else:
+                    c = c.tail(252)
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(y=c.values, x=list(range(len(c))), name="מחיר", line_color=PRIMARY))
                 for n, col in [(20, "#FFC107"), (50, "#B388FF"), (200, "#E6EDF7")]:
@@ -994,7 +1058,7 @@ elif page == "🔎 ניתוח חברה":
                 if sr.get("resistance"):
                     fig.add_hline(y=sr["resistance"], line_dash="dot", line_color=NEGATIVE,
                                   annotation_text=f"התנגדות {sr['resistance']}")
-                fig.update_layout(title=f"{tkin} · מחיר + ממוצעים נעים (שנה)")
+                fig.update_layout(title=f"{tkin} · מחיר + ממוצעים נעים ({sel})")
                 st.plotly_chart(style_fig(fig, 320), use_container_width=True)
 
                 # Volume / RSI / MACD
@@ -1080,15 +1144,44 @@ elif page == "🔎 ניתוח חברה":
                            + score_bar("נפח", tsub["volume"]) + score_bar("תנודתיות (רגוע=גבוה)", tsub["volatility"]) + "</div>",
                            unsafe_allow_html=True)
 
-            # ---- Thesis ----
-            st.markdown("#### 🧠 תזת השקעה")
+            # ---- Thesis (scenario cards) ----
+            st.markdown("#### 🧠 תזת השקעה — תרחישים")
+            _sc_style = {"bull": ("#22c55e", "rgba(34,197,94,0.10)"),
+                         "base": ("#38bdf8", "rgba(56,189,248,0.10)"),
+                         "bear": ("#ef4444", "rgba(239,68,68,0.10)")}
             tt = st.columns(3)
-            for col, key, lbl, color in [(tt[0], "bull", "🟢 תרחיש שורי", POSITIVE),
-                                         (tt[1], "base", "🔵 תרחיש בסיס", PRIMARY),
-                                         (tt[2], "bear", "🔴 תרחיש דובי", NEGATIVE)]:
-                col.markdown(f"<div class='ic-card' style='border-right:5px solid {color}'>"
-                             f"<div class='ic-title' style='color:{color}'>{lbl}</div>"
-                             f"<div class='ic-sub'>{th[key]}</div></div>", unsafe_allow_html=True)
+            for col, sc in zip(tt, rep.get("scenarios", [])):
+                ac, bg = _sc_style.get(sc["key"], (PRIMARY, "rgba(56,189,248,0.10)"))
+                tgt = sc["target"]
+                up = tgt.get("upside")
+                if up is None:
+                    pill = ""
+                else:
+                    pc = POSITIVE if up >= 0 else NEGATIVE
+                    pill = (f"<span class='pill' style='color:{pc};background:{pc}22'>"
+                            f"{'+' if up >= 0 else ''}{up}%</span>")
+                drivers = "".join(f"<li>✓ {d}</li>" for d in sc["drivers"]) or "<li>—</li>"
+                col.markdown(
+                    f"<div class='scen' style='--ac:{ac};--bg:{bg}'>"
+                    f"<div class='s-ti'>{sc['emoji']} {sc['title']}</div>"
+                    f"<div class='s-lbl'>סבירות (הערכת מודל)</div>"
+                    f"<div class='s-prob'>{sc['prob']}%</div>"
+                    f"<div class='s-lbl'>מחיר יעד (אנליסטים)</div>"
+                    f"<div class='s-tgt'>{tgt['price']}</div>{pill}"
+                    f"<div class='s-sum'>{sc['summary']}</div>"
+                    f"<div class='s-lbl'>גורמים מרכזיים</div><ul>{drivers}</ul></div>",
+                    unsafe_allow_html=True)
+            st.caption("מחירי יעד = קונצנזוס אנליסטים (Yahoo, גבוה/ממוצע/נמוך). הסבירות היא הערכת מודל "
+                       "דטרמיניסטית לפי Score V2 — אינדיקציה בלבד, לא הסתברות שוק.")
+            conf = rep.get("confidence", {})
+            cs = conf.get("score")
+            if isinstance(cs, (int, float)):
+                ccol = score_color(cs)
+                st.markdown(
+                    f"<div class='confmeter'><div class='ct'><span>🎯 רמת ביטחון בניתוח</span>"
+                    f"<b style='color:{ccol}'>{conf.get('category', '')} · {int(cs)}/100</b></div>"
+                    f"<div class='conftrack'><div class='conffill' style='width:{max(0, min(100, cs))}%;"
+                    f"background:{ccol}'></div></div></div>", unsafe_allow_html=True)
 
             # ---- Pros / Cons ----
             pcc = st.columns(2)

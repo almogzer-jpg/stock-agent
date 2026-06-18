@@ -113,6 +113,17 @@ def recommendation(score_v2, risk_cat, valuation_score, trust_score) -> str:
     return f"{order[i]} · {he[order[i]]}"
 
 
+def scenario_probs(score_v2) -> dict:
+    """Model-estimated scenario likelihood (NOT a market probability) derived
+    deterministically from Score V2. Base case anchored at 40%; bull/bear tilt
+    with the score. Always labeled in the UI as a model estimate."""
+    v2 = score_v2 if isinstance(score_v2, (int, float)) and score_v2 == score_v2 else 50
+    t = max(-1.0, min(1.0, (v2 - 50) / 50.0))
+    bull = round(30 + t * 25)
+    bear = round(30 - t * 25)
+    return {"bull": bull, "base": 100 - bull - bear, "bear": bear}
+
+
 def build_thesis(ctx: dict) -> dict:
     """Bull / base / bear cases — templates filled with the real numbers."""
     rg = _pct(ctx.get("rev_growth")) if ctx.get("rev_growth") is not None else NA
@@ -328,6 +339,27 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     thesis = build_thesis(ctx)
     proscons = build_pros_cons(ctx)
 
+    # ---- Scenario cards (real analyst targets + model-estimated likelihood) ----
+    probs = scenario_probs(score_v2)
+    price_now = ma.get("price")
+
+    def _tgt(key):
+        tp = _g(info, key)
+        if tp is None or not price_now:
+            return {"price": NA, "upside": None}
+        return {"price": f"${tp:.0f}", "upside": round((tp / price_now - 1) * 100, 1)}
+    base_facts = [f"ציון סופי v2 {score_v2}", f"תמחור: {val_label}", f"רמת סיכון: {risk_cat}"]
+    scenarios = [
+        {"key": "bull", "emoji": "🟢", "title": "תרחיש שורי", "prob": probs["bull"],
+         "target": _tgt("targetHighPrice"), "summary": thesis["bull"],
+         "drivers": [d for d in proscons["pros"] if d != "—"][:4]},
+        {"key": "base", "emoji": "🔵", "title": "תרחיש בסיס", "prob": probs["base"],
+         "target": _tgt("targetMeanPrice"), "summary": thesis["base"], "drivers": base_facts},
+        {"key": "bear", "emoji": "🔴", "title": "תרחיש דובי", "prob": probs["bear"],
+         "target": _tgt("targetLowPrice"), "summary": thesis["bear"],
+         "drivers": [d for d in proscons["cons"] if d != "—"][:4]},
+    ]
+
     # ---- Financials (statements + info) ----
     inc, bs, cf = b.get("income_stmt"), b.get("balance_sheet"), b.get("cashflow")
     revenue = _stmt_row(inc, ["Total Revenue", "Operating Revenue"])
@@ -432,6 +464,8 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
                  "warnings": risk_engine.risk_profile(close, mkt_close).get("warnings", []) if mkt_close is not None else []},
         "scores": _scores_block(tech_score, fund_score, sector_score, news_score, risk_score, score_v2, trust, val_score, comp),
         "thesis": thesis, "pros_cons": proscons,
+        "scenarios": scenarios,
+        "confidence": {"score": trust["score"], "category": trust["category"]},
         "opinion": {
             "recommendation": rec, "allocation_pct": alloc,
             "valuation_label": val_label,

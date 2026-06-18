@@ -74,6 +74,20 @@ def test_sub_scores_bounded():
         assert 0 <= s[k] <= 100
 
 
+def test_performance_metrics():
+    up = _frame(n=400, start=100, drift=0.5, seed=7)
+    mkt = _frame(n=400, start=4000, drift=0.3, seed=8)["Close"]
+    p = ta.performance(up["Close"], mkt, period="1Y")
+    assert p["stock"] > 0 and p["cagr"] is not None and p["vol"] is not None
+    assert p["maxdd"] <= 0 and p["alpha"] is not None
+    # custom range
+    import pandas as pd
+    pc = ta.performance(up["Close"], mkt, period="CUSTOM",
+                        start=up.index[50], end=up.index[200])
+    assert pc is not None and pc["n"] >= 100
+    assert ta.performance(up["Close"].head(1)) is None
+
+
 def test_insufficient_history_returns_none():
     short = _frame(n=15)
     assert ta.macd(short["Close"])["macd"] is None

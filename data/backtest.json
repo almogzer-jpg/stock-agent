@@ -2,14 +2,14 @@
   "AAPL": {
     "occurrences": 5,
     "win_rate": 60.0,
-    "avg_return": 2.25,
+    "avg_return": 2.79,
     "median_return": 2.09,
     "max_drawdown": -5.25,
-    "benchmark_rel": 1.49,
-    "avg_holding": 14,
+    "benchmark_rel": 1.81,
+    "avg_holding": 14.4,
     "is_win_rate": 66.7,
     "oos_win_rate": 50.0,
-    "oos_avg_return": 5.83,
+    "oos_avg_return": 7.17,
     "confidence": "בינוני"
   },
   "MSFT": {
@@ -192,14 +192,14 @@
   "UNH": {
     "occurrences": 1,
     "win_rate": 100.0,
-    "avg_return": 7.42,
-    "median_return": 7.42,
+    "avg_return": 7.8,
+    "median_return": 7.8,
     "max_drawdown": -0.87,
-    "benchmark_rel": 9.38,
-    "avg_holding": 10,
+    "benchmark_rel": 8.71,
+    "avg_holding": 12,
     "is_win_rate": null,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 7.42,
+    "oos_avg_return": 7.8,
     "confidence": "נמוך"
   },
   "HD": {

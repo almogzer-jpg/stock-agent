@@ -23,6 +23,15 @@ def test_recommendation_levels_and_caps():
     assert not dd.recommendation(80, "נמוך", 70, 20).startswith("Strong Buy")
 
 
+def test_scenario_probs():
+    hi = dd.scenario_probs(80)
+    assert hi["bull"] > hi["bear"] and sum(hi.values()) == 100
+    lo = dd.scenario_probs(20)
+    assert lo["bear"] > lo["bull"] and sum(lo.values()) == 100
+    mid = dd.scenario_probs(50)
+    assert mid["bull"] == mid["bear"] and sum(mid.values()) == 100
+
+
 def test_build_thesis_has_three_cases():
     ctx = {"score_v2": 72, "valuation_label": "מתומחר בהוגן", "risk_cat": "בינוני",
            "rev_growth": 18.0, "eps_growth": 22.0, "op_margin": 25.0, "trend": "מגמת עלייה",

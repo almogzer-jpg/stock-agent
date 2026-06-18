@@ -263,6 +263,39 @@ INSTITUTIONAL_CSS = f"""
   .pi-tk {{ font-size:16px; font-weight:800; }}
   .pi-name {{ color:{SECONDARY}; font-size:11.5px; margin-top:1px; }}
 
+  /* ---------- Performance section (Phase 20) ---------- */
+  .perf-grid {{ display:grid; grid-template-columns:repeat(7,1fr); gap:10px; margin:6px 0 12px; }}
+  .pcard {{ background:#0f1f3d; border:1px solid {BORDER}; border-top:3px solid var(--ac,{MUTED});
+            border-radius:14px; padding:10px 8px; text-align:center; transition:transform .12s; }}
+  .pcard:hover {{ transform:translateY(-2px); }}
+  .pcard .pl {{ color:{SECONDARY}; font-size:12.5px; font-weight:600; }}
+  .pcard .pv {{ font-size:18px; font-weight:800; color:var(--ac); margin-top:3px; white-space:nowrap; }}
+  .cmp {{ margin:9px 0; }}
+  .cmp .cl {{ display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:4px; }}
+  .cmptrack {{ height:15px; background:#0a1830; border:1px solid {BORDER}; border-radius:7px; overflow:hidden; }}
+  .cmpfill {{ height:100%; border-radius:6px; transition:width .6s cubic-bezier(.2,.8,.2,1); }}
+  /* period selector radio → pill toolbar */
+  div[data-testid="stRadio"]:has(input) .stRadio {{ }}
+  @media (max-width:640px) {{ .perf-grid {{ grid-template-columns:repeat(3,1fr); }}
+      .pcard .pv {{ font-size:16px; }} }}
+
+  /* ---------- Investment thesis scenario cards (Phase 21) ---------- */
+  .scen {{ border:1px solid var(--ac); border-radius:18px; padding:16px 18px; height:100%;
+           background:var(--bg); direction:rtl; text-align:right; animation:fadeUp .4s ease both; }}
+  .scen .s-ti {{ font-size:20px; font-weight:600; color:var(--ac); display:flex; gap:8px; align-items:center; }}
+  .scen .s-lbl {{ font-size:13px; color:{SECONDARY}; margin-top:10px; }}
+  .scen .s-prob {{ font-size:32px; font-weight:700; color:var(--ac); line-height:1.15; }}
+  .scen .s-tgt {{ font-size:30px; font-weight:700; color:{TEXT}; line-height:1.15; }}
+  .scen .pill {{ display:inline-block; font-size:13px; font-weight:700; padding:3px 12px;
+                 border-radius:999px; margin-top:4px; }}
+  .scen .s-sum {{ font-size:16px; font-weight:500; color:{TEXT}; line-height:1.6; margin:12px 0 8px; }}
+  .scen ul {{ list-style:none; padding:0; margin:4px 0; }}
+  .scen li {{ font-size:15px; font-weight:500; color:{SECONDARY}; line-height:1.6; margin:3px 0; }}
+  .confmeter {{ background:#0f1f3d; border:1px solid {BORDER}; border-radius:16px; padding:14px 18px; margin-top:12px; }}
+  .confmeter .ct {{ font-size:16px; font-weight:600; display:flex; justify-content:space-between; }}
+  .conftrack {{ height:12px; background:#0a1830; border:1px solid {BORDER}; border-radius:7px; overflow:hidden; margin-top:8px; }}
+  .conffill {{ height:100%; border-radius:6px; transition:width .7s cubic-bezier(.2,.8,.2,1); }}
+
   /* ---------- Loading skeleton ---------- */
   .skeleton {{ background:linear-gradient(90deg,{CARD} 25%,{ELEV} 37%,{CARD} 63%);
       background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:10px; }}

@@ -175,6 +175,53 @@ def _clamp(x, lo=0.0, hi=100.0):
     return max(lo, min(hi, float(x)))
 
 
+PERIOD_DAYS = {"1W": 5, "1M": 21, "3M": 63, "6M": 126, "1Y": 252, "3Y": 756, "5Y": 1260}
+
+
+def performance(close, mkt_close=None, period="1Y", start=None, end=None) -> dict | None:
+    """Presentation-support performance metrics over a window (NOT scoring).
+
+    Returns stock return %, benchmark (S&P) return %, alpha, CAGR, annualized
+    volatility, max drawdown and a simple Sharpe — all computed from the already
+    fetched price history. None fields where not computable.
+    """
+    c = close.dropna()
+    if len(c) < 2:
+        return None
+    if period == "CUSTOM" and start is not None and end is not None:
+        win = c[(c.index >= pd.Timestamp(start)) & (c.index <= pd.Timestamp(end))]
+    elif period == "YTD":
+        win = c[c.index >= pd.Timestamp(year=c.index[-1].year, month=1, day=1)] \
+            if isinstance(c.index, pd.DatetimeIndex) else c.tail(1)
+    elif period == "MAX":
+        win = c
+    else:
+        win = c.tail(PERIOD_DAYS.get(period, 252) + 1)
+    if len(win) < 2 or float(win.iloc[0]) <= 0:
+        return None
+    rets = win.pct_change().dropna()
+    n = len(win)
+    stock = (float(win.iloc[-1]) / float(win.iloc[0]) - 1) * 100
+    cagr = ((float(win.iloc[-1]) / float(win.iloc[0])) ** (252.0 / n) - 1) * 100 if n > 5 else None
+    vol = float(rets.std() * np.sqrt(252) * 100) if len(rets) >= 5 else None
+    maxdd = float((win / win.cummax() - 1.0).min() * 100)
+    sharpe = (float(rets.mean() / rets.std()) * np.sqrt(252)) if len(rets) >= 5 and rets.std() > 0 else None
+    bench = alpha = None
+    if mkt_close is not None:
+        m = mkt_close.dropna()
+        mw = m[(m.index >= win.index[0]) & (m.index <= win.index[-1])]
+        if len(mw) >= 2 and float(mw.iloc[0]) > 0:
+            bench = (float(mw.iloc[-1]) / float(mw.iloc[0]) - 1) * 100
+            alpha = stock - bench
+    return {"period": period, "start": win.index[0], "end": win.index[-1], "n": n,
+            "stock": round(stock, 2), "bench": round(bench, 2) if bench is not None else None,
+            "alpha": round(alpha, 2) if alpha is not None else None,
+            "cagr": round(cagr, 2) if cagr is not None else None,
+            "vol": round(vol, 1) if vol is not None else None,
+            "maxdd": round(maxdd, 1),
+            "sharpe": round(sharpe, 2) if sharpe is not None else None}
+
+
 def trend_class(price, ma50, ma200, ret_3m) -> str:
     """Classify the trend into 5 buckets from price vs MAs + 3-month return."""
     if None in (price, ma50, ma200):
