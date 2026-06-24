@@ -1,45 +1,21 @@
 [
   {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "גבוהה",
+    "message": "AAPL — הורדת דירוג: Outperform → Hold (KGI Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "גבוהה",
+    "message": "HD — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)"
+  },
+  {
     "type": "אזהרת סיכון",
     "scope": "TSLA",
     "severity": "גבוהה",
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Buy → Buy (Loop Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Buy → Buy (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Outperform → Outperform (Mizuho)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Jefferies)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש:  → Buy (China Renaissance)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — reit: Buy → Buy (Needham)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,33 +25,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "UNH",
     "severity": "מידע",
-    "message": "AMD — שדרוג: Neutral → Buy (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — reit: Buy → Buy (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — reit: Buy → Buy (Needham)"
+    "message": "UNH — אישרור: Outperform → Outperform (Leerink Partners)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,20 +37,32 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — שדרוג: Neutral → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — reit: Buy → Buy (Needham)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "טכנולוגיה",
+    "scope": "תעשייה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 82, חוזק יחסי +4.39%)"
+    "message": "כניסת הון לסקטור תעשייה (ציון 84, חוזק יחסי +5.8%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "אנרגיה",
+    "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור אנרגיה (ציון 19, חוזק יחסי -8.25%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 7, חוזק יחסי -6.29%)"
   }
 ]

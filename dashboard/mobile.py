@@ -308,9 +308,17 @@ def _analysis(mkt, lookup, nc):
               NEGATIVE if (rk["risk_score"] or 0) >= 66 else WARNING if (rk["risk_score"] or 0) >= 33 else POSITIVE),
     ]), unsafe_allow_html=True)
 
-    # performance
+    # performance (guarded — survive a stale/missing technicals module on the cloud)
     per = st.selectbox("תקופה", ["1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "MAX"], index=5, key="m_perf")
-    perf = ta.performance(hist["Close"], mkt_close, period=per) if hist is not None else None
+    perf = None
+    _perf_fn = getattr(ta, "performance", None)
+    if hist is not None and _perf_fn is not None:
+        try:
+            perf = _perf_fn(hist["Close"], mkt_close, period=per)
+        except Exception:
+            perf = None
+    if perf is None:
+        st.caption("נתוני ביצועים אינם זמינים כרגע (נסה לרענן את הדף).")
     if perf:
         scl = POSITIVE if perf["stock"] >= 0 else NEGATIVE
         alpha = perf["alpha"]

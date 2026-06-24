@@ -69,7 +69,8 @@ NEWS_LIMIT = 5
 # Email an alert when breakout candidates appear. Credentials live in
 # email_config.json (or env vars) — see alerts/email_notifier.py. If nothing
 # is configured, sending is a safe no-op.
-ENABLE_EMAIL = True
+# DISABLED by user request — no daily email is sent. Set back to True to re-enable.
+ENABLE_EMAIL = False
 # Manual "refresh" from the dashboard sets STOCK_AGENT_DISABLE_EMAIL=1 so a
 # button click never spams email; the scheduled daily run still emails.
 if os.environ.get("STOCK_AGENT_DISABLE_EMAIL") == "1":

@@ -1052,7 +1052,15 @@ elif page == "🔎 ניתוח חברה":
                 dc = st.columns(2)
                 cstart = dc[0].date_input("📅 מתאריך", value=(cl.index[-1] - pd.Timedelta(days=365)).date(), key="perf_start")
                 cend = dc[1].date_input("📅 עד תאריך", value=cl.index[-1].date(), key="perf_end")
-            perf = _tech.performance(hist["Close"], mkt_close, period=per, start=cstart, end=cend)
+            perf = None
+            _perf_fn = getattr(_tech, "performance", None)
+            if hist is not None and _perf_fn is not None:
+                try:
+                    perf = _perf_fn(hist["Close"], mkt_close, period=per, start=cstart, end=cend)
+                except Exception:
+                    perf = None
+            if perf is None:
+                st.caption("נתוני ביצועים אינם זמינים כרגע (נסה לרענן).")
 
             if perf:
                 sret, bret, alpha = perf["stock"], perf["bench"], perf["alpha"]
