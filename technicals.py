@@ -148,27 +148,129 @@ def volume_analysis(df) -> dict:
             "ratio": ratio, "spike": (ratio is not None and ratio >= 1.5), "flow": flow}
 
 
-def support_resistance(df, window=5, lookback=160) -> dict:
-    """Nearest support/resistance from REAL swing pivots (no invented levels)."""
-    if df is None or "Close" not in df.columns:
-        return {"support": None, "resistance": None}
+def _pivots(df, window=5, lookback=160):
+    """Swing pivots from REAL highs/lows: ([(high, vol_ok)], [(low, vol_ok)], price).
+
+    vol_ok = the pivot day's volume was above its 20-day average (volume-confirmed
+    levels are preferred when choosing support/resistance). Returns (None, None,
+    None) when there isn't enough history — never invents levels.
+    """
+    if df is None or "Close" not in getattr(df, "columns", []):
+        return None, None, None
     c = df["Close"].dropna().tail(lookback)
-    hi = df["High"].dropna().tail(lookback) if "High" in df.columns else c
-    lo = df["Low"].dropna().tail(lookback) if "Low" in df.columns else c
     if len(c) < window * 2 + 1:
-        return {"support": None, "resistance": None}
+        return None, None, None
+    hi = df["High"].reindex(c.index).fillna(c) if "High" in df.columns else c
+    lo = df["Low"].reindex(c.index).fillna(c) if "Low" in df.columns else c
+    vol = df["Volume"].reindex(c.index) if "Volume" in df.columns else None
+    vavg = vol.rolling(20).mean() if vol is not None else None
     price = float(c.iloc[-1])
     piv_hi, piv_lo = [], []
     for i in range(window, len(c) - window):
         wh, wl = hi.iloc[i - window:i + window + 1], lo.iloc[i - window:i + window + 1]
+        vok = bool(vol is not None and vavg is not None and vavg.iloc[i] == vavg.iloc[i]
+                   and vavg.iloc[i] > 0 and vol.iloc[i] > vavg.iloc[i])
         if hi.iloc[i] == wh.max():
-            piv_hi.append(float(hi.iloc[i]))
+            piv_hi.append((float(hi.iloc[i]), vok))
         if lo.iloc[i] == wl.min():
-            piv_lo.append(float(lo.iloc[i]))
-    res = [p for p in piv_hi if p > price]
-    sup = [p for p in piv_lo if p < price]
+            piv_lo.append((float(lo.iloc[i]), vok))
+    return piv_hi, piv_lo, price
+
+
+def support_resistance(df, window=5, lookback=160) -> dict:
+    """Nearest support/resistance from REAL swing pivots (no invented levels)."""
+    piv_hi, piv_lo, price = _pivots(df, window, lookback)
+    if price is None:
+        return {"support": None, "resistance": None}
+    res = [p for p, _ in piv_hi if p > price]
+    sup = [p for p, _ in piv_lo if p < price]
     return {"support": round(max(sup), 2) if sup else None,
             "resistance": round(min(res), 2) if res else None}
+
+
+NO_LEVEL = "אין רמת תמיכה/התנגדות אמינה"
+
+
+def sr_levels(df, window=5, lookback=130) -> dict | None:
+    """Full support/resistance analysis (Phase 24) from REAL price history only.
+
+    Methodology (see SUPPORT_RESISTANCE.md): swing pivots over ~6 months
+    (volume-confirmed pivots preferred) + the 52-week high/low as candidate
+    levels; MA20/50/100/200 within 2% of price are flagged as DYNAMIC levels.
+    Support is always BELOW price, resistance always ABOVE. If price trades
+    above all recent pivot highs → 'breakout' status; below all pivot lows →
+    'breakdown'. Levels are technical ESTIMATES, not guaranteed floors/ceilings.
+    """
+    piv_hi, piv_lo, price = _pivots(df, window, lookback)
+    if price is None:
+        return None
+    c = df["Close"].dropna()
+    hl = high_low_52w(c)
+
+    # A level must clear the price by ≥0.1% — otherwise rounding can turn the
+    # current bar itself (e.g. today's 52w high) into a fake level at ~price.
+    lo_cut, hi_cut = price * 0.999, price * 1.001
+
+    def _nearest(cands, below):
+        pool = [(p, v) for p, v in cands if (p < lo_cut if below else p > hi_cut)]
+        if not pool:
+            return None
+        pref = [p for p, v in pool if v] or [p for p, _ in pool]
+        return max(pref) if below else min(pref)
+
+    sup_cands = list(piv_lo) + ([(hl["low"], False)] if hl.get("low") and hl["low"] < lo_cut else [])
+    res_cands = list(piv_hi) + ([(hl["high"], False)] if hl.get("high") and hl["high"] > hi_cut else [])
+    support = _nearest(sup_cands, below=True)
+    resistance = _nearest(res_cands, below=False)
+
+    dist_sup = round((support / price - 1) * 100, 1) if support else None      # negative
+    dist_res = round((resistance / price - 1) * 100, 1) if resistance else None  # positive
+
+    # Dynamic MA levels within 2% of price.
+    ma = moving_averages(c)
+    dyn = []
+    for n in (20, 50, 100, 200):
+        v = ma.get(f"ma{n}")
+        if v and abs(v - price) / price <= 0.02:
+            dyn.append({"name": f"MA{n}", "price": round(v, 2),
+                        "side": "תמיכה דינמית" if v <= price else "התנגדות דינמית"})
+
+    # Status: price above EVERY observed level (incl. 52w high) → breakout;
+    # below every observed level → breakdown.
+    status = "normal"
+    if resistance is None and support is not None:
+        status = "breakout"
+    elif support is None and resistance is not None:
+        status = "breakdown"
+
+    rr = rr_label = None
+    if dist_res is not None and dist_sup not in (None, 0) and abs(dist_sup) > 0.05:
+        rr = round(dist_res / abs(dist_sup), 2)
+        rr_label = "אטרקטיבי" if rr > 2.0 else ("מאוזן" if rr >= 1.0 else "לא אטרקטיבי")
+
+    if status == "breakout":
+        interp = "המניה נסחרת מעל כל שיאי התנודה האחרונים — פריצה מעל התנגדות."
+    elif status == "breakdown":
+        interp = "המניה נסחרת מתחת לכל שפלי התנודה האחרונים — שבירה מתחת לתמיכה."
+    elif dist_res is not None and dist_sup is not None:
+        closer_res = dist_res < abs(dist_sup)
+        interp = ("המניה קרובה יותר להתנגדות מאשר לתמיכה — יחס סיכון/סיכוי פחות אטרקטיבי."
+                  if closer_res else
+                  "המניה קרובה יותר לתמיכה מאשר להתנגדות — יחס סיכון/סיכוי נוח יותר.")
+    else:
+        interp = NO_LEVEL
+
+    return {
+        "price": round(price, 2),
+        "support": round(support, 2) if support else None,
+        "resistance": round(resistance, 2) if resistance else None,
+        "dist_support_pct": dist_sup, "dist_resistance_pct": dist_res,
+        "breakout_level": round(resistance, 2) if resistance else None,
+        "breakdown_level": round(support, 2) if support else None,
+        "dynamic_ma": dyn, "high_52w": hl.get("high"), "low_52w": hl.get("low"),
+        "risk_reward": rr, "risk_reward_label": rr_label,
+        "status": status, "interpretation": interp,
+    }
 
 
 def _clamp(x, lo=0.0, hi=100.0):

@@ -32,6 +32,7 @@ ALERTS_CENTER_JSON = os.path.join(DATA_DIR, "alerts_center.json")  # typed alert
 BACKTEST_JSON = os.path.join(DATA_DIR, "backtest.json")        # per-ticker signal backtest stats
 UNIVERSE_JSON = os.path.join(DATA_DIR, "universe.json")        # market-wide scan results (Market Scanner)
 SYSTEM_HEALTH_JSON = os.path.join(DATA_DIR, "system_health.json")  # pipeline health metrics
+GLOBAL_JSON = os.path.join(DATA_DIR, "global_markets.json")        # global macro/crypto/FX indicators
 
 # Market Scanner (Part 5): which index universe + how many top names to deeply enrich.
 SCAN_UNIVERSE = "ALL"          # SP500 / NASDAQ100 / ALL
@@ -121,6 +122,12 @@ COLUMN_LABELS_HE = {
     "VolRatio": "יחס נפח",
     "High52w": "שיא 52 שבועות",
     "DistFromHigh%": "מרחק משיא %",
+    # Support/Resistance (Phase 24)
+    "Support": "תמיכה",
+    "Resistance": "התנגדות",
+    "DistSupport%": "מרחק מתמיכה %",
+    "DistResistance%": "מרחק מהתנגדות %",
+    "RiskReward": "סיכון/סיכוי",
     "Breakout": "פריצה",
     "Score": "ציון",
     # Fundamentals

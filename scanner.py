@@ -28,6 +28,7 @@ import yfinance as yf
 import config
 import universe
 import market
+import technicals as technicals_mod
 import risk as risk_engine
 import decisions as decision_engine
 from indicators.technical import rsi
@@ -121,6 +122,13 @@ def scan_universe(name=None, limit=None, top_enrich=None) -> dict:
         m["RiskScore"] = rp["risk_score"] if rp["risk_score"] is not None else 50
         m["RiskLevel"] = rp["category"]
         m["Beta"], m["Volatility"], m["MaxDrawdown"] = rp["beta"], rp["volatility"], rp["max_drawdown"]
+        # Support/Resistance levels (Phase 24) — real swing pivots + 52w extremes.
+        srl = technicals_mod.sr_levels(df)
+        m["Support"] = srl["support"] if srl else None
+        m["Resistance"] = srl["resistance"] if srl else None
+        m["DistSupport%"] = srl["dist_support_pct"] if srl else None
+        m["DistResistance%"] = srl["dist_resistance_pct"] if srl else None
+        m["RiskReward"] = srl["risk_reward"] if srl else None
         m["enriched"] = False
         m["ScoreV2"] = m["Score"]            # provisional until enriched
         recs.append(m)

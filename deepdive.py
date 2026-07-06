@@ -276,7 +276,9 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     rsi_last = ta._last(ta.rsi(close.dropna(), 14))
     macd = ta.macd(close)
     vol = ta.volume_analysis(hist)
-    sr = ta.support_resistance(hist)
+    srl = getattr(ta, "sr_levels", lambda *_a, **_k: None)(hist)   # Phase 24 (guarded)
+    sr = ({"support": srl["support"], "resistance": srl["resistance"]}
+          if srl else ta.support_resistance(hist))
     cross = ta.cross_signal(close)
     atr = ta.atr(hist)
     vol_annual = risk_engine.volatility(close)
@@ -346,8 +348,9 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     def _tgt(key):
         tp = _g(info, key)
         if tp is None or not price_now:
-            return {"price": NA, "upside": None}
-        return {"price": f"${tp:.0f}", "upside": round((tp / price_now - 1) * 100, 1)}
+            return {"price": NA, "price_num": None, "upside": None}
+        return {"price": f"${tp:.0f}", "price_num": round(tp, 2),
+                "upside": round((tp / price_now - 1) * 100, 1)}
     base_facts = [f"ציון סופי v2 {score_v2}", f"תמחור: {val_label}", f"רמת סיכון: {risk_cat}"]
     scenarios = [
         {"key": "bull", "emoji": "🟢", "title": "תרחיש שורי", "prob": probs["bull"],
@@ -440,15 +443,24 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
         "trend": trend, "momentum": mom, "rsi": (round(rsi_last, 1) if rsi_last is not None else NA),
         "macd": macd, "atr": (atr if atr is not None else NA), "cross": cross,
         "moving_averages": ma, "returns": rets, "high_low": hl, "volume": vol,
-        "support_resistance": sr, "beta": (beta if beta is not None else NA),
+        "support_resistance": sr, "sr_levels": srl,
+        "beta": (beta if beta is not None else NA),
         "volatility": (vol_annual if vol_annual is not None else NA),
         "max_drawdown": (maxdd if maxdd is not None else NA),
         "risk_category": risk_cat, "sub_scores": subs,
         "opinion": _tech_opinion(trend, mom, rsi_last, hl.get("dist_from_high"), sr, ma.get("price")),
     }
 
+    raw_metrics = {
+        "price": ma.get("price"), "rev_growth": rev_growth, "eps_growth": eps_growth,
+        "op_margin": op_margin, "fcf_growth": _num(fund.get("FCFGrowth")),
+        "debt_equity": _num(fund.get("DebtToEquity")), "roic": _num(fund.get("ROIC")),
+        "ret_3m": rets.get("3m"), "ret_1m": rets.get("1m"), "rsi": rsi_last,
+    }
+
     return {
         "ticker": t, "disclaimer": DISCLAIMER,
+        "raw_metrics": raw_metrics,
         "overview": overview, "market_data": market_data, "financials": financials,
         "valuation": valuation, "growth": growth,
         "competitive": {
@@ -538,6 +550,205 @@ def _explain(key):
         "trust": "אמון מ-7 גורמים (אימות, מדגם, OOS, שלמות).",
         "valuation": "PEG+מכפיל עתידי (גבוה=זול יותר).",
     }.get(key, "")
+
+
+NOT_ENOUGH = "אין מספיק נתונים"
+
+
+def _rr_interpretation(rr):
+    if rr is None:
+        return None
+    return ("מצוין" if rr >= 2.5 else "טוב" if rr >= 1.5 else "סביר" if rr >= 1.0 else "חלש")
+
+
+def _entry_quality(trend, rsi, dist_sup, dist_res, rr, val_score):
+    """Rule-based entry quality: (emoji, label, band, reasons[]). All from real metrics."""
+    reasons = []
+    if dist_sup is not None:
+        reasons.append(f"המחיר {abs(dist_sup):.1f}% מעל התמיכה")
+    if dist_res is not None:
+        reasons.append(f"{dist_res:.1f}% עד ההתנגדות")
+    if rr is not None:
+        reasons.append(f"יחס סיכון/סיכוי {rr}")
+    if isinstance(val_score, (int, float)):
+        reasons.append("התמחור אטרקטיבי" if val_score >= 65 else
+                       "התמחור סביר" if val_score >= 40 else "התמחור יקר יחסית")
+    if trend in ("מגמת ירידה", "מגמת ירידה חזקה"):
+        return "🔴", "להימנע מרדיפה", "avoid", [f"מגמה טכנית שלילית ({trend})"] + reasons[:2]
+    if (isinstance(rsi, (int, float)) and rsi >= 75) or (dist_res is not None and dist_res <= 2):
+        return "🟠", "מתוח — התרחק מרמות אלו", "extended", \
+            ([f"RSI {rsi:.0f} — קנוי-יתר"] if isinstance(rsi, (int, float)) and rsi >= 75 else []) + reasons[:3]
+    if dist_sup is not None and abs(dist_sup) <= 3 and (rr or 0) >= 2:
+        return "🟢", "נקודת כניסה מצוינת", "excellent", reasons[:4]
+    if dist_sup is not None and abs(dist_sup) <= 6 and (rr or 0) >= 1.2:
+        return "🟢", "כניסה טובה", "good", reasons[:4]
+    if rr is not None and rr < 1:
+        return "🟡", "עדיף להמתין לתיקון", "wait", reasons[:4]
+    return "🟡", "ניטרלי — אין יתרון כניסה מובהק", "wait", (reasons[:4] or [NOT_ENOUGH])
+
+
+def _check(value, good, neutral, higher_better=True):
+    """Checklist status for one metric: good/neutral/weak/na."""
+    if not isinstance(value, (int, float)) or value != value:
+        return "na"
+    if higher_better:
+        return "good" if value >= good else ("neutral" if value >= neutral else "weak")
+    return "good" if value <= good else ("neutral" if value <= neutral else "weak")
+
+
+def investment_decision(rep: dict, regime_score=None) -> dict:
+    """Assemble the Investment Decision summary — PURE derivation from the report.
+
+    No new information: everything comes from metrics already computed in
+    analyze() (scores, analyst targets, support/resistance, fundamentals).
+    Missing inputs surface as None / "אין מספיק נתונים" — never fabricated.
+    """
+    rm = rep.get("raw_metrics") or {}
+    sc = rep.get("scores") or {}
+    srl = (rep.get("technicals") or {}).get("sr_levels") or {}
+    tech = rep.get("technicals") or {}
+    rk = rep.get("risk") or {}
+    op = rep.get("opinion") or {}
+    scen = {s.get("key"): s for s in rep.get("scenarios", [])}
+    base_t = (scen.get("base") or {}).get("target") or {}
+
+    def _sv(key):
+        v = (sc.get(key) or {}).get("value")
+        return v if isinstance(v, (int, float)) else None
+
+    v2, fund_s, tech_s = _sv("final_v2"), _sv("fundamental"), _sv("technical")
+    val_s, sector_s, trust_s = _sv("valuation"), _sv("sector"), _sv("trust")
+    risk_score = rk.get("risk_score")
+    price = rm.get("price") or srl.get("price")
+
+    # Fair value = analyst consensus mean target (real data, labeled as such).
+    fair = base_t.get("price_num")
+    upside = base_t.get("upside")                       # % to consensus target
+    mos = round((fair - price) / fair * 100, 1) if (fair and price and fair > 0) else None
+    downside = srl.get("dist_support_pct")              # % to support (negative)
+    rr = (round(upside / abs(downside), 2)
+          if (isinstance(upside, (int, float)) and isinstance(downside, (int, float))
+              and upside > 0 and abs(downside) > 0.05) else srl.get("risk_reward"))
+
+    trend = tech.get("trend")
+    entry = _entry_quality(trend, rm.get("rsi"), downside, srl.get("dist_resistance_pct"),
+                           srl.get("risk_reward"), val_s)
+
+    # Horizon (rule-based from setup character).
+    ret3 = rm.get("ret_3m")
+    risk_cat = rk.get("category")
+    if srl.get("status") == "breakout" or ((ret3 or 0) >= 30 and risk_cat in ("גבוה", "גבוה מאוד")):
+        horizon = "סווינג / 3 חודשים"
+    elif (fund_s or 0) >= 70 and risk_cat in ("נמוך", "בינוני"):
+        horizon = "טווח ארוך (12+ חודשים)"
+    elif (fund_s or 0) >= 55:
+        horizon = "6–12 חודשים"
+    else:
+        horizon = "3–6 חודשים"
+
+    mom_sub = (tech.get("sub_scores") or {}).get("momentum")
+    checklist = [
+        ("צמיחה", rm.get("rev_growth"), _check(rm.get("rev_growth"), 15, 5), "%"),
+        ("רווחיות (ROIC)", rm.get("roic"), _check(rm.get("roic"), 15, 8), "%"),
+        ("שוליים", rm.get("op_margin"), _check(rm.get("op_margin"), 20, 10), "%"),
+        ("תזרים מזומנים", rm.get("fcf_growth"), _check(rm.get("fcf_growth"), 10, 0), "%"),
+        ("חוב", rm.get("debt_equity"), _check(rm.get("debt_equity"), 0.5, 1.5, higher_better=False), "x"),
+        ("תמחור", val_s, _check(val_s, 65, 40), ""),
+        ("מומנטום", ret3, _check(ret3, 15, 0), "%"),
+        ("מגמה", trend, ("good" if isinstance(trend, str) and "עלייה" in trend else
+                         "weak" if isinstance(trend, str) and "ירידה" in trend else
+                         "neutral" if trend else "na"), ""),
+        ("מבנה טכני", tech_s, _check(tech_s, 66, 40), ""),
+        ("חוזק סקטור", sector_s, _check(sector_s, 66, 40), ""),
+        ("סביבת מאקרו", regime_score, _check(regime_score, 60, 40), ""),
+        ("סיכון", risk_score, _check(risk_score, 32, 65, higher_better=False), ""),
+    ]
+
+    matrix = {"פונדמנטלי": fund_s, "טכני": tech_s, "תמחור": val_s,
+              "מומנטום": mom_sub, "סיכון (בריאות)": (100 - risk_score) if isinstance(risk_score, (int, float)) else None,
+              "סקטור": sector_s}
+
+    # Investor-type tags (rule-based).
+    tags = []
+    if (rm.get("rev_growth") or 0) >= 20 or (rm.get("eps_growth") or 0) >= 25:
+        tags.append("משקיע צמיחה")
+    if (val_s or 0) >= 65:
+        tags.append("משקיע ערך")
+    if (ret3 or 0) >= 30:
+        tags.append("סוחר מומנטום")
+    if (fund_s or 0) >= 60 and risk_cat == "נמוך":
+        tags.append("משקיע טווח ארוך")
+    if entry[2] in ("excellent", "good") and (srl.get("risk_reward") or 0) >= 2:
+        tags.append("סוחר סווינג")
+    if not tags:
+        tags.append("פרופיל מעורב — לא מובהק")
+
+    # What must happen (only for actually-weak items).
+    wait_for = []
+    if isinstance(val_s, (int, float)) and val_s < 40:
+        wait_for.append("התכווצות תמחור (ירידת מכפילים) או ירידת מחיר לכיוון התמיכה"
+                        + (f" ${srl['support']}" if srl.get("support") else ""))
+    if srl.get("dist_resistance_pct") is not None and srl["dist_resistance_pct"] <= 4 and srl.get("resistance"):
+        wait_for.append(f"פריצה מבוססת מעל ההתנגדות ${srl['resistance']}")
+    if isinstance(rm.get("rev_growth"), (int, float)) and rm["rev_growth"] < 5:
+        wait_for.append("האצת צמיחת הכנסות")
+    if isinstance(rm.get("op_margin"), (int, float)) and rm["op_margin"] < 10:
+        wait_for.append("שיפור שולי רווח תפעוליים")
+    if isinstance(rm.get("debt_equity"), (int, float)) and rm["debt_equity"] > 1.5:
+        wait_for.append("הפחתת מינוף (חוב/הון)")
+    if isinstance(trend, str) and "ירידה" in trend:
+        wait_for.append("חזרה למגמת עלייה (התייצבות מעל ממוצע 200)")
+    if not wait_for:
+        wait_for.append("אין תנאי-סף מהותיים — המדדים הנוכחיים כבר תומכים")
+
+    # What could go wrong (only data-supported risks).
+    risks = []
+    if isinstance(val_s, (int, float)) and val_s < 40:
+        risks.append("סיכון תמחור — מכפילים מתוחים ביחס לצמיחה")
+    if isinstance(rk.get("beta"), (int, float)) and rk["beta"] > 1.3:
+        risks.append(f"רגישות גבוהה לשוק (ביתא {rk['beta']})")
+    if isinstance(rm.get("debt_equity"), (int, float)) and rm["debt_equity"] > 1.5:
+        risks.append(f"מינוף גבוה (חוב/הון {rm['debt_equity']})")
+    if isinstance(sector_s, (int, float)) and sector_s < 40:
+        risks.append("חולשה סקטוריאלית — רוח נגדית ענפית")
+    if isinstance(rk.get("max_drawdown"), (int, float)) and rk["max_drawdown"] < -35:
+        risks.append(f"תנודתיות היסטורית עמוקה (ירידה מקס׳ {rk['max_drawdown']}%)")
+    if isinstance(trust_s, (int, float)) and trust_s < 40:
+        risks.append("אימות היסטורי מוגבל — מדגם קטן")
+    for x in (rep.get("regulation_risks") or {}).get("sector_risks", [])[:2]:
+        if len(risks) < 5:
+            risks.append(f"{x} (הערכה כללית לפי סקטור)")
+
+    # Price zones (visual positions 0-100 across the observed range).
+    zones = None
+    nums = [x for x in (srl.get("support"), srl.get("resistance"), price, fair) if isinstance(x, (int, float))]
+    if price and len(nums) >= 3:
+        lo, hi = min(nums) * 0.99, max(nums) * 1.01
+        rngz = (hi - lo) or 1.0
+        posz = lambda x: round((x - lo) / rngz * 100, 1) if isinstance(x, (int, float)) else None
+        zones = {"lo": round(lo, 2), "hi": round(hi, 2),
+                 "support": srl.get("support"), "resistance": srl.get("resistance"),
+                 "price": price, "fair": fair,
+                 "pos_support": posz(srl.get("support")), "pos_resistance": posz(srl.get("resistance")),
+                 "pos_price": posz(price), "pos_fair": posz(fair)}
+
+    strengths = [x for x in (rep.get("pros_cons") or {}).get("pros", []) if x != "—"][:5]
+    weaknesses = [x for x in (rep.get("pros_cons") or {}).get("cons", []) if x != "—"][:5]
+
+    return {
+        "recommendation": op.get("recommendation", NOT_ENOUGH),
+        "confidence": trust_s, "horizon": horizon,
+        "price": price, "target": base_t.get("price", NA), "target_num": fair,
+        "fair_value": base_t.get("price", NA), "margin_of_safety": mos,
+        "support": srl.get("support"), "resistance": srl.get("resistance"),
+        "upside": upside, "downside": downside, "rr": rr,
+        "rr_interpretation": _rr_interpretation(rr),
+        "risk_level": risk_cat or NOT_ENOUGH, "score_v2": v2,
+        "entry": {"emoji": entry[0], "label": entry[1], "band": entry[2], "reasons": entry[3]},
+        "checklist": checklist, "matrix": matrix,
+        "investor_types": tags, "wait_for": wait_for[:4], "risks": risks[:5],
+        "zones": zones, "strengths": strengths, "weaknesses": weaknesses,
+    }
 
 
 def _scores_block(tech, fund, sector, news, risk, v2, trust, valuation, comp):

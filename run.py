@@ -30,6 +30,7 @@ import pandas as pd
 import config
 import proprietary
 import portfolio
+import technicals
 import insights as insights_mod
 from data_loader import load_ohlcv
 from names import get_company_name
@@ -616,6 +617,13 @@ def main() -> None:
         metrics["Volatility"] = rp["volatility"]
         metrics["MaxDrawdown"] = rp["max_drawdown"]
         metrics["RiskWarnings"] = " · ".join(rp["warnings"])
+        # Support/Resistance levels (Phase 24) — real swing pivots + 52w extremes.
+        srl = technicals.sr_levels(price_df)
+        metrics["Support"] = srl["support"] if srl else None
+        metrics["Resistance"] = srl["resistance"] if srl else None
+        metrics["DistSupport%"] = srl["dist_support_pct"] if srl else None
+        metrics["DistResistance%"] = srl["dist_resistance_pct"] if srl else None
+        metrics["RiskReward"] = srl["risk_reward"] if srl else None
         if rp["risk_score"] is not None:
             metrics["ScoreRisk"] = rp["risk_score"]
             metrics["RiskLevel"] = rp["category"]
@@ -763,6 +771,10 @@ def main() -> None:
         }
         with open(config.SYSTEM_HEALTH_JSON, "w", encoding="utf-8") as fh:
             json.dump(system_health, fh, ensure_ascii=False, indent=2)
+        # Global market indicators (Phase 30) — crypto/FX/commodities/rates.
+        import globalmkt
+        with open(config.GLOBAL_JSON, "w", encoding="utf-8") as fh:
+            json.dump(globalmkt.build(), fh, ensure_ascii=False, indent=2)
     except OSError as exc:
         print(f"  ! שמירת artifact נכשלה: {exc}")
 

@@ -88,6 +88,52 @@ def test_performance_metrics():
     assert ta.performance(up["Close"].head(1)) is None
 
 
+def test_sr_levels_sides_and_distances():
+    df = _frame(n=300, seed=11)
+    lv = ta.sr_levels(df)
+    assert lv is not None
+    price = lv["price"]
+    if lv["support"] is not None:
+        assert lv["support"] < price                       # support strictly below
+        assert lv["dist_support_pct"] < 0                  # negative distance
+        assert abs(lv["dist_support_pct"] - (lv["support"] / price - 1) * 100) < 0.15
+        assert lv["breakdown_level"] == lv["support"]
+    if lv["resistance"] is not None:
+        assert lv["resistance"] > price                    # resistance strictly above
+        assert lv["dist_resistance_pct"] > 0
+        assert lv["breakout_level"] == lv["resistance"]
+
+
+def test_sr_risk_reward_classification():
+    df = _frame(n=300, seed=12)
+    lv = ta.sr_levels(df)
+    if lv and lv["risk_reward"] is not None:
+        exp = lv["dist_resistance_pct"] / abs(lv["dist_support_pct"])
+        assert abs(lv["risk_reward"] - round(exp, 2)) < 0.01
+        assert lv["risk_reward_label"] in ("אטרקטיבי", "מאוזן", "לא אטרקטיבי")
+        if lv["risk_reward"] > 2.0:
+            assert lv["risk_reward_label"] == "אטרקטיבי"
+        elif lv["risk_reward"] < 1.0:
+            assert lv["risk_reward_label"] == "לא אטרקטיבי"
+
+
+def test_sr_breakout_status_when_price_is_max():
+    import pandas as pd
+    df = _frame(n=300, start=100, drift=0.9, seed=13)   # strong uptrend → new highs
+    # force the last close far above every prior high (clean breakout)
+    df.iloc[-1, df.columns.get_loc("Close")] = float(df["High"].max()) * 1.10
+    df.iloc[-1, df.columns.get_loc("High")] = df["Close"].iloc[-1]
+    lv = ta.sr_levels(df)
+    assert lv["status"] == "breakout"
+    assert "פריצה" in lv["interpretation"]
+    assert lv["resistance"] is None or lv["resistance"] > lv["price"]
+
+
+def test_sr_no_fake_levels_on_short_history():
+    short = _frame(n=8)
+    assert ta.sr_levels(short) is None                     # not enough data → None, no invention
+
+
 def test_insufficient_history_returns_none():
     short = _frame(n=15)
     assert ta.macd(short["Close"])["macd"] is None
