@@ -1576,6 +1576,34 @@ elif page == "📊 אינטליגנציית שוק":
     k[2].metric("אמון ממוצע", fmt(sh.get("avg_trust")))
     k[3].metric("משיכות שנכשלו", sh.get("failed_pulls", "—"))
 
+    # ---------- 🌍 Global markets (Phase 30) ----------
+    g = load_global()
+    if g.get("groups"):
+        st.markdown("#### שווקים גלובליים")
+        st.caption(f"עודכן {g.get('updated', '—')} · נתונים אמיתיים (Yahoo) · פרשנות דטרמיניסטית מהשינויים המחושבים בלבד.")
+        _gtabs = st.tabs(["מדדים", "קריפטו", "מט\"ח", "סחורות", "אג\"ח וריביות"])
+        for tab, key in zip(_gtabs, ["equity", "crypto", "fx", "commodity", "rates"]):
+            with tab:
+                rows_g = g["groups"].get(key, [])
+                if not rows_g:
+                    st.caption(NA_)
+                    continue
+                body = ""
+                for r in rows_g:
+                    p = r.get("price")
+                    pv = NA_ if p is None else (f"${p:,.0f}" if str(r["symbol"]).endswith("-USD") else f"{p:,.3f}".rstrip("0").rstrip("."))
+                    cells = ""
+                    for dk in ("d1", "d7", "d30"):
+                        dv = r.get(dk)
+                        cc = MUTED if not isinstance(dv, (int, float)) else (POSITIVE if dv >= 0 else NEGATIVE)
+                        cells += f"<td style='color:{cc}'>{f'{dv:+.1f}%' if isinstance(dv, (int, float)) else '—'}</td>"
+                    body += (f"<tr><td><b>{r['name']}</b></td><td><b>{pv}</b></td>{cells}"
+                             f"<td>{r.get('trend', '—')}</td>"
+                             f"<td style='color:{SECONDARY};font-size:14px'>{r.get('interp', '')}</td></tr>")
+                st.markdown(f"<table class='sectbl'><thead><tr><th>נכס</th><th>מחיר</th><th>יומי</th>"
+                            f"<th>שבוע</th><th>חודש</th><th>מגמה</th><th>פרשנות</th></tr></thead>"
+                            f"<tbody>{body}</tbody></table>", unsafe_allow_html=True)
+
     st.markdown("#### טבלת מניות מדורגת")
     cols = ["Ticker", "Name", "ScoreV2", "Score", "ScoreFundamental", "ScoreRisk",
             "TrustScore", "RiskLevel", "ExpectedUpside%", "Confidence", "DailyChange%"]

@@ -192,6 +192,18 @@ def render(df, mkt):
     ranked = pos if not pos.empty else df.sort_values("ScoreV2", ascending=False)
 
     if page == "🏠 בית":
+        gm = _load(config.GLOBAL_JSON, {})
+        if gm.get("strip"):
+            chips = []
+            for r in gm["strip"]:
+                p, d1 = r.get("price"), r.get("d1")
+                col = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
+                pv = "—" if p is None else (f"${p/1000:.0f}K" if str(r["symbol"]).endswith("-USD") and p >= 1000
+                                            else f"${p:,.0f}" if str(r["symbol"]).endswith("-USD") else f"{p:,.2f}")
+                dv = f"{d1:+.1f}%" if isinstance(d1, (int, float)) else ""
+                chips.append(f"<span class='chip'>{r['name']} <b>{pv}</b> "
+                             f"<span style='color:{col}'>{dv}</span></span>")
+            st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
         _home(df, ranked, sectors, alerts, regime, fng, lookup, nc)
     elif page == "🔎 ניתוח":
         _analysis(mkt, lookup, nc)
