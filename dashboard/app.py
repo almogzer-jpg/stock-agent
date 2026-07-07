@@ -468,202 +468,209 @@ def opp_card(rank, r):
 
 
 if page.startswith("🏠"):
+    from dashboard import views as VW
     regime = mkt.get("regime", {})
     fng = mkt.get("fear_greed", {})
     breadth = mkt.get("breadth", {})
-    indices = mkt.get("indices", [])
     ins = mkt.get("insights", {})
     alerts = load_alert_center()
     health = load_system_health()
-
-    # ---------- Executive summary — text first (what matters today) ----------
+    g = load_global()
+    uni_h = load_universe()
+    lookup_h = VW.build_lookup(uni_h)
+    nc_h = VW.names_cache()
     reg_s, reg_l = regime.get("score"), regime.get("label", "—")
-    _top1 = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(1)
-    _secs = sorted(mkt.get("sectors", []), key=lambda s: -s.get("score", 0))
-    _crit = [a for a in alerts if a.get("severity") in ("קריטית", "גבוהה")]
-    _bits = []
-    if len(_top1):
-        _r0 = _top1.iloc[0]
-        _bits.append(f"ההזדמנות הבולטת: <b style='color:{TEXT}'>{_r0['Ticker']}</b> "
-                     f"(ציון {int(_r0['ScoreV2'])}, סיכון {fmt(_r0.get('RiskLevel'))})")
-    if _secs:
-        _bits.append(f"סקטור מוביל: {_secs[0]['sector']} · חלש: {_secs[-1]['sector']}")
-    _bits.append(f"{len(_crit)} התראות קריטיות פתוחות" if _crit else "אין התראות קריטיות")
+    rcol = regime_color(reg_s)
+    tr_avg = health.get("avg_trust")
+
+    # ---- 1. Market Command Center ----
+    one_line = (ins.get("summary") or "").replace("**", "")
     st.markdown(
-        f"<div style='margin:4px 0 26px'>"
-        f"<div style='font-size:26px;font-weight:700;line-height:1.3'>"
-        f"השוק במצב {reg_l} <span style='color:{regime_color(reg_s)}'>({fmt(reg_s)}/100)</span>"
-        f" · {len(positive)} הזדמנויות פעילות</div>"
-        f"<div style='font-size:15px;color:{SECONDARY};margin-top:10px;line-height:1.8'>{' · '.join(_bits)}.</div>"
-        f"</div>", unsafe_allow_html=True)
+        f"<div class='ic-card' style='padding:28px 30px'>"
+        f"<div style='display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap'>"
+        f"<div><div style='color:{MUTED};font-size:14px'>מצב השוק</div>"
+        f"<div style='font-size:40px;font-weight:700;color:{rcol};line-height:1.1'>{reg_l}</div>"
+        f"<div style='color:{SECONDARY};font-size:16px;margin-top:6px'>{one_line}</div></div>"
+        f"<div style='display:flex;gap:34px;flex-wrap:wrap'>"
+        f"<div><div style='color:{MUTED};font-size:13px'>ציון שוק</div>"
+        f"<div style='font-size:28px;font-weight:600;color:{rcol}'>{fmt(reg_s)}/100</div></div>"
+        f"<div><div style='color:{MUTED};font-size:13px'>פחד / חמדנות</div>"
+        f"<div style='font-size:28px;font-weight:600'>{fmt(fng.get('score'))}</div></div>"
+        f"<div><div style='color:{MUTED};font-size:13px'>ביטחון מערכת</div>"
+        f"<div style='font-size:28px;font-weight:600;color:{score_color(tr_avg)}'>{fmt(round(tr_avg) if isinstance(tr_avg,(int,float)) else None)}</div></div>"
+        f"<div><div style='color:{MUTED};font-size:13px'>עודכן</div>"
+        f"<div style='font-size:28px;font-weight:600;color:{SECONDARY}'>{latest}</div></div>"
+        f"</div></div></div>", unsafe_allow_html=True)
 
-    # ---------- Global market strip (Phase 30) ----------
-    _g = load_global()
-    if _g.get("strip"):
-        st.markdown(global_strip_html(_g), unsafe_allow_html=True)
-        st.caption(f"שווקים גלובליים · עודכן {_g.get('updated', '—')} · הרחבה בעמוד אינטליגנציית שוק")
+    # ---- 2. Global markets strip (15 assets from the artifact groups) ----
+    _by = {r["symbol"]: r for grp in (g.get("groups") or {}).values() for r in grp}
+    _order = ["^GSPC", "^IXIC", "^DJI", "^RUT", "BTC-USD", "ETH-USD", "XRP-USD",
+              "GC=F", "SI=F", "CL=F", "ILS=X", "EURILS=X", "DX-Y.NYB", "^TNX", "^VIX"]
+    chips = []
+    for sym in _order:
+        r = _by.get(sym)
+        if not r:
+            continue
+        p, d1 = r.get("price"), r.get("d1")
+        col = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
+        pv = "—" if p is None else (f"${p:,.0f}" if sym.endswith("-USD") else f"{p:,.2f}")
+        chips.append(f"<div class='chip'><div class='cl'>{r['name']} {r.get('trend','')[-1] if r.get('trend') else ''}</div>"
+                     f"<div class='cv'>{pv} <span style='color:{col};font-size:14px'>"
+                     f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></div></div>")
+    if chips:
+        st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
+        st.caption(f"שווקים גלובליים · עודכן {g.get('updated','—')}")
 
-    # ---------- Section 1: Executive KPI strip ----------
-    fg_s, fg_l = fng.get("score"), fng.get("label", "")
-    fg_c = (NEGATIVE if isinstance(fg_s, (int, float)) and fg_s < 45
-            else POSITIVE if isinstance(fg_s, (int, float)) and fg_s > 55 else WARNING)
-    crit = [a for a in alerts if a.get("severity") in ("קריטית", "גבוהה")]
-    br_score = (breadth or {}).get("score")
-    tr = health.get("avg_trust")
+    # ---- 3. Capital flow (real sector-strength proxy) ----
+    cf = mkt.get("capital_flow", {})
+    if cf.get("inflows") or cf.get("outflows"):
+        st.markdown("#### לאן זורם הכסף")
+        fc = st.columns(2)
+        _fin = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
+                       f"<span>↗ {s['sector']}</span><b style='color:{POSITIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
+                       for s in cf.get("inflows", [])[:4])
+        _fout = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
+                        f"<span>↘ {s['sector']}</span><b style='color:{NEGATIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
+                        for s in cf.get("outflows", [])[:4])
+        fc[0].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{POSITIVE}'>כניסת הון</div>{_fin}</div>",
+                       unsafe_allow_html=True)
+        fc[1].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{NEGATIVE}'>יציאת הון</div>{_fout}</div>",
+                       unsafe_allow_html=True)
+        st.caption(cf.get("method", ""))
 
-    def _kpi(ac, ico, val, lab, sub, tip):
-        return (f"<div class='kpi' style='--ac:{ac}' title='{tip}'><span class='k-dot'></span>"
-                f"<div class='k-ico'>{ico}</div><div class='k-val'>{val}</div>"
-                f"<div class='k-lab'>{lab}</div><div class='k-sub'>{sub}</div></div>")
-
-    kpis = [
-        _kpi(regime_color(reg_s), "🧭", fmt(reg_s), "מצב שוק", reg_l,
-             "ציון 0-100 ממגמת S&P 500, רמת VIX ורוחב שוק"),
-        _kpi(fg_c, "😶‍🌫️", fmt(fg_s), "פחד / חמדנות", fg_l,
-             "מדד קנייני: VIX + רוחב + מומנטום + יחס עולות/יורדות"),
-        _kpi(POSITIVE, "💎", len(positive), "הזדמנויות", f"{n_break} פריצות · {len(watch)} מעקב",
-             "מספר המניות בסטטוס חיובי היום"),
-        _kpi(NEGATIVE if crit else MUTED, "🔔", len(crit), "התראות קריטיות", f"מתוך {len(alerts)} סה\"כ",
-             "התראות בחומרה גבוהה/קריטית"),
-    ]
-    st.markdown(f"<div class='kpi-grid' style='grid-template-columns:repeat(4,1fr)'>{''.join(kpis)}</div>",
-                unsafe_allow_html=True)
-
-    # ---------- Section 2: Market Regime + What should I do today ----------
-    c = st.columns([1.05, 1.95], gap="large")
-    with c[0]:
-        st.markdown("#### מצב שוק (Market Regime)")
-        regime_gauge(reg_s, reg_l)
-        spx = mkt.get("spx_hist", [])
-        spx_up = len(spx) > 20 and spx[-1] >= sum(spx) / len(spx)
-        vix = next((i.get("price") for i in indices if i.get("symbol") == "^VIX"), None)
-        vix_low = isinstance(vix, (int, float)) and vix < 20
-        br = breadth.get("above200")
-        br_pos = isinstance(br, (int, float)) and br >= 50
-
-        def _chip(ok, label):
-            cc = POSITIVE if ok else NEGATIVE
-            return f"<span class='badge' style='color:{cc};background:{cc}1a;margin:3px 3px 0 0'>{'✓' if ok else '✕'} {label}</span>"
-        st.markdown("<div>" + _chip(spx_up, "S&P 500 מעל המגמה")
-                    + _chip(vix_low, f"VIX נמוך ({fmt(vix)})")
-                    + _chip(br_pos, f"רוחב חיובי ({fmt(br, '%')})")
-                    + f"<div class='ic-sub' style='margin-top:8px'>גורמים תורמים — נגזרים מ-S&P מול ממוצעים 200/50 ורמת VIX.</div></div>",
-                    unsafe_allow_html=True)
-    with c[1]:
-        st.markdown("#### הזדמנויות לבחינה היום")
-        top3 = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(3)
-        grid = "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:12px'>"
-        for i, (_, r) in enumerate(top3.iterrows(), start=1):
-            info = classify(r)
-            grid += (f"<div class='act' style='--ac:{info['color']}'><div class='a-pr'>🎯 עדיפות {i}</div>"
-                     f"<div class='a-ti'>בחן {r['Ticker']}</div>"
-                     f"<div class='a-row'><b>למה:</b> {info['summary']}</div>"
-                     f"<div class='a-row'><b>ציון V2:</b> {int(r['ScoreV2'])} · <b>סיכון:</b> {fmt(r.get('RiskLevel'))} · "
-                     f"<b>ביטחון:</b> {fmt(r.get('Confidence'))}%</div></div>")
-        st.markdown(grid + "</div>", unsafe_allow_html=True)
-        st.caption("לניתוח מעמיק של מניה — עבור ללשונית 🔎 ניתוח חברה.")
-
-    # ---------- Section 3: Markets strip + S&P trend ----------
-    st.markdown("#### שווקים")
-    cells = []
-    for ix in indices:
-        cp = ix.get("change_pct")
-        col = MUTED if cp is None else (POSITIVE if cp >= 0 else NEGATIVE)
-        sign = "+" if (cp is not None and cp >= 0) else ""
-        cells.append(f"<span style='margin-left:24px'><b style='color:{TEXT}'>{ix['name']}</b> "
-                     f"{fmt(ix.get('price'))} <span style='color:{col}'>{sign}{fmt(cp)}%</span></span>")
-    st.markdown(f"<div class='ic-card' style='padding:14px 20px'>{''.join(cells)}</div>", unsafe_allow_html=True)
-    spx = mkt.get("spx_hist", [])
-    if spx:
-        fig = go.Figure(go.Scatter(y=spx, line_color=PRIMARY, fill="tozeroy", fillcolor="rgba(0,194,255,0.10)"))
-        fig.update_layout(title="S&P 500 · מגמת 6 חודשים")
-        st.plotly_chart(style_fig(fig, 210), use_container_width=True)
-    with st.expander("ℹ️ איך מחושבים מצב השוק ומד הפחד/חמדנות?"):
-        st.write(fng.get("method", "—"))
-        st.write("**רוחב שוק:** " + breadth.get("method", "—"))
-
-    st.divider()
-
-    # ---------- Section 4: Top opportunities (cards + drill-down) ----------
-    st.markdown("### ההזדמנויות המובילות היום")
+    # ---- 4. Best opportunities table ----
+    st.markdown("#### ההזדמנויות המובילות היום")
     ranked = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(8)
-    from dashboard import views as _VW
     _body = ""
     for i, (_, r) in enumerate(ranked.iterrows(), 1):
         sv = r.get("ScoreV2")
         sv = int(sv) if isinstance(sv, (int, float)) and sv == sv else None
-        scol = score_color(sv)
-        rb = _VW.risk_badge(r.get("RiskLevel"))
+        rb = VW.risk_badge(r.get("RiskLevel"))
         up = r.get("ExpectedUpside%")
-        upc = POSITIVE if isinstance(up, (int, float)) and up >= 0 else NEGATIVE
-        chg = r.get("DailyChange%")
-        chc = POSITIVE if isinstance(chg, (int, float)) and chg >= 0 else NEGATIVE
-        tr = r.get("TrustScore")
-        tr = int(tr) if isinstance(tr, (int, float)) and tr == tr else None
-        _body += (
-            f"<tr>"
-            f"<td style='color:{MUTED}'>{i}</td>"
-            f"<td><div style='font-weight:700;font-size:16px'>{r['Ticker']}</div>"
-            f"<div style='color:{MUTED};font-size:13px'>{r.get('Name', '')}</div></td>"
-            f"<td><span class='tbadge' style='color:{PRIMARY}'>"
-            f"{market.SECTOR_EN_TO_HE.get(r.get('Sector'), r.get('Sector') or '—')}</span></td>"
-            f"<td><b>${fmt(r.get('Price'))}</b><div style='color:{chc};font-size:13px'>"
-            f"{f'{chg:+.1f}%' if isinstance(chg, (int, float)) else '—'}</div></td>"
-            f"<td><div style='display:flex;align-items:center;gap:10px'>"
-            f"<div class='miniprog' style='min-width:84px'><div style='width:{sv or 0}%;background:{scol}'></div></div>"
-            f"<b style='color:{scol};font-size:16px'>{sv if sv is not None else chr(8212)}</b></div></td>"
-            f"<td><b style='color:{score_color(tr)}'>{tr if tr is not None else chr(8212)}</b></td>"
-            f"<td><span class='tbadge' style='color:{rb[3]}'>{rb[0]} {rb[1]}</span></td>"
-            f"<td style='color:{upc};font-weight:600'>"
-            f"{f'{up:+.1f}%' if isinstance(up, (int, float)) else chr(8212)}</td>"
-            f"</tr>")
-    _head = "".join(f"<th>{h}</th>" for h in
-                    ["#", "חברה", "סקטור", "מחיר", "Score V2", "אמון", "סיכון", "פוטנציאל"])
+        sup, res = r.get("Support"), r.get("Resistance")
+        _body += (f"<tr><td style='color:{MUTED}'>{i}</td>"
+                  f"<td><div style='font-weight:700;font-size:16px'>{r['Ticker']}</div>"
+                  f"<div style='color:{MUTED};font-size:13px'>{r.get('Name','')}</div></td>"
+                  f"<td><span class='tbadge' style='color:{PRIMARY}'>{market.SECTOR_EN_TO_HE.get(r.get('Sector'), r.get('Sector') or '—')}</span></td>"
+                  f"<td><div style='display:flex;align-items:center;gap:10px'>"
+                  f"<div class='miniprog' style='min-width:70px'><div style='width:{sv or 0}%;background:{score_color(sv)}'></div></div>"
+                  f"<b style='color:{score_color(sv)}'>{sv if sv is not None else '—'}</b></div></td>"
+                  f"<td><span class='tbadge' style='color:{rb[3]}'>{rb[0]} {rb[1]}</span></td>"
+                  f"<td>{f'${sup}' if isinstance(sup,(int,float)) else '—'}</td>"
+                  f"<td>{f'${res}' if isinstance(res,(int,float)) else '—'}</td>"
+                  f"<td style='color:{POSITIVE if isinstance(up,(int,float)) and up>=0 else NEGATIVE};font-weight:600'>"
+                  f"{f'{up:+.1f}%' if isinstance(up,(int,float)) else '—'}</td></tr>")
+    _head = "".join(f"<th>{h}</th>" for h in ["#", "חברה", "סקטור", "ציון V2", "סיכון", "תמיכה", "התנגדות", "פוטנציאל"])
     st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
                 unsafe_allow_html=True)
-    st.caption("ציון V2 = השקלול המלא (פונדמנטלי/טכני/סקטור/חדשות/סיכון) · פוטנציאל = מדד קנייני מחושב.")
-    _bc = st.columns(len(ranked) if len(ranked) else 1)
+    _bc = st.columns(max(len(ranked), 1))
     for j, (_, r) in enumerate(ranked.iterrows()):
         if _bc[j].button(f"🔎 {r['Ticker']}", key=f"hg_{r['Ticker']}", use_container_width=True):
             st.session_state["dd_ticker"] = r["Ticker"]
             st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
             st.rerun()
 
-    # ---------- Sector rotation + upcoming events ----------
-    sc2 = st.columns(2)
-    _secs_all = sorted(mkt.get("sectors", []), key=lambda s: -s.get("score", 0))
-    if _secs_all:
-        _sbody = "".join(
-            f"<tr><td>{i}</td><td>{s['sector']}</td>"
-            f"<td><b style='color:{score_color(s['score'])}'>{s['score']}</b></td>"
-            f"<td>{s.get('momentum', '—')}</td>"
-            f"<td style='color:{POSITIVE if (s.get('rs') or 0) >= 0 else NEGATIVE}'>{s.get('rs', 0):+.1f}%</td></tr>"
-            for i, s in enumerate(_secs_all, 1))
-        sc2[0].markdown("#### רוטציית סקטורים")
-        sc2[0].markdown(f"<table class='sectbl'><thead><tr><th>#</th><th>סקטור</th><th>ציון</th>"
-                        f"<th>מומנטום</th><th>חוזק יחסי</th></tr></thead><tbody>{_sbody}</tbody></table>",
-                        unsafe_allow_html=True)
-    _upcoming = sorted([(t, e) for t, e in (events or {}).items()
-                        if isinstance(e.get("days_to_earnings"), (int, float)) and 0 <= e["days_to_earnings"] <= 45],
-                       key=lambda x: x[1]["days_to_earnings"])[:7]
-    sc2[1].markdown("#### אירועים קרובים")
-    if _upcoming:
-        _erows = "".join(
-            f"<div style='display:flex;justify-content:space-between;padding:9px 2px;"
-            f"border-bottom:1px solid {BORDER};font-size:15px'>"
-            f"<span><b>{t}</b> · דוחות כספיים</span>"
-            f"<span style='color:{SECONDARY}'>בעוד {int(e['days_to_earnings'])} ימים</span></div>"
-            for t, e in _upcoming)
-        sc2[1].markdown(f"<div class='ic-card'>{_erows}"
-                        f"<div class='ic-sub' style='margin-top:8px'>מקור: תאריכי דוחות של רשימת המעקב (Yahoo).</div></div>",
-                        unsafe_allow_html=True)
-    else:
-        sc2[1].caption("אין אירועים קרובים ידועים ברשימת המעקב.")
+    # ---- 5. Hot stocks (from the universe scan) ----
+    _all = uni_h.get("all", [])
+    if _all:
+        st.markdown("#### מניות חמות")
 
+        def _mini(col, title, items, sub_fn):
+            rowsx = "".join(f"<div style='display:flex;justify-content:space-between;padding:6px 2px;"
+                            f"border-bottom:1px solid {BORDER};font-size:14.5px'>"
+                            f"<b>{x['Ticker']}</b><span style='color:{SECONDARY}'>{sub_fn(x)}</span></div>"
+                            for x in items[:4]) or f"<div class='ic-sub'>—</div>"
+            col.markdown(f"<div class='ic-card' style='height:100%'><div style='font-weight:600;margin-bottom:6px'>{title}</div>{rowsx}</div>",
+                         unsafe_allow_html=True)
+        hs = st.columns(5)
+        _n = lambda x, k: x.get(k) if isinstance(x.get(k), (int, float)) else None
+        mom = sorted([x for x in _all if _n(x, "Ret3m") is not None], key=lambda x: -x["Ret3m"])
+        nbo = sorted([x for x in _all if _n(x, "DistResistance%") is not None and x["DistResistance%"] <= 3],
+                     key=lambda x: x["DistResistance%"])
+        nsup = sorted([x for x in _all if _n(x, "DistSupport%") is not None and abs(x["DistSupport%"]) <= 3],
+                      key=lambda x: abs(x["DistSupport%"]))
+        udv = sorted([x for x in _all if _n(x, "Valuation") is not None], key=lambda x: -x["Valuation"])
+        hq = sorted([x for x in _all if _n(x, "ScoreFundamental") is not None], key=lambda x: -x["ScoreFundamental"])
+        _mini(hs[0], "מומנטום", mom, lambda x: f"+{x['Ret3m']:.0f}%")
+        _mini(hs[1], "לקראת פריצה", nbo, lambda x: f"{x['DistResistance%']:.1f}% מההתנגדות")
+        _mini(hs[2], "ליד תמיכה", nsup, lambda x: f"{x['DistSupport%']:.1f}%")
+        _mini(hs[3], "מוערכות בחסר", udv, lambda x: f"תמחור {int(x['Valuation'])}")
+        _mini(hs[4], "איכות גבוהה", hq, lambda x: f"פונד׳ {int(x['ScoreFundamental'])}")
 
-# ===========================================================================
-# PAGE: AI assistant
-# ===========================================================================
+    # ---- 6+9. Macro snapshot + breadth (visual bars) ----
+    mb = st.columns([1.4, 1])
+    _macro_syms = [("^TNX", "תשואת 10 שנים"), ("DX-Y.NYB", "מדד הדולר"), ("CL=F", "נפט WTI"),
+                   ("GC=F", "זהב"), ("^VIX", "VIX")]
+    _mrows = ""
+    for sym, nm in _macro_syms:
+        r = _by.get(sym)
+        if not r:
+            continue
+        d1 = r.get("d1")
+        cc2 = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
+        _mrows += (f"<div style='display:flex;justify-content:space-between;gap:10px;padding:8px 2px;"
+                   f"border-bottom:1px solid {BORDER}'><span style='color:{SECONDARY}'>{nm}</span>"
+                   f"<span><b>{fmt(r.get('price'))}</b> <span style='color:{cc2}'>"
+                   f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></span>"
+                   f"<span style='color:{MUTED};font-size:13.5px'>{r.get('interp','')}</span></div>")
+    mb[0].markdown(f"<div class='ic-card'><div class='ic-title'>תמונת מאקרו</div>{_mrows}"
+                   f"<div class='ic-sub' style='margin-top:8px'>נתוני Fed/אינפלציה אינם זמינים ממקור חינמי מובנה.</div></div>",
+                   unsafe_allow_html=True)
+    _b50, _b200 = breadth.get("above50"), breadth.get("above200")
+    _adv = breadth.get("advancers"); _dec = breadth.get("decliners")
+    _advp = round(_adv / (_adv + _dec) * 100) if isinstance(_adv, (int, float)) and isinstance(_dec, (int, float)) and (_adv + _dec) else None
+
+    def _bbar(lbl, v):
+        return (f"<div class='sbar'><div class='sbar-h'><span>{lbl}</span>"
+                f"<b style='color:{score_color(v)}'>{fmt(v, '%')}</b></div>"
+                f"<div class='sbar-t'><div class='sbar-f' style='width:{v or 0}%;background:{score_color(v)}'></div></div></div>")
+    mb[1].markdown(f"<div class='ic-card'><div class='ic-title'>רוחב שוק</div>"
+                   + _bbar("מעל ממוצע 50", _b50) + _bbar("מעל ממוצע 200", _b200)
+                   + _bbar("מניות עולות היום", _advp) + "</div>", unsafe_allow_html=True)
+
+    # ---- 7+10. Events this week + market intelligence (rating actions) ----
+    ev2 = st.columns(2)
+    _wk = sorted([(t, e) for t, e in (events or {}).items()
+                  if isinstance(e.get("days_to_earnings"), (int, float)) and 0 <= e["days_to_earnings"] <= 7],
+                 key=lambda x: x[1]["days_to_earnings"])
+    _wk_html = "".join(f"<div style='display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid {BORDER}'>"
+                       f"<span><b>{t}</b> · דוחות</span><span style='color:{SECONDARY}'>בעוד {int(e['days_to_earnings'])} ימים</span></div>"
+                       for t, e in _wk) or f"<div class='ic-sub'>אין דוחות השבוע ברשימת המעקב.</div>"
+    ev2[0].markdown(f"<div class='ic-card' style='height:100%'><div class='ic-title'>אירועים השבוע</div>{_wk_html}"
+                    f"<div class='ic-sub' style='margin-top:8px'>דוחות בלבד — Fed/CPI/דיבידנדים ללא מקור חינמי מובנה.</div></div>",
+                    unsafe_allow_html=True)
+    _acts = [(t, e.get("rating_action"), e.get("rating_firm")) for t, e in (events or {}).items()
+             if e.get("rating_action")][:5]
+    _news = "".join(f"<div style='padding:7px 2px;border-bottom:1px solid {BORDER}'>"
+                    f"<b>{t}</b> · {a} <span style='color:{MUTED};font-size:13.5px'>({f_})</span></div>"
+                    for t, a, f_ in _acts) or f"<div class='ic-sub'>אין עדכוני אנליסטים.</div>"
+    ev2[1].markdown(f"<div class='ic-card' style='height:100%'><div class='ic-title'>עדכוני אנליסטים</div>{_news}</div>",
+                    unsafe_allow_html=True)
+
+    # ---- 8. Attention required ----
+    _crit = [a for a in alerts if a.get("severity") == "גבוהה"][:3]
+    if _crit:
+        st.markdown("#### דורש תשומת לב")
+        for a in _crit:
+            st.markdown(f"<div class='card' style='border-right:3px solid {NEGATIVE};padding:14px 18px'>"
+                        f"<b>{a['type']}</b> · {a.get('scope','')} — <span style='color:{SECONDARY}'>{a['message']}</span></div>",
+                        unsafe_allow_html=True)
+
+    # ---- 11. Today's insight (deterministic, from insights artifact) ----
+    if ins.get("rotation") or ins.get("risks"):
+        st.markdown(f"<div class='ic-card' style='border-right:3px solid {PRIMARY}'>"
+                    f"<div class='ic-title'>תובנת היום</div>"
+                    f"<div class='ic-sub'>{(ins.get('rotation') or ins.get('risks', '')).replace('**','')}</div>"
+                    f"<div class='ic-sub' style='color:{MUTED};font-size:13px;margin-top:6px'>נגזר דטרמיניסטית מהמדדים המחושבים.</div></div>",
+                    unsafe_allow_html=True)
+
+    # ---- 12. Quick actions ----
+    qa = st.columns(4)
+    for col, (lbl, pg) in zip(qa, [("🔎 ניתוח חברה", "🔎 ניתוח חברה"), ("💎 סריקת הזדמנויות", "💎 הזדמנויות"),
+                                   ("🗺️ סקטורים", "🗺️ סקטורים"), ("📊 אינטליגנציית שוק", "📊 אינטליגנציית שוק")]):
+        if col.button(lbl, key=f"qa_{pg}", use_container_width=True):
+            st.session_state["_pending_nav"] = pg
+            st.rerun()
 
 elif page == "💎 הזדמנויות":
     st.markdown("### הזדמנויות — מסוף גילוי הזדמנויות")
@@ -929,110 +936,105 @@ elif page == "💎 הזדמנויות":
                         st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                         st.rerun()
 
-        # ---------- Sector heatmap (Finviz-style treemap) ----------
-        sec_rows = VW.sector_intel(uni, mkt)
-        if sec_rows:
-            st.divider()
-            st.markdown("#### מפת חום סקטוריאלית")
-            st.caption("גודל = מספר הזדמנויות · צבע = Score V2 ממוצע (ירוק חזק · אדום חלש).")
-            labels = [f"{r['sector_he']}<br>{_i(r['avg_score'])}" for r in sec_rows]
-            fig = go.Figure(go.Treemap(
-                labels=labels, parents=[""] * len(sec_rows),
-                values=[r["n"] for r in sec_rows],
-                marker=dict(colors=[r["avg_score"] if r["avg_score"] is not None else 0 for r in sec_rows],
-                            colorscale=[[0, "#ef4444"], [0.4, "#fb923c"], [0.55, "#facc15"],
-                                        [0.7, "#22c55e"], [1, "#16a34a"]],
-                            cmin=0, cmax=100, line=dict(width=2, color=BG)),
-                textinfo="label", textfont=dict(size=15, color="#06121f"),
-                hovertemplate="%{label}<br>הזדמנויות: %{value}<extra></extra>"))
-            st.plotly_chart(style_fig(fig, 340), use_container_width=True)
+        st.caption("מפת החום וטבלת האינטליגנציה הסקטוריאלית עברו לעמוד 🗺️ סקטורים.")
 
-            # ---------- Sector intelligence table ----------
-            st.markdown("#### טבלת אינטליגנציית סקטורים")
-            reco_he = {"Overweight": "הגדלת משקל", "Neutral": "ניטרלי", "Underweight": "הקטנת משקל"}
-            reco_col = {"Overweight": POSITIVE, "Neutral": WARNING, "Underweight": NEGATIVE}
-            risk_col = {"נמוך": POSITIVE, "בינוני": WARNING, "גבוה": "#fb923c", "גבוה מאוד": NEGATIVE}
-
-            def _bar(val, color, mx=100):
-                p = max(0, min(100, (val or 0) / mx * 100))
-                return (f"<div class='miniprog'><div style='width:{p:.0f}%;background:{color}'></div></div>")
-            head = "".join(f"<th>{h}</th>" for h in
-                           ["#", "סקטור", "הזדמנויות", "חברה מובילה", "Score V2 ממוצע", "תמחור ממוצע",
-                            "מומנטום 3ח׳", "סיכון ממוצע", "המלצה"])
-            body = ""
-            for i, r in enumerate(sec_rows, 1):
-                acol = score_color(r["avg_score"]) if isinstance(r["avg_score"], (int, float)) else MUTED
-                vcol = score_color(r["avg_val"]) if isinstance(r["avg_val"], (int, float)) else MUTED
-                m3 = r.get("ret_3m")
-                mcol = POSITIVE if isinstance(m3, (int, float)) and m3 >= 0 else NEGATIVE
-                ms = (f"{'+' if m3 >= 0 else ''}{m3}%" if isinstance(m3, (int, float)) else "—")
-                rk = r.get("avg_risk")
-                body += (f"<tr><td>{i}</td>"
-                         f"<td><span class='tbadge' style='color:{PRIMARY}'>{r['sector_he']}</span></td>"
-                         f"<td><b>{r['n']}</b></td>"
-                         f"<td><b>{r['top']}</b></td>"
-                         f"<td><div style='display:flex;align-items:center;gap:8px'>{_bar(r['avg_score'], acol)}"
-                         f"<b style='color:{acol}'>{_i(r['avg_score'])}</b></div></td>"
-                         f"<td><div style='display:flex;align-items:center;gap:8px'>{_bar(r['avg_val'], vcol)}"
-                         f"<b style='color:{vcol}'>{_i(r['avg_val'])}</b></div></td>"
-                         f"<td><span style='color:{mcol}'>{ms}</span></td>"
-                         f"<td><span style='color:{risk_col.get(rk, MUTED)}'>{rk or '—'}</span></td>"
-                         f"<td><span class='tbadge' style='color:{reco_col[r['reco']]}'>{reco_he[r['reco']]}</span></td></tr>")
-            st.markdown(f"<table class='sectbl'><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>",
-                        unsafe_allow_html=True)
-            st.caption("המלצה נגזרת מחוזק הסקטור (Overweight ≥66 · Underweight <40) — דטרמיניסטי.")
 elif page == "🗺️ סקטורים":
-    st.markdown("### אינטליגנציית סקטורים")
-    sectors = mkt.get("sectors", [])
-    if not sectors or "score" not in sectors[0]:
-        st.caption("נתוני סקטורים לא זמינים כרגע. הריצו רענון.")
+    from dashboard import views as VW
+    st.markdown("### סקטורים — איפה להיות ואיפה לא")
+    uni_s = load_universe()
+    sec_rows = VW.sector_intel(uni_s, mkt) if uni_s else []
+    if not sec_rows:
+        st.info("הסריקה הרחבה עדיין לא רצה. הרץ `python scanner.py ALL` ורענן.")
     else:
-        ranked = sorted(sectors, key=lambda s: s["score"], reverse=True)
-        # Headline: strongest & weakest
-        strong, weak = ranked[0], ranked[-1]
-        h1, h2 = st.columns(2)
-        h1.markdown(f"<div class='card' style='border-right:5px solid {GREEN}'>"
-                    f"<div style='color:{MUTED}'>🟢 הסקטור החזק ביותר היום</div>"
-                    f"<div style='font-size:24px;font-weight:800'>{strong['sector']}</div>"
-                    f"<div>ציון <b style='color:{GREEN}'>{strong['score']}</b> · {strong['trend']} · "
-                    f"חוזק יחסי מול S&P {strong['rs']:+}% · חודש {strong['ret_1m']:+}%</div></div>",
-                    unsafe_allow_html=True)
-        h2.markdown(f"<div class='card' style='border-right:5px solid {RED}'>"
-                    f"<div style='color:{MUTED}'>🔴 הסקטור החלש ביותר היום</div>"
-                    f"<div style='font-size:24px;font-weight:800'>{weak['sector']}</div>"
-                    f"<div>ציון <b style='color:{RED}'>{weak['score']}</b> · {weak['trend']} · "
-                    f"חוזק יחסי מול S&P {weak['rs']:+}% · חודש {weak['ret_1m']:+}%</div></div>",
+        # ---- Conclusion line (the answer first) ----
+        _tilt = [r["sector_he"] for r in sec_rows if r["reco"] == "Overweight"][:2]
+        _avoid = [r["sector_he"] for r in sec_rows if r["reco"] == "Underweight"][:2]
+        st.markdown(f"<div style='font-size:20px;font-weight:600;margin:2px 0 18px'>"
+                    f"הטה ל: <span style='color:{POSITIVE}'>{', '.join(_tilt) or '—'}</span>"
+                    f" · הימנע מ: <span style='color:{NEGATIVE}'>{', '.join(_avoid) or '—'}</span></div>",
                     unsafe_allow_html=True)
 
-        # Heatmap by sector score
-        sdf = pd.DataFrame(ranked).sort_values("score")
-        colors = [GREEN if v >= 60 else (AMBER if v >= 40 else RED) for v in sdf["score"]]
-        fig = go.Figure(go.Bar(x=sdf["score"], y=sdf["sector"], orientation="h",
-                               marker_color=colors,
-                               text=[f"{v}" for v in sdf["score"]], textposition="auto"))
-        fig.update_layout(title="ציון סקטור (0–100)", xaxis_range=[0, 100])
-        st.plotly_chart(style_fig(fig, 420), use_container_width=True)
+        # ---- Heatmap (size = opportunities, color = avg V2) ----
+        labels = [f"{r['sector_he']}<br>{int(r['avg_score']) if r['avg_score'] is not None else '—'}" for r in sec_rows]
+        fig = go.Figure(go.Treemap(
+            labels=labels, parents=[""] * len(sec_rows),
+            values=[r["n"] for r in sec_rows],
+            marker=dict(colors=[r["avg_score"] if r["avg_score"] is not None else 0 for r in sec_rows],
+                        colorscale=[[0, "#ef4444"], [0.4, "#fb923c"], [0.55, "#facc15"],
+                                    [0.7, "#22c55e"], [1, "#16a34a"]],
+                        cmin=0, cmax=100, line=dict(width=2, color=BG)),
+            textinfo="label", textfont=dict(size=15, color="#06121f"),
+            hovertemplate="%{label}<br>הזדמנויות: %{value}<extra></extra>"))
+        st.plotly_chart(style_fig(fig, 330), use_container_width=True)
+        st.caption("גודל = מספר הזדמנויות · צבע = ציון V2 ממוצע.")
 
-        # Full ranked table
-        st.markdown("##### דירוג מלא")
-        table = pd.DataFrame(ranked)[["rank", "sector", "score", "trend",
-                                      "momentum", "rs", "ret_1m", "ret_3m", "change_pct"]]
-        table.columns = ["דירוג", "סקטור", "ציון", "מגמה", "מומנטום",
-                         "חוזק יחסי %", "תשואה חודש %", "תשואה רבעון %", "יומי %"]
-        st.dataframe(
-            table, use_container_width=True, hide_index=True,
-            column_config={
-                "ציון": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "מומנטום": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-            },
-        )
-        st.caption("ציון סקטור = מגמה (40%) + מומנטום חודשי (30%) + חוזק יחסי מול S&P 500 (30%). "
-                   "מבוסס על ETF סקטוריאליים אמיתיים (XLK, XLF, ...).")
+        # ---- Intelligence table ----
+        reco_he = {"Overweight": "הגדלת משקל", "Neutral": "ניטרלי", "Underweight": "הקטנת משקל"}
+        reco_col = {"Overweight": POSITIVE, "Neutral": WARNING, "Underweight": NEGATIVE}
+        risk_col2 = {"נמוך": POSITIVE, "בינוני": WARNING, "גבוה": "#fb923c", "גבוה מאוד": NEGATIVE}
 
+        def _sbarx(val, color, mx=100):
+            p = max(0, min(100, (val or 0) / mx * 100))
+            return f"<div class='miniprog'><div style='width:{p:.0f}%;background:{color}'></div></div>"
+        headx = "".join(f"<th>{h}</th>" for h in
+                        ["#", "סקטור", "הזדמנויות", "חברה מובילה", "ציון V2 ממוצע", "תמחור ממוצע",
+                         "מומנטום 3ח׳", "סיכון ממוצע", "המלצה"])
+        bodyx = ""
+        for i, r in enumerate(sec_rows, 1):
+            acol = score_color(r["avg_score"]) if isinstance(r["avg_score"], (int, float)) else MUTED
+            vcol = score_color(r["avg_val"]) if isinstance(r["avg_val"], (int, float)) else MUTED
+            m3 = r.get("ret_3m")
+            mcol = POSITIVE if isinstance(m3, (int, float)) and m3 >= 0 else NEGATIVE
+            ms = (f"{'+' if m3 >= 0 else ''}{m3}%" if isinstance(m3, (int, float)) else "—")
+            bodyx += (f"<tr><td>{i}</td>"
+                      f"<td><span class='tbadge' style='color:{PRIMARY}'>{r['sector_he']}</span></td>"
+                      f"<td><b>{r['n']}</b></td><td><b>{r['top']}</b></td>"
+                      f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['avg_score'], acol)}"
+                      f"<b style='color:{acol}'>{int(r['avg_score']) if r['avg_score'] is not None else '—'}</b></div></td>"
+                      f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['avg_val'], vcol)}"
+                      f"<b style='color:{vcol}'>{int(r['avg_val']) if r['avg_val'] is not None else '—'}</b></div></td>"
+                      f"<td><span style='color:{mcol}'>{ms}</span></td>"
+                      f"<td><span style='color:{risk_col2.get(r['avg_risk'], MUTED)}'>{r['avg_risk'] or '—'}</span></td>"
+                      f"<td><span class='tbadge' style='color:{reco_col[r['reco']]}'>{reco_he[r['reco']]}</span></td></tr>")
+        st.markdown(f"<table class='sectbl'><thead><tr>{headx}</tr></thead><tbody>{bodyx}</tbody></table>",
+                    unsafe_allow_html=True)
+        st.caption("המלצה נגזרת מחוזק הסקטור (הגדלה ≥66 · הקטנה <40) — דטרמיניסטי, מנתוני ETF סקטוריאליים.")
 
-# ===========================================================================
-# PAGE: alerts / news / backtest
-# ===========================================================================
+        # ---- Drill-down: the best stocks inside a sector ----
+        st.markdown("#### המניות המובילות בסקטור")
+        he2en = {r["sector_he"]: r["sector"] for r in sec_rows}
+        sel_he = st.selectbox("בחר סקטור", [r["sector_he"] for r in sec_rows], key="sec_drill")
+        sel_en = he2en.get(sel_he)
+        pool = [x for x in uni_s.get("all", []) if x.get("Sector") == sel_en] or \
+               [x for x in uni_s.get("opportunities", []) if x.get("Sector") == sel_en]
+        pool = sorted(pool, key=lambda x: -(x.get("ScoreV2") or 0))[:5]
+        if not pool:
+            st.caption("אין מניות מועשרות בסקטור זה בסריקה הנוכחית.")
+        else:
+            lookup_s = VW.build_lookup(uni_s)
+            nc_s = VW.names_cache()
+            dbody = ""
+            for x in pool:
+                svx = x.get("ScoreV2")
+                svx = int(svx) if isinstance(svx, (int, float)) else None
+                rbx = VW.risk_badge(x.get("RiskLevel"))
+                m3x = x.get("Ret3m")
+                dbody += (f"<tr><td><div style='font-weight:700;font-size:16px'>{x['Ticker']}</div>"
+                          f"<div style='color:{MUTED};font-size:13px'>{VW.company_name(x['Ticker'], lookup_s, nc_s)}</div></td>"
+                          f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(svx, score_color(svx))}"
+                          f"<b style='color:{score_color(svx)}'>{svx if svx is not None else '—'}</b></div></td>"
+                          f"<td><span class='tbadge' style='color:{rbx[3]}'>{rbx[0]} {rbx[1]}</span></td>"
+                          f"<td style='color:{POSITIVE if isinstance(m3x,(int,float)) and m3x>=0 else NEGATIVE}'>"
+                          f"{f'{m3x:+.0f}%' if isinstance(m3x,(int,float)) else '—'}</td></tr>")
+            st.markdown(f"<table class='sectbl'><thead><tr><th>חברה</th><th>ציון V2</th>"
+                        f"<th>סיכון</th><th>מומנטום 3ח׳</th></tr></thead><tbody>{dbody}</tbody></table>",
+                        unsafe_allow_html=True)
+            dcols = st.columns(len(pool))
+            for j, x in enumerate(pool):
+                if dcols[j].button(f"🔎 {x['Ticker']}", key=f"sd_{x['Ticker']}", use_container_width=True):
+                    st.session_state["dd_ticker"] = x["Ticker"]
+                    st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                    st.rerun()
 
 elif page == "🚨 התראות":
     st.markdown("### מרכז התראות — דוחות · פריצות · זינוקי נפח · חדשות מהותיות")

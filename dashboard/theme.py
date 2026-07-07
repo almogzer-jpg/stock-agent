@@ -134,6 +134,17 @@ INSTITUTIONAL_CSS = f"""
   /* ================= Sidebar ================= */
   section[data-testid="stSidebar"] {{ background:{CARD}; border-left:1px solid {BORDER}; }}
   section[data-testid="stSidebar"] * {{ color:{TEXT}; }}
+  /* Sidebar radio → institutional NAV (no radio circles, active accent bar) */
+  section[data-testid="stSidebar"] .stRadio div[data-testid="stWidgetLabel"] {{ display:none; }}
+  section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label > div:first-child {{ display:none; }}
+  section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label {{
+      padding:12px 14px; border-radius:10px; font-size:15.5px; font-weight:600;
+      margin-bottom:3px; width:100%; transition:background .15s;
+      border-right:3px solid transparent; }}
+  section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label:hover {{ background:{ELEV}; }}
+  section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label:has(input:checked) {{
+      background:{ELEV}; border-right:3px solid {PRIMARY}; }}
+  section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label:has(input:checked) p {{ color:{PRIMARY}; }}
   .stRadio [role="radiogroup"] label {{ padding:7px 10px; border-radius:8px; transition:background .15s; }}
   .stRadio [role="radiogroup"] label:hover {{ background:{ELEV}; }}
 
