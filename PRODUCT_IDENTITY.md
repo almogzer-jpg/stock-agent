@@ -64,3 +64,5 @@ Companion to `DESIGN_SYSTEM.md`. Binding for every future change.
 | Speed-to-decision | A PM completes the page's decision faster than before the change |
 | Professional appearance | First-impression ≥9.5; "would proudly show next to Bloomberg/Koyfin" |
 Plus: 105+ unit tests green · DOM-verified desktop + `?m=1` · benchmark note (better/worse vs Bloomberg/Koyfin/TradingView/Finviz/SA).
+
+15. **Decision language, not data language** — every metric is displayed as its investment meaning, not a bare number: "המחיר 2.4% מעל תמיכה מרכזית — יחס סיכון/סיכוי נוח" not "Support=$145"; "התמחור 18% מעל חציון הסקטור" not "P/E=36"; "מומנטום חזק אך מתקרב לקנוי-יתר" not "RSI=67". Raw numbers stay available one layer down (tooltip/expander). Every screen answers "מה לעשות עכשיו?". Benchmark = Bloomberg+Koyfin+Finviz+Morningstar+SeekingAlpha combined, with better UX.

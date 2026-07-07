@@ -1,0 +1,51 @@
+name: Daily data refresh
+
+# Refreshes the data snapshot every weekday morning (Israel time) and commits
+# it back — Streamlit Cloud auto-redeploys, so the app is never stale.
+# Manual trigger available via the Actions tab (workflow_dispatch).
+
+on:
+  schedule:
+    - cron: "0 4 * * 1-5"   # 04:00 UTC = 06:00/07:00 Israel, Mon-Fri
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Watchlist scan (run.py)
+        env:
+          STOCK_AGENT_DISABLE_EMAIL: "1"
+          PYTHONUTF8: "1"
+          MPLBACKEND: "Agg"
+        run: python run.py
+
+      - name: Universe scan (scanner.py ALL)
+        env:
+          PYTHONUTF8: "1"
+        run: python scanner.py ALL
+
+      - name: Commit refreshed snapshot
+        run: |
+          git config user.name "stock-agent-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "chore: daily data refresh"
+            git push
+          fi
