@@ -6,16 +6,10 @@
     "message": "HD — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)"
   },
   {
-    "type": "אזהרת סיכון",
-    "scope": "TSLA",
-    "severity": "גבוהה",
-    "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Outperform → Outperform (Leerink Partners)"
+    "type": "דוחות",
+    "scope": "JPM",
+    "severity": "בינונית",
+    "message": "JPM — דוחות כספיים בעוד 7 ימים (2026-07-14)"
   },
   {
     "type": "שינוי דירוג",
@@ -25,45 +19,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
-    "message": "JPM — אישרור: Equal-Weight → Equal-Weight (Morgan Stanley)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — כיסוי חדש: Overweight → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (Morgan Stanley)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — reit: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — שדרוג: Hold → Buy (HSBC)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — שדרוג: Neutral → Buy (Guggenheim)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "JPM — אישרור: Outperform → Outperform (Evercore ISI Group)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,15 +37,39 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — כיסוי חדש: Overweight → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
     "message": "GOOGL — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
+    "message": "AMD — אישרור: Buy → Buy (Goldman Sachs)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — אישרור: Hold → Hold (HSBC)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — reit: Outperform → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — שדרוג: Neutral → Buy (Guggenheim)"
   },
   {
     "type": "שינוי דירוג",
@@ -90,15 +78,27 @@
     "message": "TSLA — אישרור: Hold → Hold (Freedom Broker)"
   },
   {
-    "type": "רוטציית סקטורים",
-    "scope": "בריאות",
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור בריאות (ציון 97, חוזק יחסי +14.0%)"
+    "message": "ADBE — שדרוג: Hold → Buy (HSBC)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Outperform → Outperform (Wolfe Research)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "שירותי תקשורת",
+    "scope": "פיננסים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 20, חוזק יחסי -1.58%)"
+    "message": "כניסת הון לסקטור פיננסים (ציון 95, חוזק יחסי +10.96%)"
+  },
+  {
+    "type": "רוטציית סקטורים",
+    "scope": "אנרגיה",
+    "severity": "מידע",
+    "message": "יציאת הון מסקטור אנרגיה (ציון 16, חוזק יחסי -8.64%)"
   }
 ]

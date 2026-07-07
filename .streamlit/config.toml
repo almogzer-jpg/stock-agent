@@ -1,0 +1,13 @@
+# Streamlit native-widget theme (Phase 28/30 polish).
+# Makes built-in components (data grid, selectboxes, buttons, toggles) follow
+# the institutional dark palette instead of the light default.
+[theme]
+base = "dark"
+primaryColor = "#5EA8FF"
+backgroundColor = "#0B0F17"
+secondaryBackgroundColor = "#131926"
+textColor = "#F4F6F8"
+font = "sans serif"
+
+[server]
+headless = true

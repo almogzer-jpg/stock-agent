@@ -586,24 +586,48 @@ if page.startswith("🏠"):
 
     # ---------- Section 4: Top opportunities (cards + drill-down) ----------
     st.markdown("### ההזדמנויות המובילות היום")
-    ranked = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(10)
-    _hrows = []
+    ranked = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(8)
+    from dashboard import views as _VW
+    _body = ""
     for i, (_, r) in enumerate(ranked.iterrows(), 1):
-        _hrows.append({"#": i, "סימול": r["Ticker"], "חברה": r.get("Name"),
-                       "סקטור": market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—"),
-                       "Score V2": int(r["ScoreV2"]) if r.get("ScoreV2") == r.get("ScoreV2") else None,
-                       "סיכון": fmt(r.get("RiskLevel")),
-                       "פוטנציאל %": r.get("ExpectedUpside%")})
-    _hev = st.dataframe(pd.DataFrame(_hrows), use_container_width=True, hide_index=True,
-                        on_select="rerun", selection_mode="single-row", key="home_grid",
-                        column_config={
-                            "Score V2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                            "פוטנציאל %": st.column_config.NumberColumn(format="%+.1f%%")})
-    st.caption("לחיצה על שורה פותחת ניתוח חברה מלא.")
-    if getattr(_hev, "selection", None) and _hev.selection.get("rows"):
-        st.session_state["dd_ticker"] = _hrows[_hev.selection["rows"][0]]["סימול"]
-        st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
-        st.rerun()
+        sv = r.get("ScoreV2")
+        sv = int(sv) if isinstance(sv, (int, float)) and sv == sv else None
+        scol = score_color(sv)
+        rb = _VW.risk_badge(r.get("RiskLevel"))
+        up = r.get("ExpectedUpside%")
+        upc = POSITIVE if isinstance(up, (int, float)) and up >= 0 else NEGATIVE
+        chg = r.get("DailyChange%")
+        chc = POSITIVE if isinstance(chg, (int, float)) and chg >= 0 else NEGATIVE
+        tr = r.get("TrustScore")
+        tr = int(tr) if isinstance(tr, (int, float)) and tr == tr else None
+        _body += (
+            f"<tr>"
+            f"<td style='color:{MUTED}'>{i}</td>"
+            f"<td><div style='font-weight:700;font-size:16px'>{r['Ticker']}</div>"
+            f"<div style='color:{MUTED};font-size:13px'>{r.get('Name', '')}</div></td>"
+            f"<td><span class='tbadge' style='color:{PRIMARY}'>"
+            f"{market.SECTOR_EN_TO_HE.get(r.get('Sector'), r.get('Sector') or '—')}</span></td>"
+            f"<td><b>${fmt(r.get('Price'))}</b><div style='color:{chc};font-size:13px'>"
+            f"{f'{chg:+.1f}%' if isinstance(chg, (int, float)) else '—'}</div></td>"
+            f"<td><div style='display:flex;align-items:center;gap:10px'>"
+            f"<div class='miniprog' style='min-width:84px'><div style='width:{sv or 0}%;background:{scol}'></div></div>"
+            f"<b style='color:{scol};font-size:16px'>{sv if sv is not None else chr(8212)}</b></div></td>"
+            f"<td><b style='color:{score_color(tr)}'>{tr if tr is not None else chr(8212)}</b></td>"
+            f"<td><span class='tbadge' style='color:{rb[3]}'>{rb[0]} {rb[1]}</span></td>"
+            f"<td style='color:{upc};font-weight:600'>"
+            f"{f'{up:+.1f}%' if isinstance(up, (int, float)) else chr(8212)}</td>"
+            f"</tr>")
+    _head = "".join(f"<th>{h}</th>" for h in
+                    ["#", "חברה", "סקטור", "מחיר", "Score V2", "אמון", "סיכון", "פוטנציאל"])
+    st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
+                unsafe_allow_html=True)
+    st.caption("ציון V2 = השקלול המלא (פונדמנטלי/טכני/סקטור/חדשות/סיכון) · פוטנציאל = מדד קנייני מחושב.")
+    _bc = st.columns(len(ranked) if len(ranked) else 1)
+    for j, (_, r) in enumerate(ranked.iterrows()):
+        if _bc[j].button(f"🔎 {r['Ticker']}", key=f"hg_{r['Ticker']}", use_container_width=True):
+            st.session_state["dd_ticker"] = r["Ticker"]
+            st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+            st.rerun()
 
     # ---------- Sector rotation + upcoming events ----------
     sc2 = st.columns(2)
@@ -697,7 +721,7 @@ elif page == "💎 הזדמנויות":
         # ---------- Score V2 explanation ----------
         st.markdown(
             f"<div class='ic-card' style='border-right:5px solid {PRIMARY}'>"
-            f"<div class='ic-title'>ℹ️ מהו ציון Score V2?</div>"
+            f"<div class='ic-title'>ℹ️ מהו ציון V2?</div>"
             f"<div class='ic-sub'>ציון משוקלל 0–100 המשלב: פונדמנטל/איכות · תמחור · מומנטום טכני · חוזק סקטור · סיכון.</div>"
             f"<div class='ic-sub' style='margin-top:5px'>"
             f"<span style='color:#22c55e'>80–100 יוצא דופן</span> · "
@@ -798,7 +822,7 @@ elif page == "💎 הזדמנויות":
                             "מרשים (100%+)": 100}
                 VAL_OPTS = {"הכל": 0, "לא יקר (40+)": 40, "אטרקטיבי (60+)": 60, "זול מאוד (80+)": 80}
                 b = st.columns(3)
-                min_score = SCORE_OPTS[b[0].selectbox("ציון מינימלי (Score V2)", list(SCORE_OPTS),
+                min_score = SCORE_OPTS[b[0].selectbox("ציון V2 מינימלי", list(SCORE_OPTS),
                                                       index=1, key="f_score",
                                                       help="ציון משוקלל 0-100: פונדמנטל, טכני, סקטור, חדשות וסיכון.")]
                 min_mom = MOM_OPTS[b[1].selectbox("מומנטום מינימלי (3 חודשים)", list(MOM_OPTS),
@@ -882,7 +906,7 @@ elif page == "💎 הזדמנויות":
                         "תמחור": _val_badge(r.get("Valuation")), "סיכון": f"{rb[0]} {rb[1]}",
                         "תמיכה": _sr_cell(r.get("Support"), r.get("DistSupport%")),
                         "התנגדות": _sr_cell(r.get("Resistance"), r.get("DistResistance%")),
-                        "סיכון/סיכוי": r.get("RiskReward") if _num(r.get("RiskReward")) is not None else None,
+                        "סיכון/סיכוי": r.get("RiskReward") if _num(r.get("RiskReward")) is not None else float("nan"),
                         "סוג הזדמנות": _type_badge(r.get("tags")),
                     })
                 gdf = pd.DataFrame(rows)
@@ -894,7 +918,8 @@ elif page == "💎 הזדמנויות":
                         on_select="rerun", selection_mode="single-row", key="opp_grid",
                         column_config={
                             "Score V2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                            "מומנטום 3ח׳": st.column_config.NumberColumn(format="%+.1f%%")})
+                            "מומנטום 3ח׳": st.column_config.NumberColumn(format="%+.1f%%"),
+                            "סיכון/סיכוי": st.column_config.NumberColumn(format="%.2f")})
                     cc = st.columns([3, 1])
                     cc[0].caption("מיון: לחיצה על כותרת עמודה · לחיצה על שורה → ניתוח מניה אוטומטי.")
                     cc[1].download_button("📥 ייצוא CSV", gdf.to_csv(index=False).encode("utf-8-sig"),
@@ -1023,15 +1048,32 @@ elif page == "🚨 התראות":
         counts = Counter(a["type"] for a in center)
         st.caption(" · ".join(f"{type_icon.get(t,'•')} {t}: {c}" for t, c in counts.items()))
         st.divider()
-        for a in center:
-            col = sev_color.get(a["severity"], MUTED)
-            st.markdown(
-                f"<div class='card' style='border-right:5px solid {col};padding:10px 14px'>"
-                f"<span style='font-weight:700'>{type_icon.get(a['type'],'🔔')} {a['type']}</span> "
-                f"<span style='color:{col};font-size:12px'>· {a['severity']}</span> "
-                f"<span style='color:{MUTED};font-size:12px'>· {a['scope']}</span><br>"
-                f"<span style='color:{TEXT}'>{a['message']}</span></div>",
-                unsafe_allow_html=True)
+        # Grouped by severity (action center): each alert → open the analysis.
+        _sev_hdr = [("גבוהה", "🔴 קריטיות — דורשות התייחסות", NEGATIVE),
+                    ("בינונית", "🟠 חשובות", "#fb923c"),
+                    ("מידע", "🔵 מידע", PRIMARY)]
+        import re as _re
+        for sev_key, sev_title, col in _sev_hdr:
+            group = [a for a in center if a.get("severity") == sev_key]
+            if not group:
+                continue
+            st.markdown(f"#### {sev_title} <span style='color:{MUTED};font-size:15px'>({len(group)})</span>",
+                        unsafe_allow_html=True)
+            for i, a in enumerate(group):
+                tk = a.get("scope")
+                valid_tk = isinstance(tk, str) and _re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,5}", tk)
+                cc = st.columns([6, 1])
+                cc[0].markdown(
+                    f"<div class='card' style='border-right:3px solid {col};padding:14px 18px;margin-bottom:8px'>"
+                    f"<span style='font-weight:600'>{type_icon.get(a['type'], '🔔')} {a['type']}</span>"
+                    f"<span style='color:{MUTED}'> · {a.get('scope', '')}</span><br>"
+                    f"<span style='color:{SECONDARY}'>{a['message']}</span></div>",
+                    unsafe_allow_html=True)
+                if valid_tk and cc[1].button(f"🔎 {tk}", key=f"alw_{sev_key}_{i}_{tk}",
+                                             use_container_width=True):
+                    st.session_state["dd_ticker"] = tk
+                    st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                    st.rerun()
 
 elif page == "🔎 ניתוח חברה":
     import deepdive
@@ -1406,7 +1448,7 @@ elif page == "🔎 ניתוח חברה":
             # ---- Score breakdown ----
             st.markdown("#### ציוני Stock Agent")
             rh = sc["risk"]["value"]
-            bars = (score_bar("ציון סופי v2", v2) + score_bar("טכני", sc["technical"]["value"])
+            bars = (score_bar("ציון V2", v2) + score_bar("טכני", sc["technical"]["value"])
                     + score_bar("פונדמנטלי", _num_or(sc["fundamental"]["value"]))
                     + score_bar("סקטור", _num_or(sc["sector"]["value"]))
                     + score_bar("חדשות", _num_or(sc["news"]["value"]))

@@ -274,7 +274,7 @@ def _opportunities(df, uni, lookup, nc):
         f_sec = st.selectbox("סקטור", ["הכל"] + secs, key="m_sec")
         f_risk = st.multiselect("רמת סיכון", ["נמוך", "בינוני", "גבוה", "גבוה מאוד"], key="m_risk")
         SC = {"הכל": 0, "60+": 60, "70+": 70, "80+": 80}
-        f_score = SC[st.selectbox("ציון מינימלי (Score V2)", list(SC), key="m_score")]
+        f_score = SC[st.selectbox("ציון V2 מינימלי", list(SC), key="m_score")]
     v = base
     if f_sec != "הכל" and "Sector" in v:
         v = v[v["Sector"] == f_sec]
