@@ -57,3 +57,37 @@ Every displayed score exposes: inputs → formula/weights → contributions → 
 | **I-4** | E2 MTF/volume-profile/probabilities | Medium |
 | **I-5** | E5 dual-source scenarios + calibration | Low-Medium |
 Sequenced AFTER the pre-release criticals (cloud refresh, skeleton, consolidation) — intelligence without fresh data is worthless. Each engine ships with pure functions + unit tests + the Quality Gate.
+
+---
+
+# E0 — Investment Decision Engine (the brain, above all engines)
+**Purpose:** think like a 20-year PM — not compute indicators, but SYNTHESIZE all engines (E1-E7 + regime/sector/sentiment/liquidity/earnings inputs) into one coherent, conflict-resolved decision. Every recommendation in the platform ultimately flows from E0. Deterministic, rule-based, fully explainable — "thinking", not black box.
+
+## Conflict-resolution matrix (the core IP — examples, extensible ruleset)
+| Situation (engine signals) | Resolution |
+|---|---|
+| עסק מצוין + תמחור גרוע | **Wait** — "חברה לרשימת המתנה; מחיר יעד כניסה מה-E3" |
+| תמחור זול + עסק חלש | **Avoid** — מלכודת ערך (value trap) |
+| פריצה טכנית חזקה + פונדמנטל חלש | **Trade-only** — אופק קצר, סווינג בלבד, לא השקעה |
+| חברה מצוינת + שוק דובי (regime) | **Accumulate-slowly / Watch** — איכות כן, תזמון לא |
+| עסק+תמחור+טכני מיושרים | **Highest conviction** — Strong Buy, הקצאה מלאה |
+| ביטחון (E6) נמוך בכל שילוב | downgrade אוטומטי לרמה זהירה + "אינדיקציה בלבד" |
+| סיכון נזילות/מינוף קיצוני | cap קשיח על ההמלצה בלי קשר לשאר |
+
+## Mandatory outputs (per ticker)
+1. **Final decision** — 9-level scale: Strong Buy · Buy · Accumulate · Watch · Hold · Wait · Reduce · Sell · Strong Sell (supersedes today's 6-level).
+2. **Confidence 0-100** (from E6; gates language).
+3. **Decision summary** — one sentence, human PM voice.
+4. **Top reasons FOR** — ranked by contribution weight.
+5. **Top reasons AGAINST** — ranked.
+6. **Upgrade path** — what must change to raise the rating (explicit thresholds: "תמחור מתחת ל-X / פריצת $Y").
+7. **Thesis invalidators** — measurable kill-conditions (feed future Signals/Watchlist).
+8. **Expected holding period** — swing / 3-6m / 6-12m / 12m+.
+9. **Suitable investor types** — Income/Growth/Value/Momentum/Swing/Long-term/Institutional (multi-tag).
+10. **Monitor next quarter** — 3-5 named metrics with current values.
+
+## Implementation notes
+- v0 exists today (`deepdive.investment_decision`) — E0 replaces it once E1-E7 mature; same pure-function + tests pattern; the conflict matrix is a declarative rule table (testable row-by-row).
+- Sentiment/liquidity/earnings inputs start from existing proxies (news score, $ volume, earnings dates) and deepen with the engines.
+- UI contract: the Decision Card everywhere renders ONLY E0 output; every element clickable to its evidence (E7).
+- Phasing: E0-lite lands with I-1 (consumes current engines through the new conflict matrix + 9-level scale); E0-full after I-3.
