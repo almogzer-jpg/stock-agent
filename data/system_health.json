@@ -3,15 +3,15 @@
   "signals": 0,
   "data_completeness": 100.0,
   "failed_pulls": 0,
-  "avg_confidence": 58.5,
-  "avg_trust": 60.3,
+  "avg_confidence": 59.0,
+  "avg_trust": 60.7,
   "sector_distribution": {
     "Technology": 7,
     "Financial Services": 3,
-    "Consumer Cyclical": 3,
     "Communication Services": 3,
+    "Consumer Cyclical": 3,
     "Healthcare": 2,
     "Consumer Defensive": 2
   },
-  "date": "07/07/2026"
+  "date": "08/07/2026"
 }

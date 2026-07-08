@@ -1,63 +1,45 @@
 [
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
+    "scope": "AVGO",
     "severity": "גבוהה",
-    "message": "HD — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)"
+    "message": "AVGO — הורדת דירוג: Buy → Hold (Erste Group)"
+  },
+  {
+    "type": "אזהרת סיכון",
+    "scope": "TSLA",
+    "severity": "גבוהה",
+    "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
     "type": "דוחות",
     "scope": "JPM",
     "severity": "בינונית",
-    "message": "JPM — דוחות כספיים בעוד 7 ימים (2026-07-14)"
+    "message": "JPM — דוחות כספיים בעוד 6 ימים (2026-07-14)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
-    "message": "V — כיסוי חדש: Overweight → Overweight (Piper Sandler)"
+    "message": "V — כיסוי חדש:  → Overweight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
-    "message": "LLY — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
+    "message": "LLY — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
-    "message": "JPM — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "JPM — אישרור: Buy → Buy (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
-    "message": "MA — כיסוי חדש: Overweight → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (Goldman Sachs)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Hold → Hold (HSBC)"
+    "message": "MA — אישרור: Buy → Buy (TD Cowen)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,15 +49,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "CRM",
+    "scope": "UNH",
     "severity": "מידע",
-    "message": "CRM — שדרוג: Neutral → Buy (Guggenheim)"
+    "message": "UNH — אישרור: Hold → Hold (HSBC)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "TSLA",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "TSLA — אישרור: Hold → Hold (Freedom Broker)"
+    "message": "GOOGL — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -90,15 +78,33 @@
     "message": "MSFT — אישרור: Outperform → Outperform (Wolfe Research)"
   },
   {
-    "type": "רוטציית סקטורים",
-    "scope": "פיננסים",
+    "type": "שינוי דירוג",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור פיננסים (ציון 95, חוזק יחסי +10.96%)"
+    "message": "AMD — אישרור: Buy → Buy (Goldman Sachs)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "TSLA",
+    "severity": "מידע",
+    "message": "TSLA — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — שדרוג: Neutral → Buy (Guggenheim)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "אנרגיה",
+    "scope": "בריאות",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור אנרגיה (ציון 16, חוזק יחסי -8.64%)"
+    "message": "כניסת הון לסקטור בריאות (ציון 92, חוזק יחסי +9.67%)"
+  },
+  {
+    "type": "רוטציית סקטורים",
+    "scope": "טכנולוגיה",
+    "severity": "מידע",
+    "message": "יציאת הון מסקטור טכנולוגיה (ציון 22, חוזק יחסי -6.07%)"
   }
 ]
