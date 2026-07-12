@@ -290,10 +290,20 @@ def performance(close, mkt_close=None, period="1Y", start=None, end=None) -> dic
     c = close.dropna()
     if len(c) < 2:
         return None
+
+    def _anchor(ts):
+        """Match a boundary timestamp to the index timezone (live yfinance data
+        is tz-aware; a naive Timestamp raises on comparison)."""
+        ts = pd.Timestamp(ts)
+        tz = getattr(c.index, "tz", None)
+        if tz is not None:
+            ts = ts.tz_localize(tz) if ts.tzinfo is None else ts.tz_convert(tz)
+        return ts
+
     if period == "CUSTOM" and start is not None and end is not None:
-        win = c[(c.index >= pd.Timestamp(start)) & (c.index <= pd.Timestamp(end))]
+        win = c[(c.index >= _anchor(start)) & (c.index <= _anchor(end))]
     elif period == "YTD":
-        win = c[c.index >= pd.Timestamp(year=c.index[-1].year, month=1, day=1)] \
+        win = c[c.index >= _anchor(pd.Timestamp(year=c.index[-1].year, month=1, day=1))] \
             if isinstance(c.index, pd.DatetimeIndex) else c.tail(1)
     elif period == "MAX":
         win = c

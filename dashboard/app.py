@@ -539,36 +539,76 @@ if page.startswith("🏠"):
         st.caption(cf.get("method", ""))
 
     # ---- 4. Best opportunities table ----
-    st.markdown("#### ההזדמנויות המובילות היום")
+    st.markdown("### ההזדמנויות המובילות היום")
     ranked = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(8)
+
+    def _why_row(r):
+        """Decision-language reason — derived only from real fields (priority chain)."""
+        ev = (events or {}).get(r["Ticker"], {})
+        act = str(ev.get("rating_action") or "")
+        n = lambda k: r.get(k) if isinstance(r.get(k), (int, float)) else None
+        if bool(r.get("Breakout")):
+            return "פריצה טכנית פעילה"
+        if (n("EPSGrowth") or 0) >= 20 and str(r.get("RiskLevel")) == "נמוך":
+            return "האצת רווחים באיכות גבוהה"
+        if (n("EPSGrowth") or 0) >= 20:
+            return "האצת רווחים"
+        if "שדרוג" in act:
+            return "שדרוג אנליסטים טרי"
+        if (n("RSI14") or 50) <= 35 and abs(n("DistSupport%") or 99) <= 4:
+            return "מכירת-יתר צמוד לתמיכה"
+        if (n("DistFromHigh%") or 99) <= 3:
+            return "מומנטום — נושקת לשיא 52 שבועות"
+        if n("PEG") is not None and 0 < r["PEG"] <= 1.2:
+            return "תמחור אטרקטיבי ביחס לצמיחה"
+        if (n("ScoreFundamental") or 0) >= 70:
+            return "איכות פונדמנטלית גבוהה"
+        return "ציון משוקלל מוביל"
+
     _body = ""
-    for i, (_, r) in enumerate(ranked.iterrows(), 1):
-        sv = r.get("ScoreV2")
-        sv = int(sv) if isinstance(sv, (int, float)) and sv == sv else None
-        rb = VW.risk_badge(r.get("RiskLevel"))
-        up = r.get("ExpectedUpside%")
-        sup, res = r.get("Support"), r.get("Resistance")
-        _body += (f"<tr><td style='color:{MUTED}'>{i}</td>"
-                  f"<td><div style='font-weight:700;font-size:16px'>{r['Ticker']}</div>"
-                  f"<div style='color:{MUTED};font-size:13px'>{r.get('Name','')}</div></td>"
-                  f"<td><span class='tbadge' style='color:{PRIMARY}'>{market.SECTOR_EN_TO_HE.get(r.get('Sector'), r.get('Sector') or '—')}</span></td>"
-                  f"<td><div style='display:flex;align-items:center;gap:10px'>"
-                  f"<div class='miniprog' style='min-width:70px'><div style='width:{sv or 0}%;background:{score_color(sv)}'></div></div>"
-                  f"<b style='color:{score_color(sv)}'>{sv if sv is not None else '—'}</b></div></td>"
-                  f"<td><span class='tbadge' style='color:{rb[3]}'>{rb[0]} {rb[1]}</span></td>"
-                  f"<td>{f'${sup}' if isinstance(sup,(int,float)) else '—'}</td>"
-                  f"<td>{f'${res}' if isinstance(res,(int,float)) else '—'}</td>"
-                  f"<td style='color:{POSITIVE if isinstance(up,(int,float)) and up>=0 else NEGATIVE};font-weight:600'>"
-                  f"{f'{up:+.1f}%' if isinstance(up,(int,float)) else '—'}</td></tr>")
-    _head = "".join(f"<th>{h}</th>" for h in ["#", "חברה", "סקטור", "ציון V2", "סיכון", "תמיכה", "התנגדות", "פוטנציאל"])
+    for _, r in ranked.iterrows():
+        n = lambda k: r.get(k) if isinstance(r.get(k), (int, float)) else None
+        sv = int(r["ScoreV2"]) if n("ScoreV2") is not None else None
+        chg = n("DailyChange%")
+        chc = POSITIVE if (chg or 0) >= 0 else NEGATIVE
+        up = n("ExpectedUpside%")
+        tgt = round(r["Price"] * (1 + up / 100), 2) if (n("Price") and up is not None) else None
+        sup, res = n("Support"), n("Resistance")
+        dsup, dres = n("DistSupport%"), n("DistResistance%")
+        rr = n("RiskReward")
+        rrc = POSITIVE if (rr or 0) >= 2 else WARNING if (rr or 0) >= 1 else NEGATIVE
+        _body += (
+            f"<tr>"
+            f"<td><div style='font-weight:700;font-size:16px'>{r['Ticker']}</div>"
+            f"<div style='color:{MUTED};font-size:13px'>{r.get('Name','')}</div></td>"
+            f"<td><div style='font-weight:700;font-size:19px'>${fmt(n('Price'))}</div>"
+            f"<div style='color:{chc};font-size:13.5px;font-weight:600'>"
+            f"{f'{chg:+.1f}% היום' if chg is not None else '—'}</div></td>"
+            f"<td><div style='display:flex;align-items:center;gap:8px'>"
+            f"<div class='miniprog' style='min-width:64px'><div style='width:{sv or 0}%;background:{score_color(sv)}'></div></div>"
+            f"<b style='color:{score_color(sv)}'>{sv if sv is not None else '—'}</b></div></td>"
+            f"<td><div style='font-weight:600'>{f'${tgt:,.2f}' if tgt else '—'}</div>"
+            f"<div style='color:{POSITIVE if (up or 0)>=0 else NEGATIVE};font-size:13px'>"
+            f"{f'{up:+.1f}%' if up is not None else ''}</div></td>"
+            f"<td><div>{f'${sup}' if sup else '—'}</div>"
+            f"<div style='color:{MUTED};font-size:12.5px'>{f'{dsup}%' if dsup is not None else ''}</div></td>"
+            f"<td><div>{f'${res}' if res else '—'}</div>"
+            f"<div style='color:{MUTED};font-size:12.5px'>{f'+{dres}%' if dres is not None else ''}</div></td>"
+            f"<td><b style='color:{rrc};font-size:16px'>{rr if rr is not None else '—'}</b></td>"
+            f"<td style='color:{SECONDARY};font-size:13.5px'>{_why_row(r)}</td></tr>")
+    _head = "".join(f"<th>{h}</th>" for h in
+                    ["חברה", "מחיר נוכחי", "ציון V2", "יעד (מחושב)", "תמיכה", "התנגדות",
+                     "סיכון/סיכוי", "למה עכשיו?"])
     st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
                 unsafe_allow_html=True)
+    st.caption("יעד = מחיר × פוטנציאל מחושב (מדד קנייני) · תמיכה/התנגדות מרמות מחיר אמיתיות · לחיצה על 🔎 פותחת ניתוח מלא.")
     _bc = st.columns(max(len(ranked), 1))
     for j, (_, r) in enumerate(ranked.iterrows()):
         if _bc[j].button(f"🔎 {r['Ticker']}", key=f"hg_{r['Ticker']}", use_container_width=True):
             st.session_state["dd_ticker"] = r["Ticker"]
             st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
             st.rerun()
+
 
     # ---- 5. Hot stocks (from the universe scan) ----
     _all = uni_h.get("all", [])

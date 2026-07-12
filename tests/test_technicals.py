@@ -88,6 +88,21 @@ def test_performance_metrics():
     assert ta.performance(up["Close"].head(1)) is None
 
 
+def test_performance_timezone_aware_ytd():
+    """Live yfinance history is tz-aware — YTD/CUSTOM must NOT raise (regression)."""
+    import pandas as pd
+    import numpy as np
+    idx = pd.date_range("2024-07-01", periods=400, freq="D", tz="America/New_York")
+    c = pd.Series(np.linspace(100, 160, 400), index=idx)
+    m = pd.Series(np.linspace(4000, 4600, 400), index=idx)
+    for per in ("1W", "1M", "3M", "6M", "YTD", "1Y", "3Y", "MAX"):
+        assert ta.performance(c, m, period=per) is not None, f"{per} None on tz-aware data"
+    ytd = ta.performance(c, m, period="YTD")
+    assert ytd["stock"] is not None and ytd["bench"] is not None
+    assert ytd["start"].tzinfo is not None          # window keeps tz (chart reuse)
+    assert ta.performance(c, m, period="CUSTOM", start=idx[40], end=idx[300]) is not None
+
+
 def test_sr_levels_sides_and_distances():
     df = _frame(n=300, seed=11)
     lv = ta.sr_levels(df)
