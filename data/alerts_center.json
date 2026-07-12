@@ -55,27 +55,27 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Outperform → Outperform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
     "message": "MA — כיסוי חדש:  → Overweight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
     "message": "AMD — אישרור: Buy → Buy (Goldman Sachs)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Buy → Buy (TD Cowen)"
   },
   {
     "type": "שינוי דירוג",
