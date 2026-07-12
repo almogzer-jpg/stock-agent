@@ -23,3 +23,8 @@ __pycache__/
 
 # Local editor / harness config
 .claude/
+
+# Old MVP app (separate project) + review packages — never commit
+stock-screener/
+STOCK_AGENT_PRO_FULL_REVIEW.zip
+CHATGPT_REVIEW_PACKAGE/
