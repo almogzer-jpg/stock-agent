@@ -120,6 +120,10 @@ INSTITUTIONAL_CSS = f"""
   /* header stays VISIBLE (it holds the sidebar-open arrow — the only way back to
      navigation when the sidebar is collapsed); hide only its chrome, never the arrow */
   #MainMenu, footer {{ visibility:hidden; }}
+  /* Streamlit Cloud floating badge (crown + creator avatar), bottom corner.
+     Class names are hashed per release — match by class fragment. */
+  [class*="viewerBadge"], [class*="profileContainer"],
+  a[href*="streamlit.io/cloud"] {{ display:none !important; }}
   header[data-testid="stHeader"] {{ background:transparent; }}
   header[data-testid="stHeader"] [data-testid="stToolbar"],
   header[data-testid="stHeader"] [data-testid="stMainMenu"],
