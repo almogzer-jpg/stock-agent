@@ -68,7 +68,13 @@ MOBILE_CSS = f"""
        background:{PRIMARY}; }}
   div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) * {{ color:#0B1220 !important; }}
   /* ---- Sticky BOTTOM navigation (real-app feel) ---- */
-  .st-key-mnav {{ position:fixed; bottom:0; left:0; right:0; z-index:999;
+  /* Streamlit Cloud floating badge (crown + creator avatar) sits bottom-right with
+     z-index ~999990 and steals taps from the nav. Its class names are hashed, so:
+     (1) hide it via class-fragment selectors, (2) keep the nav's z-index above it
+     as a fallback for future hash/markup changes. */
+  [class*="viewerBadge"], [class*="profileContainer"],
+  a[href*="streamlit.io/cloud"] {{ display:none !important; }}
+  .st-key-mnav {{ position:fixed; bottom:0; left:0; right:0; z-index:1000000;
        background:{CARD}; border-top:1px solid {BORDER};
        padding:6px 6px calc(8px + env(safe-area-inset-bottom)); margin:0; }}
   .st-key-mnav [role="radiogroup"] {{ display:flex; justify-content:space-around;
