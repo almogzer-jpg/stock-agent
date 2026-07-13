@@ -533,46 +533,9 @@ if page.startswith("🏠"):
     rcol = regime_color(reg_s)
     tr_avg = health.get("avg_trust")
 
-    # ---- 1. Market Command Center ----
-    one_line = (ins.get("summary") or "").replace("**", "")
-    st.markdown(
-        f"<div class='ic-card' style='padding:28px 30px'>"
-        f"<div style='display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap'>"
-        f"<div><div style='color:{MUTED};font-size:14px'>מצב השוק</div>"
-        f"<div style='font-size:40px;font-weight:700;color:{rcol};line-height:1.1'>{reg_l}</div>"
-        f"<div style='color:{SECONDARY};font-size:16px;margin-top:6px'>{one_line}</div></div>"
-        f"<div style='display:flex;gap:34px;flex-wrap:wrap'>"
-        f"<div><div style='color:{MUTED};font-size:13px'>ציון שוק</div>"
-        f"<div style='font-size:28px;font-weight:600;color:{rcol}'>{fmt(reg_s)}/100</div></div>"
-        f"<div><div style='color:{MUTED};font-size:13px'>פחד / חמדנות</div>"
-        f"<div style='font-size:28px;font-weight:600'>{fmt(fng.get('score'))}</div></div>"
-        f"<div><div style='color:{MUTED};font-size:13px'>ביטחון מערכת</div>"
-        f"<div style='font-size:28px;font-weight:600;color:{score_color(tr_avg)}'>{fmt(round(tr_avg) if isinstance(tr_avg,(int,float)) else None)}</div></div>"
-        f"<div><div style='color:{MUTED};font-size:13px'>עודכן</div>"
-        f"<div style='font-size:28px;font-weight:600;color:{SECONDARY}'>{latest}</div></div>"
-        f"</div></div></div>", unsafe_allow_html=True)
-
-    # ---- 2. Global markets strip (15 assets from the artifact groups) ----
-    _by = {r["symbol"]: r for grp in (g.get("groups") or {}).values() for r in grp}
-    _order = ["^GSPC", "^IXIC", "^DJI", "^RUT", "BTC-USD", "ETH-USD", "XRP-USD",
-              "GC=F", "SI=F", "CL=F", "ILS=X", "EURILS=X", "DX-Y.NYB", "^TNX", "^VIX"]
-    chips = []
-    for sym in _order:
-        r = _by.get(sym)
-        if not r:
-            continue
-        p, d1 = r.get("price"), r.get("d1")
-        col = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
-        pv = "—" if p is None else (f"${p:,.0f}" if sym.endswith("-USD") else f"{p:,.2f}")
-        chips.append(f"<div class='chip'><div class='cl'>{r['name']} {r.get('trend','')[-1] if r.get('trend') else ''}</div>"
-                     f"<div class='cv'>{pv} <span style='color:{col};font-size:14px'>"
-                     f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></div></div>")
-    if chips:
-        st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
-        st.caption(f"שווקים גלובליים · עודכן {g.get('updated','—')}")
-
     # ---------- Morning Brief (Delta Engine) — the 30-second briefing ----------
     import delta as _delta
+    _by = {r["symbol"]: r for grp in (g.get("groups") or {}).values() for r in grp}
     _env = _delta.classify_environment(regime, _by.get("^VIX"), breadth,
                                        sorted(mkt.get("sectors", []), key=lambda s: -s.get("score", 0)))
     _pair_prev, _pair_cur = _delta.load_pair()
@@ -599,6 +562,98 @@ if page.startswith("🏠"):
                   for s in (_b1, _b2, _b3))
         + f"<div class='ic-sub' style='margin-top:10px;font-size:13px;color:{MUTED}'>איך סווגה הסביבה: "
         + " · ".join(_env["why"]) + "</div></div>", unsafe_allow_html=True)
+
+    # ---- 2. Global markets strip (15 assets from the artifact groups) ----
+    _by = {r["symbol"]: r for grp in (g.get("groups") or {}).values() for r in grp}
+    _order = ["^GSPC", "^IXIC", "^DJI", "^RUT", "BTC-USD", "ETH-USD", "XRP-USD",
+              "GC=F", "SI=F", "CL=F", "ILS=X", "EURILS=X", "DX-Y.NYB", "^TNX", "^VIX"]
+    chips = []
+    for sym in _order:
+        r = _by.get(sym)
+        if not r:
+            continue
+        p, d1 = r.get("price"), r.get("d1")
+        col = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
+        pv = "—" if p is None else (f"${p:,.0f}" if sym.endswith("-USD") else f"{p:,.2f}")
+        chips.append(f"<div class='chip'><div class='cl'>{r['name']} {r.get('trend','')[-1] if r.get('trend') else ''}</div>"
+                     f"<div class='cv'>{pv} <span style='color:{col};font-size:14px'>"
+                     f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></div></div>")
+    if chips:
+        st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
+        st.caption(f"שווקים גלובליים · עודכן {g.get('updated','—')}")
+
+    # ---- 1. Market Command Center ----
+    one_line = (ins.get("summary") or "").replace("**", "")
+    st.markdown(
+        f"<div class='ic-card' style='padding:28px 30px'>"
+        f"<div style='display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap'>"
+        f"<div><div style='color:{MUTED};font-size:14px'>מצב השוק</div>"
+        f"<div style='font-size:40px;font-weight:700;color:{rcol};line-height:1.1'>{reg_l}</div>"
+        f"<div style='color:{SECONDARY};font-size:16px;margin-top:6px'>{one_line}</div></div>"
+        f"<div style='display:flex;gap:34px;flex-wrap:wrap'>"
+        f"<div><div style='color:{MUTED};font-size:13px'>ציון שוק</div>"
+        f"<div style='font-size:28px;font-weight:600;color:{rcol}'>{fmt(reg_s)}/100</div></div>"
+        f"<div><div style='color:{MUTED};font-size:13px'>פחד / חמדנות</div>"
+        f"<div style='font-size:28px;font-weight:600'>{fmt(fng.get('score'))}</div></div>"
+        f"<div><div style='color:{MUTED};font-size:13px'>ביטחון מערכת</div>"
+        f"<div style='font-size:28px;font-weight:600;color:{score_color(tr_avg)}'>{fmt(round(tr_avg) if isinstance(tr_avg,(int,float)) else None)}</div></div>"
+        f"<div><div style='color:{MUTED};font-size:13px'>עודכן</div>"
+        f"<div style='font-size:28px;font-weight:600;color:{SECONDARY}'>{latest}</div></div>"
+        f"</div></div></div>", unsafe_allow_html=True)
+
+    # ---- 3. Capital flow (real sector-strength proxy) ----
+    cf = mkt.get("capital_flow", {})
+    if cf.get("inflows") or cf.get("outflows"):
+        st.markdown("#### לאן זורם הכסף")
+        fc = st.columns(2)
+        _fin = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
+                       f"<span>↗ {s['sector']}</span><b style='color:{POSITIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
+                       for s in cf.get("inflows", [])[:4])
+        _fout = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
+                        f"<span>↘ {s['sector']}</span><b style='color:{NEGATIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
+                        for s in cf.get("outflows", [])[:4])
+        fc[0].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{POSITIVE}'>כניסת הון</div>{_fin}</div>",
+                       unsafe_allow_html=True)
+        fc[1].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{NEGATIVE}'>יציאת הון</div>{_fout}</div>",
+                       unsafe_allow_html=True)
+        st.caption(cf.get("method", ""))
+        _af = _delta.asset_flows(g.get("groups") or {})
+        if _af:
+            st.markdown("<div class='ic-sub' style='margin-top:4px'><b>בין אפיקים (מגמת 30 יום · פרוקסי-מחיר מוערך):</b> "
+                        + " · ".join(f"{a['asset']} {a['trend']} ({a['d30']:+.1f}%)" for a in _af)
+                        + "</div>", unsafe_allow_html=True)
+
+    # ---- 4. Best opportunities table ----
+    # ---- 6+9. Macro snapshot + breadth (visual bars) ----
+    mb = st.columns([1.4, 1])
+    _macro_syms = [("^TNX", "תשואת 10 שנים"), ("DX-Y.NYB", "מדד הדולר"), ("CL=F", "נפט WTI"),
+                   ("GC=F", "זהב"), ("^VIX", "VIX")]
+    _mrows = ""
+    for sym, nm in _macro_syms:
+        r = _by.get(sym)
+        if not r:
+            continue
+        d1 = r.get("d1")
+        cc2 = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
+        _mrows += (f"<div style='display:flex;justify-content:space-between;gap:10px;padding:8px 2px;"
+                   f"border-bottom:1px solid {BORDER}'><span style='color:{SECONDARY}'>{nm}</span>"
+                   f"<span><b>{fmt(r.get('price'))}</b> <span style='color:{cc2}'>"
+                   f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></span>"
+                   f"<span style='color:{MUTED};font-size:13.5px'>{r.get('interp','')}</span></div>")
+    mb[0].markdown(f"<div class='ic-card'><div class='ic-title'>תמונת מאקרו</div>{_mrows}"
+                   f"<div class='ic-sub' style='margin-top:8px'>נתוני Fed/אינפלציה אינם זמינים ממקור חינמי מובנה.</div></div>",
+                   unsafe_allow_html=True)
+    _b50, _b200 = breadth.get("above50"), breadth.get("above200")
+    _adv = breadth.get("advancers"); _dec = breadth.get("decliners")
+    _advp = round(_adv / (_adv + _dec) * 100) if isinstance(_adv, (int, float)) and isinstance(_dec, (int, float)) and (_adv + _dec) else None
+
+    def _bbar(lbl, v):
+        return (f"<div class='sbar'><div class='sbar-h'><span>{lbl}</span>"
+                f"<b style='color:{score_color(v)}'>{fmt(v, '%')}</b></div>"
+                f"<div class='sbar-t'><div class='sbar-f' style='width:{v or 0}%;background:{score_color(v)}'></div></div></div>")
+    mb[1].markdown(f"<div class='ic-card'><div class='ic-title'>רוחב שוק</div>"
+                   + _bbar("מעל ממוצע 50", _b50) + _bbar("מעל ממוצע 200", _b200)
+                   + _bbar("מניות עולות היום", _advp) + "</div>", unsafe_allow_html=True)
 
     # ---------- מה השתנה — Delta Feed (changes only, cause + ONE action) ----------
     if _dd.get("available") and (_dd["items"] or _dd["new"]):
@@ -628,30 +683,7 @@ if page.startswith("🏠"):
                 st.rerun()
         st.caption(f"השוואה: {_dd.get('prev_date')} ← {_dd.get('cur_date')} · מוצגים שינויים בלבד, עם הסיבה מפירוק הציון.")
 
-    # ---- 3. Capital flow (real sector-strength proxy) ----
-    cf = mkt.get("capital_flow", {})
-    if cf.get("inflows") or cf.get("outflows"):
-        st.markdown("#### לאן זורם הכסף")
-        fc = st.columns(2)
-        _fin = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
-                       f"<span>↗ {s['sector']}</span><b style='color:{POSITIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
-                       for s in cf.get("inflows", [])[:4])
-        _fout = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
-                        f"<span>↘ {s['sector']}</span><b style='color:{NEGATIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
-                        for s in cf.get("outflows", [])[:4])
-        fc[0].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{POSITIVE}'>כניסת הון</div>{_fin}</div>",
-                       unsafe_allow_html=True)
-        fc[1].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{NEGATIVE}'>יציאת הון</div>{_fout}</div>",
-                       unsafe_allow_html=True)
-        st.caption(cf.get("method", ""))
-        _af = _delta.asset_flows(g.get("groups") or {})
-        if _af:
-            st.markdown("<div class='ic-sub' style='margin-top:4px'><b>בין אפיקים (מגמת 30 יום · פרוקסי-מחיר מוערך):</b> "
-                        + " · ".join(f"{a['asset']} {a['trend']} ({a['d30']:+.1f}%)" for a in _af)
-                        + "</div>", unsafe_allow_html=True)
-
-    # ---- 4. Best opportunities table ----
-    st.markdown("### ההזדמנויות המובילות היום")
+    st.markdown("### ההזדמנויות בעלות האמונה הגבוהה ביותר היום")
     ranked = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(8)
 
     def _why_row(r):
@@ -722,36 +754,23 @@ if page.startswith("🏠"):
             st.rerun()
 
 
-    # ---- 6+9. Macro snapshot + breadth (visual bars) ----
-    mb = st.columns([1.4, 1])
-    _macro_syms = [("^TNX", "תשואת 10 שנים"), ("DX-Y.NYB", "מדד הדולר"), ("CL=F", "נפט WTI"),
-                   ("GC=F", "זהב"), ("^VIX", "VIX")]
-    _mrows = ""
-    for sym, nm in _macro_syms:
-        r = _by.get(sym)
-        if not r:
-            continue
-        d1 = r.get("d1")
-        cc2 = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
-        _mrows += (f"<div style='display:flex;justify-content:space-between;gap:10px;padding:8px 2px;"
-                   f"border-bottom:1px solid {BORDER}'><span style='color:{SECONDARY}'>{nm}</span>"
-                   f"<span><b>{fmt(r.get('price'))}</b> <span style='color:{cc2}'>"
-                   f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></span>"
-                   f"<span style='color:{MUTED};font-size:13.5px'>{r.get('interp','')}</span></div>")
-    mb[0].markdown(f"<div class='ic-card'><div class='ic-title'>תמונת מאקרו</div>{_mrows}"
-                   f"<div class='ic-sub' style='margin-top:8px'>נתוני Fed/אינפלציה אינם זמינים ממקור חינמי מובנה.</div></div>",
-                   unsafe_allow_html=True)
-    _b50, _b200 = breadth.get("above50"), breadth.get("above200")
-    _adv = breadth.get("advancers"); _dec = breadth.get("decliners")
-    _advp = round(_adv / (_adv + _dec) * 100) if isinstance(_adv, (int, float)) and isinstance(_dec, (int, float)) and (_adv + _dec) else None
-
-    def _bbar(lbl, v):
-        return (f"<div class='sbar'><div class='sbar-h'><span>{lbl}</span>"
-                f"<b style='color:{score_color(v)}'>{fmt(v, '%')}</b></div>"
-                f"<div class='sbar-t'><div class='sbar-f' style='width:{v or 0}%;background:{score_color(v)}'></div></div></div>")
-    mb[1].markdown(f"<div class='ic-card'><div class='ic-title'>רוחב שוק</div>"
-                   + _bbar("מעל ממוצע 50", _b50) + _bbar("מעל ממוצע 200", _b200)
-                   + _bbar("מניות עולות היום", _advp) + "</div>", unsafe_allow_html=True)
+    # ---- Watchlist changes (answer: מה השתנה ברשימה שלי?) ----
+    import mywatch as _mw
+    _wlrows = _mw.enrich(uni_h, df.to_dict("records") if not df.empty else [])
+    _wlatt = [w for w in _wlrows if w["attention"]] if _wlrows else []
+    if _wlrows:
+        st.markdown("#### מה השתנה ברשימת המעקב שלך")
+        if not _wlatt:
+            st.markdown(f"<div class='ic-sub'>הכל יציב — {len(_wlrows)} מניות במעקב, ללא שינוי מהותי מאז השמירה.</div>",
+                        unsafe_allow_html=True)
+        for w in _wlatt[:4]:
+            st.markdown(f"<div class='card' style='border-right:3px solid {NEGATIVE};padding:12px 16px'>"
+                        f"<b style='font-size:16px'>{w['ticker']}</b> — "
+                        f"<span style='color:{SECONDARY}'>{' · '.join(w['attention'])}</span></div>",
+                        unsafe_allow_html=True)
+        if st.button("פתח את המעקב המלא ⭐", key="home_wl"):
+            st.session_state["_pending_nav"] = "⭐ המעקב שלי"
+            st.rerun()
 
     # ---- 7+10. Events this week + market intelligence (rating actions) ----
     ev2 = st.columns(2)
@@ -780,6 +799,36 @@ if page.startswith("🏠"):
             st.markdown(f"<div class='card' style='border-right:3px solid {NEGATIVE};padding:14px 18px'>"
                         f"<b>{a['type']}</b> · {a.get('scope','')} — <span style='color:{SECONDARY}'>{a['message']}</span></div>",
                         unsafe_allow_html=True)
+
+    # ---- Research queue — the page ends with a decision ----
+    st.markdown("#### תור המחקר שלך להיום")
+    _queue = []
+    for it in (_dd.get("items") or [])[:6]:
+        _act = _delta.action_for(it["score_now"], it.get("group"), it.get("d_score"))
+        if _act["icon"] in ("🔍", "⚠️", "📈"):
+            _queue.append((it["ticker"], f"{_act['icon']} {_act['verb']} — {it['changes'][0]}"))
+    for _tk in (_dd.get("new") or [])[:3]:
+        _queue.append((_tk, "🔍 לחקור — חדשה בסריקה"))
+    for w in _wlatt[:2]:
+        _queue.append((w["ticker"], f"⚠️ לבחון — {w['attention'][0]}"))
+    _seen = set()
+    _queue = [q for q in _queue if not (q[0] in _seen or _seen.add(q[0]))][:6]
+    if not _queue:
+        st.markdown(f"<div class='ic-sub'>אין פריטים דחופים היום — זמן טוב להעמיק באחת ההזדמנויות שבטבלה למעלה.</div>",
+                    unsafe_allow_html=True)
+    else:
+        st.markdown("<div class='ic-card'>" + "".join(
+            f"<div style='display:flex;justify-content:space-between;gap:10px;padding:8px 2px;"
+            f"border-bottom:1px solid {BORDER}'><b>{tk}</b>"
+            f"<span style='color:{SECONDARY};font-size:14.5px'>{why}</span></div>"
+            for tk, why in _queue) + "</div>", unsafe_allow_html=True)
+        _qc = st.columns(max(len(_queue), 1))
+        for j, (tk, _) in enumerate(_queue):
+            if _qc[j].button(f"🔎 {tk}", key=f"rq_{tk}", use_container_width=True):
+                st.session_state["dd_ticker"] = tk
+                st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                st.rerun()
+    st.caption("התור נבנה מהשינויים המדידים של הבוקר + התראות המעקב שלך — כל פריט עם פעולה אחת ברורה.")
 
     # ---- 12. Quick actions ----
     qa = st.columns(4)
