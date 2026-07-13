@@ -674,11 +674,16 @@ if page.startswith("🏠"):
         _fh = "".join(f"<th>{h}</th>" for h in ["חברה", "מה השתנה", "למה (מדיד)", "פעולה"])
         st.markdown(f"<table class='sectbl'><thead><tr>{_fh}</tr></thead><tbody>{_fb}</tbody></table>",
                     unsafe_allow_html=True)
+        _dl_ctx = {it["ticker"]: f"הופיעה בשינויי-הלילה: {it['changes'][0]} · סיבה מדידה: {it['causes'][0]}"
+                   for it in _dd["items"][:7]}
+        for _tkn in _dd["new"][:3]:
+            _dl_ctx.setdefault(_tkn, "מניה חדשה בסריקת הבוקר — טרם נותחה לעומק")
         _dl_tks = ([it["ticker"] for it in _dd["items"][:7]] + _dd["new"][:3])[:8]
         _dcols = st.columns(max(len(_dl_tks), 1))
         for j, tk in enumerate(_dl_tks):
             if _dcols[j].button(f"🔎 {tk}", key=f"dl_{tk}", use_container_width=True):
                 st.session_state["dd_ticker"] = tk
+                st.session_state["dd_context"] = _dl_ctx.get(tk, "")
                 st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                 st.rerun()
         st.caption(f"השוואה: {_dd.get('prev_date')} ← {_dd.get('cur_date')} · מוצגים שינויים בלבד, עם הסיבה מפירוק הציון.")
@@ -823,9 +828,10 @@ if page.startswith("🏠"):
             f"<span style='color:{SECONDARY};font-size:14.5px'>{why}</span></div>"
             for tk, why in _queue) + "</div>", unsafe_allow_html=True)
         _qc = st.columns(max(len(_queue), 1))
-        for j, (tk, _) in enumerate(_queue):
+        for j, (tk, _why) in enumerate(_queue):
             if _qc[j].button(f"🔎 {tk}", key=f"rq_{tk}", use_container_width=True):
                 st.session_state["dd_ticker"] = tk
+                st.session_state["dd_context"] = f"בתור המחקר של הבוקר: {_why}"
                 st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                 st.rerun()
     st.caption("התור נבנה מהשינויים המדידים של הבוקר + התראות המעקב שלך — כל פריט עם פעולה אחת ברורה.")
@@ -1321,6 +1327,14 @@ elif page == "🔎 ניתוח חברה":
     q[2].caption("דוגמאות: NVDA · AAPL · LLY · PLTR · MSFT · GOOGL")
 
     if tkin:
+        # Cross-page intelligence: WHY the user landed here (one-shot context).
+        _ctx = st.session_state.pop("dd_context", None)
+        if _ctx:
+            st.markdown(f"<div class='ic-card' style='background:{ELEV};padding:14px 20px;"
+                        f"border-right:3px solid {PRIMARY}'>"
+                        f"<span style='color:{MUTED};font-size:13px'>למה הגעת לכאן · </span>"
+                        f"<span style='font-size:15px'>{_ctx}</span></div>", unsafe_allow_html=True)
+
         # Skeleton loading (V3): a research-report placeholder renders INSTANTLY
         # while the live fetch runs — perceived speed instead of a blank spinner.
         _skel = st.empty()
@@ -1608,6 +1622,21 @@ elif page == "🔎 ניתוח חברה":
                 # ---- Recommendation history (Phase 0.5) ----
                 _hist = rep.get("history") or []
                 if len(_hist) >= 2:
+                    _pv, _cu = _hist[-2], _hist[-1]
+                    def _arr2(a, b, inv=False):
+                        if not isinstance(a, (int, float)) or not isinstance(b, (int, float)) or a == b:
+                            return "→ ללא שינוי"
+                        up = b > a
+                        return f"{'↑' if up else '↓'} {a}→{b}"
+                    _same = _pv.get("recommendation") == _cu.get("recommendation")
+                    _rec_txt = ("ללא שינוי — עקביות" if _same
+                                else f"השתנתה: {_pv.get('recommendation')} ← {_cu.get('recommendation')}")
+                    st.markdown(
+                        f"<div class='ic-sub' style='margin-top:4px'>"
+                        f"<b>זיכרון החלטות</b> (מאז {_pv['date']}): המלצה {_rec_txt}"
+                        f" · ביטחון {_arr2(_pv.get('confidence'), _cu.get('confidence'))}"
+                        f" · ציון V2 {_arr2(_pv.get('score_v2'), _cu.get('score_v2'))}"
+                        f" · יעד {_arr2(_pv.get('target'), _cu.get('target'))}</div>", unsafe_allow_html=True)
                     with st.expander(f"📜 היסטוריית המלצות ({len(_hist)} רשומות)"):
                         prev, cur = _hist[-2], _hist[-1]
                         def _arrow(a, b):
