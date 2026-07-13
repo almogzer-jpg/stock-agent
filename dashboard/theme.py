@@ -117,13 +117,21 @@ INSTITUTIONAL_CSS = f"""
       margin-top:2.2rem; margin-bottom:.8rem; }}
   p {{ margin-bottom:.6rem; }}
   div[data-testid="stCaptionContainer"] p {{ font-size:{FS_FOOT}; }}
-  #MainMenu, footer, header[data-testid="stHeader"] {{ visibility:hidden; }}
-  /* the sidebar open/close controls must ALWAYS stay reachable (nav lives there) */
-  [data-testid="stSidebarCollapsedControl"], [data-testid="stSidebarCollapseButton"],
-  header[data-testid="stHeader"] [data-testid="stSidebarCollapsedControl"] {{
+  /* header stays VISIBLE (it holds the sidebar-open arrow — the only way back to
+     navigation when the sidebar is collapsed); hide only its chrome, never the arrow */
+  #MainMenu, footer {{ visibility:hidden; }}
+  header[data-testid="stHeader"] {{ background:transparent; }}
+  header[data-testid="stHeader"] [data-testid="stToolbar"],
+  header[data-testid="stHeader"] [data-testid="stMainMenu"],
+  header[data-testid="stHeader"] [data-testid="stStatusWidget"],
+  [data-testid="stDecoration"] {{ visibility:hidden; }}
+  [data-testid="stSidebarCollapsedControl"], [data-testid="stExpandSidebarButton"],
+  [data-testid="stSidebarCollapseButton"] {{
       visibility:visible !important; opacity:1 !important; }}
   [data-testid="stSidebarCollapsedControl"] {{ color:{PRIMARY}; background:{CARD};
       border-radius:10px; padding:6px; }}
+  [data-testid="stSidebarCollapsedControl"] svg,
+  [data-testid="stExpandSidebarButton"] svg {{ color:{PRIMARY}; fill:{PRIMARY}; }}
   .block-container {{ padding-top:1.6rem; padding-bottom:3.4rem; max-width:1460px; }}
   ::selection {{ background:{PRIMARY}33; }}
   hr {{ border-color:{BORDER}; opacity:.5; margin:2rem 0; }}
