@@ -21,19 +21,25 @@
     "type": "דוחות",
     "scope": "JPM",
     "severity": "בינונית",
-    "message": "JPM — דוחות כספיים בעוד 4 ימים (2026-07-14)"
+    "message": "JPM — דוחות כספיים בעוד 1 ימים (2026-07-14)"
   },
   {
     "type": "דוחות",
     "scope": "UNH",
     "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 6 ימים (2026-07-16)"
+    "message": "UNH — דוחות כספיים בעוד 3 ימים (2026-07-16)"
+  },
+  {
+    "type": "זינוק נפח",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — נפח מסחר פי 2.0 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "NFLX",
     "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 6 ימים (2026-07-16)"
+    "message": "NFLX — דוחות כספיים בעוד 3 ימים (2026-07-16)"
   },
   {
     "type": "שינוי דירוג",
@@ -45,7 +51,7 @@
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
+    "message": "LLY — אישרור: Buy → Buy (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -55,15 +61,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Buy → Buy (TD Cowen)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
     "message": "MA — כיסוי חדש:  → Overweight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (Goldman Sachs)"
+    "message": "MSFT — אישרור: Buy → Buy (Argus Research)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,33 +85,33 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "ADBE",
     "severity": "מידע",
     "message": "ADBE — שדרוג: Hold → Buy (HSBC)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
+    "scope": "PG",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (BMO Capital)"
+    "message": "PG — אישרור: Buy → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — אישרור: Buy → Buy (Stifel)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
     "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
@@ -117,12 +129,12 @@
     "type": "רוטציית סקטורים",
     "scope": "פיננסים",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור פיננסים (ציון 86, חוזק יחסי +5.38%)"
+    "message": "כניסת הון לסקטור פיננסים (ציון 82, חוזק יחסי +4.01%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "אנרגיה",
+    "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור אנרגיה (ציון 22, חוזק יחסי -7.2%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 24, חוזק יחסי -2.15%)"
   }
 ]
