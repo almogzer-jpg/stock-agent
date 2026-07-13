@@ -111,11 +111,13 @@ def _dd_fetch(ticker):
     return deepdive.fetch_bundle(ticker)
 
 
-def _goto(page, ticker=None, key=None, label=None):
-    """Full-width action button that deep-links to a mobile page."""
+def _goto(page, ticker=None, key=None, label=None, ctx=None):
+    """Full-width action button that deep-links to a mobile page (with why-context)."""
     if st.button(label or page, key=key or f"go_{page}_{ticker}", use_container_width=True):
         if ticker:
             st.session_state["dd_ticker"] = ticker
+        if ctx:
+            st.session_state["dd_context"] = ctx
         st.session_state["_m_pending"] = page
         st.rerun()
 
@@ -222,7 +224,28 @@ def render(df, mkt):
 # ---------------------------------------------------------------------------
 
 def _home(df, ranked, sectors, alerts, regime, fng, lookup, nc):
-    """Home = 6 focused cards: regime, F&G, top-3, sector, main alert, decision CTA."""
+    """Home = morning brief + 6 focused cards (regime, F&G, top-3, sector, alert, CTA)."""
+    # --- Morning brief (lite): environment + the single most material change ---
+    try:
+        import delta as dl
+        _gm = _load(config.GLOBAL_JSON, {})
+        _vix = next((r for grp in (_gm.get("groups") or {}).values() for r in grp
+                     if r.get("symbol") == "^VIX"), None)
+        _env = dl.classify_environment(regime, _vix, {}, sectors)
+        _ddm = dl.diff_scores(*dl.load_pair())
+        _top = _ddm["items"][0] if _ddm.get("items") else None
+        st.markdown(f"<div class='mcard' style='border-right:4px solid {PRIMARY}'>"
+                    f"<div class='mco'>תדריך בוקר</div>"
+                    f"<div style='font-size:17px;font-weight:700'>{' · '.join(_env['labels'])}</div>"
+                    + (f"<div class='mco' style='margin-top:4px'>הבולט מאז {_ddm.get('prev_date')}: "
+                       f"<b>{_top['ticker']}</b> — {_top['changes'][0]}<br>סיבה: {_top['causes'][0]}</div>"
+                       if _top else "<div class='mco'>אין שינוי מהותי מאז הסריקה הקודמת.</div>")
+                    + "</div>", unsafe_allow_html=True)
+        if _top:
+            _goto("🔎 ניתוח", _top["ticker"], key="mb_top", label=f"🔎 ניתוח {_top['ticker']}",
+                  ctx=f"הבולט בתדריך הבוקר: {_top['changes'][0]} · סיבה: {_top['causes'][0]}")
+    except Exception:
+        pass
     reg_s = regime.get("score")
     fg = fng.get("score")
     fgc = (NEGATIVE if isinstance(fg, (int, float)) and fg < 45
@@ -350,6 +373,10 @@ def _analysis(mkt, lookup, nc):
     st.markdown("#### ניתוח חברה")
     st.session_state.setdefault("dd_ticker", "AAPL")
     tk = st.text_input("סימול", key="dd_ticker", placeholder="NVDA, AAPL, LLY").strip().upper()
+    _ctx = st.session_state.pop("dd_context", None)
+    if _ctx:
+        st.markdown(f"<div class='mcard' style='border-right:4px solid {PRIMARY};padding:11px 14px'>"
+                    f"<span class='mco'>למה הגעת לכאן · </span>{_ctx}</div>", unsafe_allow_html=True)
     if not tk:
         return
     with st.spinner(f"מנתח את {tk}…"):

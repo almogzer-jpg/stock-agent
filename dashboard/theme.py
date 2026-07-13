@@ -134,6 +134,13 @@ INSTITUTIONAL_CSS = f"""
   /* ================= Sidebar ================= */
   section[data-testid="stSidebar"] {{ background:{CARD}; border-left:1px solid {BORDER}; }}
   section[data-testid="stSidebar"] * {{ color:{TEXT}; }}
+  /* a11y: visible focus ring everywhere (keyboard navigation) */
+  button:focus-visible, a:focus-visible, [role="radio"]:focus-visible,
+  input:focus-visible, [tabindex]:focus-visible {{
+      outline:2px solid {PRIMARY} !important; outline-offset:2px; border-radius:6px; }}
+  /* hide the nav widget's label ("תצוגה") — nav needs no caption */
+  section[data-testid="stSidebar"] label[data-testid="stWidgetLabel"],
+  section[data-testid="stSidebar"] div[data-testid="stWidgetLabel"] {{ display:none; }}
   /* Sidebar radio → institutional NAV (no radio circles, active accent bar) */
   section[data-testid="stSidebar"] .stRadio div[data-testid="stWidgetLabel"] {{ display:none; }}
   section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label > div:first-child {{ display:none; }}

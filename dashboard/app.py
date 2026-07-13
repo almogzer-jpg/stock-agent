@@ -755,6 +755,7 @@ if page.startswith("🏠"):
     for j, (_, r) in enumerate(ranked.iterrows()):
         if _bc[j].button(f"🔎 {r['Ticker']}", key=f"hg_{r['Ticker']}", use_container_width=True):
             st.session_state["dd_ticker"] = r["Ticker"]
+            st.session_state["dd_context"] = f"מובילה בהזדמנויות הבוקר — {_why_row(r)}"
             st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
             st.rerun()
 
@@ -885,6 +886,8 @@ elif page == "⭐ המעקב שלי":
         for j, w in enumerate(_wl[:8]):
             if _wcols[j].button(f"🔎 {w['ticker']}", key=f"wl_{w['ticker']}", use_container_width=True):
                 st.session_state["dd_ticker"] = w["ticker"]
+                st.session_state["dd_context"] = ("מרשימת המעקב שלך: "
+                                                  + (" · ".join(w["attention"]) or "בדיקה שוטפת — אין שינוי מהותי"))
                 st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                 st.rerun()
         _rm = st.selectbox("הסר מהרשימה", ["—"] + [w["ticker"] for w in _wl], key="wl_rm")
@@ -1261,6 +1264,7 @@ elif page == "🗺️ סקטורים":
             for j, x in enumerate(pool):
                 if dcols[j].button(f"🔎 {x['Ticker']}", key=f"sd_{x['Ticker']}", use_container_width=True):
                     st.session_state["dd_ticker"] = x["Ticker"]
+                    st.session_state["dd_context"] = f"מובילה בסקטור {sel_he} (ציון V2 מהגבוהים בסקטור)"
                     st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                     st.rerun()
 
@@ -1309,6 +1313,7 @@ elif page == "🚨 התראות":
                 if valid_tk and cc[1].button(f"🔎 {tk}", key=f"alw_{sev_key}_{i}_{tk}",
                                              use_container_width=True):
                     st.session_state["dd_ticker"] = tk
+                    st.session_state["dd_context"] = f"מהתראה ({a['type']}): {str(a['message'])[:90]}"
                     st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                     st.rerun()
 
@@ -2087,6 +2092,28 @@ elif page == "⚙️ הגדרות":
                 "ומנועי ניקוד דטרמיניסטיים, וניתנת לשחזור.</div>"
                 "<div class='ic-sub'>המערכת עונה: מה קורה · למה · מה הסיכונים · האם החברה אטרקטיבית · זול/הוגן/יקר.</div>"
                 "<div class='ic-sub'>⚠️ מידע בלבד, לא ייעוץ השקעות.</div></div>", unsafe_allow_html=True)
+
+    # ---- How the system thinks (methodology, from the real engine constants) ----
+    st.markdown("#### איך המערכת חושבת")
+    try:
+        from ranking_engine.composite import WEIGHTS as _W
+    except Exception:
+        _W = {"fundamental": 0.35, "technical": 0.25, "sector": 0.20, "news": 0.10, "risk": 0.10}
+    _wl_he = {"fundamental": "פונדמנטלי", "technical": "טכני", "sector": "סקטור",
+              "news": "חדשות", "risk": "בריאות-סיכון"}
+    st.markdown(
+        f"<div class='ic-card'>"
+        f"<div class='ic-sub'><b>ציון V2</b> = שקלול דטרמיניסטי: "
+        + " · ".join(f"{_wl_he.get(k, k)} {v:.0%}" for k, v in _W.items())
+        + " (ממדים חסרים → המשקלים מנורמלים מחדש; הפירוק המלא מוצג בכל ניתוח).</div>"
+        f"<div class='ic-sub'><b>סולם ההמלצות:</b> ‎78+ קנייה חזקה · ‎68+ קנייה · ‎55+ מעקב · ‎45+ החזקה · ‎35+ הקטנה · אחרת להימנע. "
+        f"סיכון 'גבוה מאוד' או אמון נמוך (<40) מורידים דרגה אוטומטית.</div>"
+        f"<div class='ic-sub'><b>כללי אמינות:</b> מקור יחיד ללא אימות-צולב לעולם אינו 'גבוהה' (תקרה 74); "
+        f"מקורות סותרים → 'נמוכה'; אמינות לא-מספקת → ההמלצה מדוכאת ('אין מספיק מידע אמין').</div>"
+        f"<div class='ic-sub'><b>עקרונות:</b> אפס LLM · הכל ניתן-שחזור · עובדה/מחושב/תרחיש מתויגים · "
+        f"'אין נתון זמין' במקום המצאה · כל המלצה עם סיבות, סיכונים ותנאי-פירכה.</div>"
+        f"<div class='ic-sub' style='color:{MUTED};font-size:13px'>תיעוד מלא: RELIABILITY.md · DATA_GOVERNANCE.md בריפו.</div>"
+        f"</div>", unsafe_allow_html=True)
 
     # ---- Reliability & provenance (Step 0) ----
     st.markdown("#### אמינות נתונים ומקורות")
