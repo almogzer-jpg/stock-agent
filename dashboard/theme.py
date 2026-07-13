@@ -118,6 +118,12 @@ INSTITUTIONAL_CSS = f"""
   p {{ margin-bottom:.6rem; }}
   div[data-testid="stCaptionContainer"] p {{ font-size:{FS_FOOT}; }}
   #MainMenu, footer, header[data-testid="stHeader"] {{ visibility:hidden; }}
+  /* the sidebar open/close controls must ALWAYS stay reachable (nav lives there) */
+  [data-testid="stSidebarCollapsedControl"], [data-testid="stSidebarCollapseButton"],
+  header[data-testid="stHeader"] [data-testid="stSidebarCollapsedControl"] {{
+      visibility:visible !important; opacity:1 !important; }}
+  [data-testid="stSidebarCollapsedControl"] {{ color:{PRIMARY}; background:{CARD};
+      border-radius:10px; padding:6px; }}
   .block-container {{ padding-top:1.6rem; padding-bottom:3.4rem; max-width:1460px; }}
   ::selection {{ background:{PRIMARY}33; }}
   hr {{ border-color:{BORDER}; opacity:.5; margin:2rem 0; }}

@@ -32,7 +32,8 @@ from dashboard.theme import (DARK_CSS, style_fig, GREEN, AMBER, RED, BLUE, CARD,
                              SECONDARY, PRIMARY, POSITIVE, WARNING, NEGATIVE, BG, BORDER, ELEV,
                              score_color, regime_color, sparkline_svg, score_bar)
 
-st.set_page_config(page_title="Stock Agent Pro", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Stock Agent Pro", page_icon="📈", layout="wide",
+                   initial_sidebar_state="expanded")
 st.markdown(DARK_CSS, unsafe_allow_html=True)
 
 
