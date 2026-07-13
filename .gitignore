@@ -12,6 +12,9 @@ data/*
 !data/backtest.json
 !data/system_health.json
 !data/universe.json
+!data/reliability.json
+!data/scores_today.json
+!data/scores_prev.json
 # keep ignoring logs, excel, caches and the timestamped outputs/
 data/outputs/
 data/*.log
@@ -28,3 +31,6 @@ __pycache__/
 stock-screener/
 STOCK_AGENT_PRO_FULL_REVIEW.zip
 CHATGPT_REVIEW_PACKAGE/
+data/decision_audit.jsonl
+data/rec_history.json
+data/my_watchlist.json

@@ -19,6 +19,7 @@ import math
 import pandas as pd
 import yfinance as yf
 
+import config
 import market
 import risk as risk_engine
 import decisions as dec
@@ -456,11 +457,56 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
         "op_margin": op_margin, "fcf_growth": _num(fund.get("FCFGrowth")),
         "debt_equity": _num(fund.get("DebtToEquity")), "roic": _num(fund.get("ROIC")),
         "ret_3m": rets.get("3m"), "ret_1m": rets.get("1m"), "rsi": rsi_last,
+        "inst_held_pct": (round(_g(info, "heldPercentInstitutions") * 100, 1)
+                          if isinstance(_g(info, "heldPercentInstitutions"), (int, float)) else None),
+        "earnings_date": _earnings_date(info),
     }
+
+    # ---- Phase 0.5: data confidence, quality warnings, gate, audit, history ----
+    import reliability as _rel
+    _completeness = (comp["completeness"] * 100) if comp else 50
+    _cross_ok = None
+    try:
+        import json as _json
+        with open(config.RELIABILITY_JSON, encoding="utf-8") as _fh:
+            _cross_ok = _json.load(_fh).get("crosscheck", {}).get("status") == "ok"
+    except Exception:
+        _cross_ok = None
+    dconf = _rel.data_confidence(sources_agreeing=1, fresh=True, source_quality=80,
+                                 cross_ok=_cross_ok, fallback_used=False,
+                                 completeness=_completeness)
+    warnings_q = []
+    if hist is None or len(getattr(hist, "index", [])) < 60:
+        warnings_q.append("⚠️ נתונים טכניים חלקיים — היסטוריית מחיר קצרה")
+    if fund_score is None:
+        warnings_q.append("⚠️ נתונים פונדמנטליים חסרים — הציון המשוקלל חושב בלעדיהם")
+    if not _g(info, "targetMeanPrice"):
+        warnings_q.append("⚠️ יעד אנליסטים לא זמין")
+    warnings_q.append("⚠️ מקור נתונים ראשי יחיד (Yahoo) — אימות-צולב זמין למט\"ח/מדדים בלבד")
+    gate = _rel.quality_gate(dconf["score"], fresh=True,
+                             critical_missing=[f for f, v in
+                                               [("מחיר", ma.get("price")), ("היסטוריית מחיר", hist is not None)]
+                                               if not v],
+                             cross_status="ok" if _cross_ok else "not_completed")
+    try:  # audit trail + recommendation history — never blocks the analysis
+        _rel.record_decision_audit({
+            "ticker": t, "recommendation": rec, "confidence": trust["score"],
+            "score_v2": score_v2, "data_confidence": dconf["score"],
+            "sources": ["Yahoo Finance (yfinance)"], "fallbacks": [],
+            "models": ["composite_v2", "risk_engine", "technicals", "trust", "decision_v0"],
+            "missing": (comp.get("missing") if comp else []) or [],
+            "weights": (comp.get("weights") if comp else {}) or {},
+            "gate_pass": gate["pass"]})
+        _rel.record_recommendation(t, rec, trust["score"], score_v2,
+                                   _g(info, "targetMeanPrice"), risk_cat)
+    except Exception:
+        pass
 
     return {
         "ticker": t, "disclaimer": DISCLAIMER,
         "raw_metrics": raw_metrics,
+        "data_confidence": dconf, "quality_warnings": warnings_q, "quality_gate": gate,
+        "history": _rel.recommendation_history(t),
         "overview": overview, "market_data": market_data, "financials": financials,
         "valuation": valuation, "growth": growth,
         "competitive": {
@@ -663,6 +709,14 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
         ("סביבת מאקרו", regime_score, _check(regime_score, 60, 40), ""),
         ("סיכון", risk_score, _check(risk_score, 32, 65, higher_better=False), ""),
     ]
+    # V2 intelligence: earnings quality (FCF keeping up with EPS) + institutional holding.
+    eq_gap = ((rm.get("fcf_growth") - rm.get("eps_growth"))
+              if isinstance(rm.get("fcf_growth"), (int, float)) and isinstance(rm.get("eps_growth"), (int, float))
+              else None)
+    checklist.append(("איכות רווחים (FCF מול EPS)", round(eq_gap, 1) if eq_gap is not None else None,
+                      _check(eq_gap, -10, -25), " נק'"))
+    checklist.append(("אחזקות מוסדיות", rm.get("inst_held_pct"),
+                      _check(rm.get("inst_held_pct"), 60, 30), "%"))
 
     matrix = {"פונדמנטלי": fund_s, "טכני": tech_s, "תמחור": val_s,
               "מומנטום": mom_sub, "סיכון (בריאות)": (100 - risk_score) if isinstance(risk_score, (int, float)) else None,
@@ -735,7 +789,7 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
     strengths = [x for x in (rep.get("pros_cons") or {}).get("pros", []) if x != "—"][:5]
     weaknesses = [x for x in (rep.get("pros_cons") or {}).get("cons", []) if x != "—"][:5]
 
-    return {
+    out = {
         "recommendation": op.get("recommendation", NOT_ENOUGH),
         "confidence": trust_s, "horizon": horizon,
         "price": price, "target": base_t.get("price", NA), "target_num": fair,
@@ -748,7 +802,190 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
         "checklist": checklist, "matrix": matrix,
         "investor_types": tags, "wait_for": wait_for[:4], "risks": risks[:5],
         "zones": zones, "strengths": strengths, "weaknesses": weaknesses,
+        "breakdown": _decision_breakdown(rep),
     }
+    # ---- Decision Engine V2: the intelligence layer ----
+    out["thesis_confidence"] = thesis_confidence(rep, regime_score)
+    out["position"] = position_suggestion(out["thesis_confidence"]["score"], risk_cat,
+                                          (rep.get("risk") or {}).get("volatility"),
+                                          out["recommendation"])
+    out["invalidators"] = thesis_invalidators(rep)
+    out["catalysts"] = catalysts_timeline(rep)
+    out["rating_change"] = explain_rating_change(rep.get("history") or [])
+    out["exec_summary_3"] = executive_summary_3(rep, out)
+    return out
+
+
+def _decision_breakdown(rep: dict) -> dict:
+    """Explainability (Phase 0.5): contribution of each dimension to the final
+    score + which factor most held the rating back. Pure derivation from the
+    composite contributions already computed — no new logic."""
+    sc = rep.get("scores") or {}
+    contrib = (sc.get("final_v2") or {}).get("contributions") or {}
+    he = {"fundamental": "פונדמנטלי", "technical": "טכני", "sector": "סקטור",
+          "news": "חדשות", "risk": "בריאות-סיכון"}
+    parts = [{"name": he.get(k, k), "points": round(v, 1)}
+             for k, v in sorted(contrib.items(), key=lambda x: -x[1])]
+    dims = {"פונדמנטלי": (sc.get("fundamental") or {}).get("value"),
+            "תמחור": (sc.get("valuation") or {}).get("value"),
+            "טכני": (sc.get("technical") or {}).get("value"),
+            "סקטור": (sc.get("sector") or {}).get("value")}
+    rk = (rep.get("risk") or {}).get("risk_score")
+    if isinstance(rk, (int, float)):
+        dims["סיכון (בריאות)"] = 100 - rk
+    weak = [(n, v) for n, v in dims.items() if isinstance(v, (int, float)) and v < 55]
+    weak.sort(key=lambda x: x[1])
+    blockers = [f"{n} ({round(v)}/100) מנע דירוג גבוה יותר" for n, v in weak[:2]]
+    return {"contributions": parts, "blockers": blockers}
+
+
+# ===========================================================================
+# Decision Engine V2 — the intelligence layer (Phase: senior-analyst thinking).
+# Pure derivations from already-computed data. No new data, no forecasts —
+# rule-based synthesis, always labeled as model output.
+# ===========================================================================
+
+def thesis_confidence(rep: dict, regime_score=None) -> dict:
+    """Investment-Thesis Confidence — DISTINCT from data confidence.
+
+    Measures whether the *thesis* is well-supported: signal agreement across
+    dimensions (40), historical validation via trust (30), regime alignment
+    (15), evidence depth (15). Deterministic and decomposable.
+    """
+    sc = rep.get("scores") or {}
+    def _v(k):
+        v = (sc.get(k) or {}).get("value")
+        return v if isinstance(v, (int, float)) else None
+    dims = [_v("fundamental"), _v("technical"), _v("sector"), _v("valuation")]
+    known = [d for d in dims if d is not None]
+    # Agreement: how tightly the dimensions cluster (aligned story > mixed story).
+    agree = 0.0
+    if len(known) >= 2:
+        spread = max(known) - min(known)
+        agree = 40 * max(0.0, 1 - spread / 80.0)
+    trust_v = _v("trust") or 0
+    hist_part = 30 * trust_v / 100
+    v2 = _v("final_v2")
+    regime_part = 0.0
+    if isinstance(regime_score, (int, float)) and isinstance(v2, (int, float)):
+        bullish_thesis = v2 >= 55
+        regime_bull = regime_score >= 55
+        regime_part = 15 if bullish_thesis == regime_bull else 5
+    else:
+        regime_part = 7
+    depth_part = 15 * len(known) / 4
+    score = round(agree + hist_part + regime_part + depth_part)
+    label = ("גבוה" if score >= 75 else "בינוני" if score >= 50 else "נמוך")
+    return {"score": score, "label": label,
+            "parts": {"הסכמת אותות": round(agree), "אימות היסטורי": round(hist_part),
+                      "התאמה למשטר השוק": round(regime_part), "עומק ראיות": round(depth_part)}}
+
+
+def position_suggestion(thesis_conf, risk_cat, volatility, recommendation) -> dict:
+    """Suggested portfolio exposure band — from conviction, risk and volatility."""
+    rec = str(recommendation or "")
+    if any(k in rec for k in ("Avoid", "Reduce")):
+        return {"name": "להימנע", "range": "0%", "why": "ההמלצה שלילית"}
+    if "Watch" in rec or "Hold" in rec:
+        return {"name": "המתנה — ללא פוזיציה חדשה", "range": "0%", "why": "ההמלצה היא מעקב/החזקה"}
+    tc = thesis_conf if isinstance(thesis_conf, (int, float)) else 50
+    vol_hi = isinstance(volatility, (int, float)) and volatility >= 45
+    risky = risk_cat in ("גבוה", "גבוה מאוד")
+    if tc >= 80 and not risky and not vol_hi and "Strong" in rec:
+        return {"name": "אמונה גבוהה", "range": "8-10%", "why": "ביטחון-תזה גבוה, סיכון נמוך, המלצה חזקה"}
+    if tc >= 70 and not risky:
+        return {"name": "פוזיציית ליבה", "range": "5-8%", "why": "ביטחון-תזה טוב וסיכון סביר"}
+    if tc >= 55:
+        return {"name": "פוזיציה בינונית", "range": "3-5%", "why": "תזה סבירה — חשיפה מדודה"}
+    return {"name": "פוזיציה התחלתית", "range": "1-2%", "why": "ביטחון-תזה/סיכון מצדיקים כניסה זהירה בלבד"}
+
+
+def thesis_invalidators(rep: dict) -> list:
+    """Measurable kill-conditions: 'what would make this recommendation wrong?'"""
+    out = []
+    srl = (rep.get("technicals") or {}).get("sr_levels") or {}
+    rm = rep.get("raw_metrics") or {}
+    if srl.get("support"):
+        out.append(f"סגירה שבועית מתחת לתמיכה ${srl['support']} — שבירת המבנה הטכני")
+    if isinstance(rm.get("rev_growth"), (int, float)) and rm["rev_growth"] > 0:
+        out.append(f"האטת צמיחת הכנסות מתחת ל-{max(0, round(rm['rev_growth'] / 2))}% (כיום {rm['rev_growth']:.0f}%)")
+    if isinstance(rm.get("op_margin"), (int, float)):
+        out.append(f"שחיקת שולי תפעול מתחת ל-{max(0, round(rm['op_margin'] - 5))}% (כיום {rm['op_margin']:.0f}%)")
+    out.append("הורדת תחזית (guidance) בדוח הקרוב")
+    sc = rep.get("scores") or {}
+    val = (sc.get("valuation") or {}).get("value")
+    if isinstance(val, (int, float)) and val < 50:
+        out.append("התכווצות מכפילים בשוק — פגיעה כפולה בתמחור מתוח")
+    out.append("מעבר משטר-שוק ל-Risk-Off (ציון שוק <40)")
+    return out[:5]
+
+
+def catalysts_timeline(rep: dict) -> list:
+    """Upcoming catalysts — ONLY from real available data (honest coverage)."""
+    out = []
+    rm = rep.get("raw_metrics") or {}
+    ed = rm.get("earnings_date")
+    if ed and ed != NA:
+        out.append({"event": "דוח כספי רבעוני", "date": ed, "direction": "ניטרלי",
+                    "impact": "גבוהה", "confidence": "גבוה (תאריך רשמי)"})
+    tgt = None
+    for s in rep.get("scenarios", []):
+        if s.get("key") == "base":
+            tgt = s.get("target", {}).get("upside")
+    if isinstance(tgt, (int, float)):
+        out.append({"event": "עדכוני יעדי אנליסטים", "date": "שוטף",
+                    "direction": "חיובי" if tgt > 5 else "שלילי" if tgt < -5 else "ניטרלי",
+                    "impact": "בינונית", "confidence": "בינוני (קונצנזוס נוכחי)"})
+    out.append({"event": "החלטות ריבית / מאקרו (Fed, CPI)", "date": "מחזורי",
+                "direction": "ניטרלי", "impact": "בינונית-גבוהה",
+                "confidence": "נמוך — אין מקור חינמי לתאריכים פר-אירוע"})
+    return out
+
+
+def explain_rating_change(history: list) -> dict | None:
+    """When the recommendation changed vs the previous record — explain WHY
+    from the stored measurable diffs. None when unchanged / no history."""
+    if not history or len(history) < 2:
+        return None
+    prev, cur = history[-2], history[-1]
+    if prev.get("recommendation") == cur.get("recommendation"):
+        return None
+    reasons = []
+    def _d(k, name, fmt="{:+.0f}"):
+        a, b = prev.get(k), cur.get(k)
+        if isinstance(a, (int, float)) and isinstance(b, (int, float)) and a != b:
+            reasons.append(f"{name} {fmt.format(b - a)} ({a}→{b})")
+    _d("score_v2", "ציון V2")
+    _d("confidence", "ביטחון")
+    _d("target", "יעד אנליסטים", "{:+.1f}")
+    if prev.get("risk") != cur.get("risk") and cur.get("risk"):
+        reasons.append(f"רמת סיכון: {prev.get('risk')}→{cur.get('risk')}")
+    direction = "שדרוג" if str(cur.get("recommendation", "")) > str(prev.get("recommendation", "")) else "שינוי"
+    return {"from": prev.get("recommendation"), "to": cur.get("recommendation"),
+            "direction": direction, "since": prev.get("date"),
+            "reasons": reasons or ["השינוי נובע משקלול מחדש של המדדים (ללא דלתא בודדת דומיננטית)"]}
+
+
+def executive_summary_3(rep: dict, dec: dict) -> list:
+    """Three deterministic sentences: what's happening · why it matters · what now."""
+    o = rep.get("overview") or {}
+    md = rep.get("market_data") or {}
+    tech = rep.get("technicals") or {}
+    sc = rep.get("scores") or {}
+    v2 = (sc.get("final_v2") or {}).get("value")
+    val = (sc.get("valuation") or {}).get("value")
+    ent = (dec or {}).get("entry") or {}
+    s1 = (f"{o.get('name', rep.get('ticker'))} נסחרת ב-{md.get('price', '—')} "
+          f"({md.get('daily_change', '—')} היום), במגמה טכנית: {tech.get('trend', '—')}, "
+          f"עם ציון V2 של {v2 if v2 is not None else '—'}/100.")
+    val_txt = ("בתמחור אטרקטיבי" if isinstance(val, (int, float)) and val >= 65 else
+               "בתמחור הוגן" if isinstance(val, (int, float)) and val >= 40 else
+               "בתמחור מתוח" if isinstance(val, (int, float)) else "בתמחור שאינו ניתן להערכה")
+    s2 = (f"החברה מדורגת {val_txt}, עם רמת סיכון {rep.get('risk', {}).get('category', '—')} — "
+          f"השילוב הזה קובע את יחס הסיכון/סיכוי של ההשקעה.")
+    s3 = (f"ההמלצה: {(dec or {}).get('recommendation', '—')} לאופק {(dec or {}).get('horizon', '—')}; "
+          f"איכות הכניסה כרגע: {ent.get('label', '—')}.")
+    return [s1, s2, s3]
 
 
 def _scores_block(tech, fund, sector, news, risk, v2, trust, valuation, comp):

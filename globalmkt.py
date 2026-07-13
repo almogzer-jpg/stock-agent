@@ -75,14 +75,24 @@ def build() -> dict:
             c = None
         if c is None or len(c) < 2:
             row = {"symbol": sym, "name": name, "price": None, "d1": None, "d7": None,
-                   "d30": None, "trend": "—", "interp": ""}
+                   "d30": None, "trend": "—", "interp": "", "source": None}
+            # Fallback to the independent secondary source where mapped (Step 0).
+            try:
+                import crosscheck
+                sprice, _sd = crosscheck.fetch_stooq_close(sym)
+                if sprice is not None:
+                    row["price"] = round(sprice, 3 if "ILS" in sym or sym == "EURUSD=X" else 2)
+                    row["source"] = "Stooq (גיבוי)"
+            except Exception:
+                pass
         else:
             scale = 0.1 if sym == "^TNX" else 1.0
             d1, d7, d30 = _ret(c, 1), _ret(c, 5), _ret(c, 21)
             row = {"symbol": sym, "name": name,
                    "price": round(float(c.iloc[-1]) * scale, 3 if "ILS" in sym or sym == "EURUSD=X" else 2),
                    "d1": d1, "d7": d7, "d30": d30,
-                   "trend": trend_of(d30), "interp": interpret(sym, d1, d30)}
+                   "trend": trend_of(d30), "interp": interpret(sym, d1, d30),
+                   "source": "Yahoo"}
         rows.setdefault(grp, []).append(row)
         by_sym[sym] = row
     # Yield curve 10Y-2Y (only from real values).

@@ -773,8 +773,20 @@ def main() -> None:
             json.dump(system_health, fh, ensure_ascii=False, indent=2)
         # Global market indicators (Phase 30) — crypto/FX/commodities/rates.
         import globalmkt
+        g = globalmkt.build()
         with open(config.GLOBAL_JSON, "w", encoding="utf-8") as fh:
-            json.dump(globalmkt.build(), fh, ensure_ascii=False, indent=2)
+            json.dump(g, fh, ensure_ascii=False, indent=2)
+        # Reliability layer (Step 0): cross-validate vs Stooq + freshness report.
+        # Guarded end-to-end — a failure here must never break the pipeline.
+        try:
+            import crosscheck
+            import reliability
+            by_sym = {r["symbol"]: r for grp in g.get("groups", {}).values() for r in grp}
+            xrep = crosscheck.run_crosscheck(by_sym)
+            reliability.save_report(reliability.build_report(system_health, xrep))
+            print(f"  אימות-צולב (Stooq): {xrep['status']} · {xrep['compared']} השוואות")
+        except Exception as exc:
+            print(f"  ! שכבת אמינות נכשלה (לא חוסם): {exc}")
     except OSError as exc:
         print(f"  ! שמירת artifact נכשלה: {exc}")
 
@@ -788,6 +800,12 @@ def main() -> None:
         print(f"  ! חישוב התיק נכשל: {exc}")
 
     # Write the full deliverable set (timestamped + latest + index.html).
+    # Delta Engine snapshots (Morning Terminal): rotate today→prev, write today.
+    try:
+        import delta
+        delta.rotate_and_write(df)
+    except Exception as exc:
+        print(f"  ! snapshot דלתא נכשל (לא חוסם): {exc}")
     write_timestamped_outputs(df, closes_map, notifier.history, backtest_rows,
                               indices, regime)
 

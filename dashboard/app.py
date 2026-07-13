@@ -70,71 +70,87 @@ def _disp(v):
 
 
 # ===========================================================================
-# Cached loaders — read precomputed artifacts (instant, no network)
+# Cached loaders — read precomputed artifacts (instant, no network).
+# Step 0 hardening: a missing OR CORRUPT artifact degrades to an empty value —
+# the app never crashes on bad data; the reliability report surfaces the gap.
 # ===========================================================================
+
+def _read_json(path, default):
+    """Safe artifact read: missing/malformed → default (never raises)."""
+    try:
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as fh:
+                return json.load(fh)
+    except Exception:
+        pass
+    return default
+
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_results() -> pd.DataFrame:
     inv = {v: k for k, v in L.items()}
-    df = pd.read_csv(config.RESULTS_CSV).rename(columns=inv)
+    try:
+        df = pd.read_csv(config.RESULTS_CSV).rename(columns=inv)
+    except Exception:
+        return pd.DataFrame(columns=["Ticker", "Name", "ScoreV2"])
     df["_group"] = [classify(r)["group"] for _, r in df.iterrows()]
     return df
 
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_market() -> dict:
-    if os.path.exists(config.MARKET_JSON):
-        with open(config.MARKET_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {}
+    return _read_json(config.MARKET_JSON, {})
 
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_closes() -> dict:
-    if os.path.exists(config.CLOSES_JSON):
-        with open(config.CLOSES_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {}
+    return _read_json(config.CLOSES_JSON, {})
 
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_events() -> dict:
-    if os.path.exists(config.EVENTS_JSON):
-        with open(config.EVENTS_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {}
+    return _read_json(config.EVENTS_JSON, {})
 
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_alert_center() -> list:
-    if os.path.exists(config.ALERTS_CENTER_JSON):
-        with open(config.ALERTS_CENTER_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return []
+    return _read_json(config.ALERTS_CENTER_JSON, [])
 
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_universe() -> dict:
-    if os.path.exists(config.UNIVERSE_JSON):
-        with open(config.UNIVERSE_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {}
+    return _read_json(config.UNIVERSE_JSON, {})
 
 
 @st.cache_data(ttl=120, show_spinner=False)
 def load_system_health() -> dict:
-    if os.path.exists(config.SYSTEM_HEALTH_JSON):
-        with open(config.SYSTEM_HEALTH_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {}
+    return _read_json(config.SYSTEM_HEALTH_JSON, {})
 
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_global() -> dict:
-    if os.path.exists(config.GLOBAL_JSON):
-        with open(config.GLOBAL_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {}
+    return _read_json(config.GLOBAL_JSON, {})
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_reliability() -> dict:
+    return _read_json(config.RELIABILITY_JSON, {})
+
+
+def provenance_line() -> str:
+    """One consistent provenance caption: source · as-of · freshness · cross-check."""
+    rel = load_reliability()
+    if not rel:
+        return "מקור: Yahoo Finance · דוח אמינות טרם נוצר (הרץ סריקה)"
+    x = rel.get("crosscheck", {})
+    _sec = x.get("secondary_source", "מקור משני")
+    xs = {"ok": f"אימות-צולב ({_sec}): תקין ✓", "disagreement": "⚠️ אימות-צולב: מקורות סותרים",
+          "not_completed": "אימות-צולב לא הושלם"}.get(x.get("status"), "אימות-צולב לא הושלם")
+    r = rel.get("reliability", {})
+    stale = [n for n, a in rel.get("artifacts", {}).items() if a.get("status") == "stale"]
+    stale_s = f" · ⚠️ נתונים ישנים: {', '.join(stale)}" if stale else ""
+    return (f"מקור ראשי: {rel.get('primary_source', 'Yahoo')} · עודכן {rel.get('generated', '—')} · "
+            f"{xs} · אמינות נתונים: {r.get('label', '—')} ({r.get('score', '—')}/100){stale_s}")
 
 
 def global_strip_html(g: dict) -> str:
@@ -263,6 +279,40 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ---- Internal health diagnostics (Phase 0.5) — hidden page, ?diag=1 ----
+if st.query_params.get("diag") == "1":
+    st.markdown("### 🔧 דיאגנוסטיקת מערכת (פנימי)")
+    _rel = load_reliability()
+    _sh = load_system_health()
+    _g0 = load_global()
+    _fb = [r for grp in (_g0.get("groups") or {}).values() for r in grp
+           if r.get("source") and "Stooq" in str(r.get("source"))]
+    d1, d2, d3 = st.columns(3)
+    d1.metric("משיכות מוצלחות", _sh.get("scanned", "—"))
+    d1.metric("משיכות שנכשלו", _sh.get("failed_pulls", "—"))
+    d2.metric("שלמות ממוצעת", fmt(_sh.get("data_completeness"), "%"))
+    d2.metric("אמון ממוצע", fmt(_sh.get("avg_trust")))
+    d3.metric("ציון אמינות", (_rel.get("reliability") or {}).get("score", "—"))
+    d3.metric("שימוש ב-fallback", len(_fb))
+    st.markdown("#### בריאות מקורות")
+    _x = _rel.get("crosscheck", {})
+    st.write({"primary": _rel.get("primary_source"), "crosscheck_status": _x.get("status"),
+              "compared": f"{_x.get('compared', 0)}/{len(_x.get('checks', []))}",
+              "last_reliability_report": _rel.get("generated"),
+              "last_scan": _sh.get("date"), "global_asof": _g0.get("updated")})
+    st.markdown("#### טריות ארטיפקטים")
+    st.write(_rel.get("artifacts", {}))
+    st.markdown("#### יומן החלטות אחרון (audit trail)")
+    try:
+        import reliability as _relmod
+        with open(_relmod.DECISION_AUDIT_PATH, encoding="utf-8") as _fh:
+            _lines = _fh.readlines()[-5:]
+        for _ln in _lines:
+            st.code(_ln.strip(), language="json")
+    except Exception:
+        st.caption("אין רשומות ביקורת עדיין (יווצרו עם ניתוחי חברה).")
+    st.stop()
+
 # Cross-page navigation request (e.g. "ניתוח חברה" button) — applied BEFORE the
 # nav widget is instantiated, since a widget's value can't be set after creation.
 if st.session_state.get("_pending_nav"):
@@ -270,7 +320,7 @@ if st.session_state.get("_pending_nav"):
 
 page = st.sidebar.radio(
     "תצוגה",
-    ["🏠 ראשי", "🔎 ניתוח חברה", "💎 הזדמנויות", "🗺️ סקטורים", "🚨 התראות",
+    ["🏠 ראשי", "🔎 ניתוח חברה", "⭐ המעקב שלי", "💎 הזדמנויות", "🗺️ סקטורים", "🚨 התראות",
      "📊 אינטליגנציית שוק", "⚙️ הגדרות"],
     key="nav",
 )
@@ -521,6 +571,63 @@ if page.startswith("🏠"):
         st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
         st.caption(f"שווקים גלובליים · עודכן {g.get('updated','—')}")
 
+    # ---------- Morning Brief (Delta Engine) — the 30-second briefing ----------
+    import delta as _delta
+    _env = _delta.classify_environment(regime, _by.get("^VIX"), breadth,
+                                       sorted(mkt.get("sectors", []), key=lambda s: -s.get("score", 0)))
+    _pair_prev, _pair_cur = _delta.load_pair()
+    _dd = _delta.diff_scores(_pair_prev, _pair_cur)
+    _crit_b = [a for a in alerts if a.get("severity") == "גבוהה"]
+    _earn_today = [t for t, e in (events or {}).items()
+                   if isinstance(e.get("days_to_earnings"), (int, float)) and 0 <= e["days_to_earnings"] <= 1]
+    _top_delta = _dd["items"][0] if _dd.get("items") else None
+    _b1 = ("סביבת השוק: " + " · ".join(_env["labels"]) + ". "
+           + (f"מאז {_dd.get('prev_date')}: {len(_dd['items'])} שינויים מהותיים"
+              + (f", {len(_dd['new'])} מניות חדשות בסריקה" if _dd.get("new") else "") + "."
+              if _dd.get("available") else "אין סריקה קודמת להשוואה עדיין."))
+    _b2 = (f"הבולט ביותר: {_top_delta['ticker']} — {_top_delta['changes'][0]} "
+           f"(סיבה מדידה: {_top_delta['causes'][0]})." if _top_delta
+           else "לא נרשם שינוי מהותי במניות המעקב.")
+    _b3_bits = [x for x in [f"{len(_crit_b)} התראות קריטיות" if _crit_b else None,
+                            f"דוחות היום/מחר: {', '.join(_earn_today[:3])}" if _earn_today else None,
+                            (f"{len(_dd['new'])} חדשות לחקירה: {', '.join(_dd['new'][:3])}" if _dd.get("new") else None)] if x]
+    _b3 = "פוקוס היום: " + (" · ".join(_b3_bits) if _b3_bits else "אין אירועים חריגים — יום מחקר רגיל.")
+    st.markdown(
+        f"<div class='ic-card' style='background:{ELEV};padding:24px 28px'>"
+        f"<div style='color:{MUTED};font-size:13px'>תדריך בוקר</div>"
+        + "".join(f"<div style='font-size:17px;line-height:1.8;margin-top:6px'>{s}</div>"
+                  for s in (_b1, _b2, _b3))
+        + f"<div class='ic-sub' style='margin-top:10px;font-size:13px;color:{MUTED}'>איך סווגה הסביבה: "
+        + " · ".join(_env["why"]) + "</div></div>", unsafe_allow_html=True)
+
+    # ---------- מה השתנה — Delta Feed (changes only, cause + ONE action) ----------
+    if _dd.get("available") and (_dd["items"] or _dd["new"]):
+        st.markdown("#### מה השתנה מאז הסריקה הקודמת")
+        _fb = ""
+        for it in _dd["items"][:7]:
+            act = _delta.action_for(it["score_now"], it.get("group"), it.get("d_score"))
+            _fb += (f"<tr><td><div style='font-weight:700;font-size:16px'>{it['ticker']}</div>"
+                    f"<div style='color:{MUTED};font-size:12.5px'>{it.get('name','')}</div></td>"
+                    f"<td style='color:{SECONDARY}'>{'<br>'.join(it['changes'][:2])}</td>"
+                    f"<td style='color:{MUTED};font-size:13.5px'>{' · '.join(it['causes'][:2])}</td>"
+                    f"<td style='white-space:nowrap'><b>{act['icon']} {act['verb']}</b></td></tr>")
+        for tk in _dd["new"][:3]:
+            _fb += (f"<tr><td><b style='font-size:16px'>{tk}</b></td>"
+                    f"<td style='color:{POSITIVE}'>חדשה בסריקה</td>"
+                    f"<td style='color:{MUTED};font-size:13.5px'>נכנסה לרשימת המעקב של המערכת</td>"
+                    f"<td><b>🔍 לחקור היום</b></td></tr>")
+        _fh = "".join(f"<th>{h}</th>" for h in ["חברה", "מה השתנה", "למה (מדיד)", "פעולה"])
+        st.markdown(f"<table class='sectbl'><thead><tr>{_fh}</tr></thead><tbody>{_fb}</tbody></table>",
+                    unsafe_allow_html=True)
+        _dl_tks = ([it["ticker"] for it in _dd["items"][:7]] + _dd["new"][:3])[:8]
+        _dcols = st.columns(max(len(_dl_tks), 1))
+        for j, tk in enumerate(_dl_tks):
+            if _dcols[j].button(f"🔎 {tk}", key=f"dl_{tk}", use_container_width=True):
+                st.session_state["dd_ticker"] = tk
+                st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                st.rerun()
+        st.caption(f"השוואה: {_dd.get('prev_date')} ← {_dd.get('cur_date')} · מוצגים שינויים בלבד, עם הסיבה מפירוק הציון.")
+
     # ---- 3. Capital flow (real sector-strength proxy) ----
     cf = mkt.get("capital_flow", {})
     if cf.get("inflows") or cf.get("outflows"):
@@ -537,6 +644,11 @@ if page.startswith("🏠"):
         fc[1].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{NEGATIVE}'>יציאת הון</div>{_fout}</div>",
                        unsafe_allow_html=True)
         st.caption(cf.get("method", ""))
+        _af = _delta.asset_flows(g.get("groups") or {})
+        if _af:
+            st.markdown("<div class='ic-sub' style='margin-top:4px'><b>בין אפיקים (מגמת 30 יום · פרוקסי-מחיר מוערך):</b> "
+                        + " · ".join(f"{a['asset']} {a['trend']} ({a['d30']:+.1f}%)" for a in _af)
+                        + "</div>", unsafe_allow_html=True)
 
     # ---- 4. Best opportunities table ----
     st.markdown("### ההזדמנויות המובילות היום")
@@ -610,33 +722,6 @@ if page.startswith("🏠"):
             st.rerun()
 
 
-    # ---- 5. Hot stocks (from the universe scan) ----
-    _all = uni_h.get("all", [])
-    if _all:
-        st.markdown("#### מניות חמות")
-
-        def _mini(col, title, items, sub_fn):
-            rowsx = "".join(f"<div style='display:flex;justify-content:space-between;padding:6px 2px;"
-                            f"border-bottom:1px solid {BORDER};font-size:14.5px'>"
-                            f"<b>{x['Ticker']}</b><span style='color:{SECONDARY}'>{sub_fn(x)}</span></div>"
-                            for x in items[:4]) or f"<div class='ic-sub'>—</div>"
-            col.markdown(f"<div class='ic-card' style='height:100%'><div style='font-weight:600;margin-bottom:6px'>{title}</div>{rowsx}</div>",
-                         unsafe_allow_html=True)
-        hs = st.columns(5)
-        _n = lambda x, k: x.get(k) if isinstance(x.get(k), (int, float)) else None
-        mom = sorted([x for x in _all if _n(x, "Ret3m") is not None], key=lambda x: -x["Ret3m"])
-        nbo = sorted([x for x in _all if _n(x, "DistResistance%") is not None and x["DistResistance%"] <= 3],
-                     key=lambda x: x["DistResistance%"])
-        nsup = sorted([x for x in _all if _n(x, "DistSupport%") is not None and abs(x["DistSupport%"]) <= 3],
-                      key=lambda x: abs(x["DistSupport%"]))
-        udv = sorted([x for x in _all if _n(x, "Valuation") is not None], key=lambda x: -x["Valuation"])
-        hq = sorted([x for x in _all if _n(x, "ScoreFundamental") is not None], key=lambda x: -x["ScoreFundamental"])
-        _mini(hs[0], "מומנטום", mom, lambda x: f"+{x['Ret3m']:.0f}%")
-        _mini(hs[1], "לקראת פריצה", nbo, lambda x: f"{x['DistResistance%']:.1f}% מההתנגדות")
-        _mini(hs[2], "ליד תמיכה", nsup, lambda x: f"{x['DistSupport%']:.1f}%")
-        _mini(hs[3], "מוערכות בחסר", udv, lambda x: f"תמחור {int(x['Valuation'])}")
-        _mini(hs[4], "איכות גבוהה", hq, lambda x: f"פונד׳ {int(x['ScoreFundamental'])}")
-
     # ---- 6+9. Macro snapshot + breadth (visual bars) ----
     mb = st.columns([1.4, 1])
     _macro_syms = [("^TNX", "תשואת 10 שנים"), ("DX-Y.NYB", "מדד הדולר"), ("CL=F", "נפט WTI"),
@@ -696,14 +781,6 @@ if page.startswith("🏠"):
                         f"<b>{a['type']}</b> · {a.get('scope','')} — <span style='color:{SECONDARY}'>{a['message']}</span></div>",
                         unsafe_allow_html=True)
 
-    # ---- 11. Today's insight (deterministic, from insights artifact) ----
-    if ins.get("rotation") or ins.get("risks"):
-        st.markdown(f"<div class='ic-card' style='border-right:3px solid {PRIMARY}'>"
-                    f"<div class='ic-title'>תובנת היום</div>"
-                    f"<div class='ic-sub'>{(ins.get('rotation') or ins.get('risks', '')).replace('**','')}</div>"
-                    f"<div class='ic-sub' style='color:{MUTED};font-size:13px;margin-top:6px'>נגזר דטרמיניסטית מהמדדים המחושבים.</div></div>",
-                    unsafe_allow_html=True)
-
     # ---- 12. Quick actions ----
     qa = st.columns(4)
     for col, (lbl, pg) in zip(qa, [("🔎 ניתוח חברה", "🔎 ניתוח חברה"), ("💎 סריקת הזדמנויות", "💎 הזדמנויות"),
@@ -712,8 +789,64 @@ if page.startswith("🏠"):
             st.session_state["_pending_nav"] = pg
             st.rerun()
 
+elif page == "⭐ המעקב שלי":
+    import mywatch
+    st.markdown("### המעקב שלי — מה השתנה מאז ששמרת?")
+    _wl = mywatch.enrich(load_universe(), df.to_dict("records") if not df.empty else [])
+    if not _wl:
+        st.info("הרשימה ריקה. בעמוד ניתוח-חברה לחץ ⭐ כדי לשמור חברה עם תמונת-המצב של אותו רגע — "
+                "ומכאן והלאה נגיד לך בדיוק מה השתנה ומה דורש תשומת לב.")
+    else:
+        _att = [w for w in _wl if w["attention"]]
+        st.markdown(f"<div style='font-size:20px;font-weight:600;margin:2px 0 16px'>"
+                    + (f"<span style='color:{NEGATIVE}'>{len(_att)} מתוך {len(_wl)} דורשות תשומת לב</span>"
+                       if _att else f"<span style='color:{POSITIVE}'>הכל יציב — אין שינוי מהותי ברשימה</span>")
+                    + "</div>", unsafe_allow_html=True)
+        _body = ""
+        for w in _wl:
+            att = "<br>".join(f"⚠️ {a}" for a in w["attention"]) or "—"
+            dpc, dsc = w["d_price"], w["d_score"]
+            p0 = f"${w['price']}" if w.get("price") else "—"
+            p1 = f"${w['price_now']}" if w.get("price_now") else "לא נסרק"
+            s0 = w.get("score_v2")
+            s1 = w.get("score_now")
+            dpc_html = f"{dpc:+.1f}%" if dpc is not None else ""
+            dsc_html = f"{dsc:+.0f}" if dsc is not None else ""
+            _body += (
+                f"<tr><td><div style='font-weight:700;font-size:16px'>{w['ticker']}</div>"
+                f"<div style='color:{MUTED};font-size:12.5px'>נשמר {w['added']}</div></td>"
+                f"<td>{p0}</td>"
+                f"<td><b>{p1}</b><div style='color:{POSITIVE if (dpc or 0) >= 0 else NEGATIVE};font-size:12.5px'>{dpc_html}</div></td>"
+                f"<td>{s0 if s0 is not None else '—'} ← <b style='color:{score_color(s1)}'>{s1 if s1 is not None else '—'}</b>"
+                f"<div style='color:{POSITIVE if (dsc or 0) >= 0 else NEGATIVE};font-size:12.5px'>{dsc_html}</div></td>"
+                f"<td style='color:{SECONDARY};font-size:13.5px'>{w.get('recommendation') or '—'}</td>"
+                f"<td style='color:{NEGATIVE if w['attention'] else MUTED};font-size:13.5px'>{att}</td></tr>")
+        _head = "".join(f"<th>{h}</th>" for h in
+                        ["חברה", "מחיר בשמירה", "מחיר עכשיו", "ציון V2 (אז ← עכשיו)", "המלצה בשמירה", "דורש תשומת לב"])
+        st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
+                    unsafe_allow_html=True)
+        st.caption("הבסיס להשוואה = תמונת-המצב שנשמרה בלחיצת ⭐ · 'עכשיו' = הסריקה האחרונה (ארטיפקטים).")
+        _wcols = st.columns(min(len(_wl), 8))
+        for j, w in enumerate(_wl[:8]):
+            if _wcols[j].button(f"🔎 {w['ticker']}", key=f"wl_{w['ticker']}", use_container_width=True):
+                st.session_state["dd_ticker"] = w["ticker"]
+                st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+                st.rerun()
+        _rm = st.selectbox("הסר מהרשימה", ["—"] + [w["ticker"] for w in _wl], key="wl_rm")
+        if _rm != "—" and st.button("הסר", key="wl_rm_btn"):
+            mywatch.remove(_rm)
+            st.rerun()
+
 elif page == "💎 הזדמנויות":
     st.markdown("### הזדמנויות — מסוף גילוי הזדמנויות")
+    _u0 = load_universe()
+    if _u0:
+        _o0 = _u0.get("opportunities", [])
+        _top0 = max(_o0, key=lambda x: x.get("ScoreV2") or 0) if _o0 else None
+        st.markdown(f"<div style='font-size:17px;color:{SECONDARY};margin:2px 0 14px'>"
+                    f"<b style='color:{TEXT}'>{len(_o0)} הזדמנויות מועשרות</b> מתוך {_u0.get('scanned', '—')} שנסרקו"
+                    + (f" · המובילה: <b>{_top0['Ticker']}</b> (ציון {int(_top0['ScoreV2'])})" if _top0 else "")
+                    + " · סנן לפי הקריטריונים שלך ופתח ניתוח מלא בלחיצה.</div>", unsafe_allow_html=True)
     uni = load_universe()
     if not uni:
         st.info("הסריקה הרחבה עדיין לא רצה. הרץ במסוף: `python scanner.py ALL` (כ‑1.5 דקות), ואז רענן.")
@@ -1078,6 +1211,13 @@ elif page == "🗺️ סקטורים":
 
 elif page == "🚨 התראות":
     st.markdown("### מרכז התראות — דוחות · פריצות · זינוקי נפח · חדשות מהותיות")
+    _c0 = load_alert_center()
+    _hi0 = [a for a in _c0 if a.get("severity") == "גבוהה"]
+    st.markdown(f"<div style='font-size:17px;color:{SECONDARY};margin:2px 0 14px'>"
+                + (f"<b style='color:{NEGATIVE}'>{len(_hi0)} התראות קריטיות</b> מתוך {len(_c0)} — התחל מהן; "
+                   f"לכל התראה עם סימול יש כפתור ניתוח מיידי." if _hi0 else
+                   f"<b style='color:{POSITIVE}'>אין התראות קריטיות</b> — {len(_c0)} עדכונים שוטפים בלבד.")
+                + "</div>", unsafe_allow_html=True)
     center = load_alert_center()
     if not center:
         st.caption("אין התראות פעילות כרגע.")
@@ -1132,12 +1272,31 @@ elif page == "🔎 ניתוח חברה":
     q[2].caption("דוגמאות: NVDA · AAPL · LLY · PLTR · MSFT · GOOGL")
 
     if tkin:
-        with st.spinner(f"מנתח את {tkin}…"):
-            try:
-                bundle = deepdive_fetch(tkin)
-                rep = deepdive.analyze(tkin, sectors=mkt.get("sectors"), bundle=bundle)
-            except Exception as e:
-                rep = {"error": f"שגיאה בניתוח {tkin}: {e}"}
+        # Skeleton loading (V3): a research-report placeholder renders INSTANTLY
+        # while the live fetch runs — perceived speed instead of a blank spinner.
+        _skel = st.empty()
+        _skel.markdown(
+            f"<div class='ic-card' style='padding:28px 30px'>"
+            f"<div class='skeleton' style='width:38%;height:26px'></div>"
+            f"<div class='skeleton' style='width:24%;height:15px;margin-top:10px'></div>"
+            f"<div style='display:flex;gap:28px;margin-top:22px'>"
+            + "".join("<div class='skeleton' style='width:104px;height:44px'></div>" for _ in range(6))
+            + f"</div></div>"
+            f"<div class='ic-card' style='background:{ELEV};padding:20px 24px'>"
+            + "".join(f"<div class='skeleton' style='width:{w}%;height:15px;margin:9px 0'></div>"
+                      for w in (92, 84, 60))
+            + "</div>"
+            f"<div style='display:flex;gap:16px'>"
+            + "".join("<div class='ic-card skeleton' style='flex:1;height:210px'></div>" for _ in range(3))
+            + "</div>"
+            f"<div class='ic-sub' style='margin-top:8px;color:{MUTED}'>מנתח את {tkin} — נתונים חיים מ-Yahoo (כ-10 שניות בפעם הראשונה)…</div>",
+            unsafe_allow_html=True)
+        try:
+            bundle = deepdive_fetch(tkin)
+            rep = deepdive.analyze(tkin, sectors=mkt.get("sectors"), bundle=bundle)
+        except Exception as e:
+            rep = {"error": f"שגיאה בניתוח {tkin}: {e}"}
+        _skel.empty()
         if rep.get("error"):
             st.error(rep["error"])
         else:
@@ -1167,6 +1326,13 @@ elif page == "🔎 ניתוח חברה":
             reco_pill = (f"<span class='tbadge' style='color:{PRIMARY};font-size:15px;padding:7px 18px'>"
                          f"{'🟢' if 'Buy' in str(reco_he_txt) or 'קנייה' in reco_he_txt else '🟡' if reco_he_txt in ('מעקב', 'החזקה') else '🔴'} "
                          f"{reco_he_txt}</span>")
+            # Reliability badge (Phase 0.5) — data confidence of THIS analysis.
+            _dc = rep.get("data_confidence") or {}
+            _dc_c = (POSITIVE if _dc.get("score", 0) >= 80 else
+                     WARNING if _dc.get("score", 0) >= 65 else NEGATIVE)
+            reco_pill += (f" <span class='tbadge' style='color:{_dc_c};font-size:14px;padding:6px 14px'>"
+                          f"{'🟢' if _dc.get('score', 0) >= 80 else '🟡' if _dc.get('score', 0) >= 65 else '🔴'} "
+                          f"{_dc.get('label_he', 'אמינות לא חושבה')} {_dc.get('score', '—')}/100</span>")
             st.markdown(
                 f"<div class='ic-card' style='padding:28px 30px'>"
                 f"<div style='display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap'>"
@@ -1190,10 +1356,45 @@ elif page == "🔎 ניתוח חברה":
                 + _hm("אמון", sc["trust"]["value"], score_color(sc["trust"]["value"]))
                 + "</div></div>", unsafe_allow_html=True)
 
+            # ---- Data-quality warnings + full source transparency (Phase 0.5) ----
+            for _w in (rep.get("quality_warnings") or [])[:4]:
+                st.caption(_w)
+            with st.expander("📚 מקור הנתונים"):
+                _relrep = load_reliability()
+                _x2 = _relrep.get("crosscheck", {})
+                st.markdown(
+                    f"<div class='ic-sub'>מקור ראשי: <b>Yahoo Finance (yfinance)</b> · נתונים חיים (עודכן ברגע הניתוח)</div>"
+                    f"<div class='ic-sub'>מקור משני: {_x2.get('secondary_source', '—')} · "
+                    f"סטטוס אימות-צולב: <b>{_x2.get('status', 'not_completed')}</b> (מט\"ח/מדדים בלבד — לא מניות בודדות)</div>"
+                    f"<div class='ic-sub'>ביטחון-נתונים לניתוח זה: <b>{(rep.get('data_confidence') or {}).get('score', '—')}/100 · "
+                    f"{(rep.get('data_confidence') or {}).get('label_he', '')}</b> · fallback: לא נדרש</div>"
+                    f"<div class='ic-sub'>שלמות נתונים: {fmt(round((rep.get('meta') or {}).get('completeness', 0) * 100) if (rep.get('meta') or {}).get('completeness') is not None else None, '%')} · "
+                    f"עובדות=Yahoo · חישובים=מנועי המערכת (מתויג בכל סעיף)</div>", unsafe_allow_html=True)
+
             # ==== Investment Decision (Phase 25) — the signature section ====
             _dec_fn = getattr(deepdive, "investment_decision", None)
             dec = _dec_fn(rep, regime_score=(mkt.get("regime") or {}).get("score")) if _dec_fn else None
+            # Quality gate (Phase 0.5): insufficient reliability → suppress conclusions.
+            _gate = rep.get("quality_gate") or {"pass": True}
+            if not _gate.get("pass", True):
+                st.error("**אין מספיק מידע אמין כדי לגבש מסקנה.** הנתונים מוצגים ללא המלצה. "
+                         "סיבות: " + " · ".join(_gate.get("reasons", [])))
+                dec = None
             if dec:
+                # ---- Executive summary — 3 sentences, <30 seconds (Engine V2) ----
+                _es3 = dec.get("exec_summary_3") or []
+                if _es3:
+                    st.markdown(
+                        f"<div class='ic-card' style='background:{ELEV};padding:20px 24px'>"
+                        + "".join(f"<div style='font-size:16px;line-height:1.75;margin:2px 0'>"
+                                  f"<b style='color:{PRIMARY}'>{i}.</b> {s}</div>"
+                                  for i, s in enumerate(_es3, 1))
+                        + "</div>", unsafe_allow_html=True)
+                # ---- Rating change explanation (never change silently) ----
+                _rc = dec.get("rating_change")
+                if _rc:
+                    st.info(f"**ההמלצה השתנתה** ({_rc['since']}): {_rc['from']} → {_rc['to']}. "
+                            f"סיבות מדידות: {' · '.join(_rc['reasons'])}")
                 st.markdown("#### החלטת השקעה")
                 NEA = "אין מספיק נתונים"
 
@@ -1224,6 +1425,9 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>ביטחון (ציון אמון)</div>"
                     f"<div class='sbar-t' style='margin-top:4px'><div class='sbar-f' style='width:{conf if isinstance(conf,(int,float)) else 0}%;background:{score_color(conf)}'></div></div>"
                     f"<div style='font-size:14px;font-weight:600;color:{score_color(conf)}'>{int(conf) if isinstance(conf,(int,float)) else NEA}%</div>"
+                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>ביטחון בתזה (הסכמת אותות · נפרד מאמינות הנתונים)</div>"
+                    f"<div style='font-size:16px;font-weight:700;color:{score_color((dec.get('thesis_confidence') or {}).get('score'))}'>"
+                    f"{(dec.get('thesis_confidence') or {}).get('score', '—')}/100 · {(dec.get('thesis_confidence') or {}).get('label', '')}</div>"
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>אופק השקעה</div>"
                     f"<div style='font-size:15px;font-weight:600'>{dec['horizon']}</div>"
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>איכות כניסה</div>"
@@ -1271,7 +1475,11 @@ elif page == "🔎 ניתוח חברה":
                     f" <span style='font-size:14px'>{dec.get('rr_interpretation') or ''}</span></div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>מתאים ל</div>"
                     f"<div>" + " ".join(f"<span class='tbadge' style='color:{PRIMARY};margin:2px'>{t}</span>"
-                                        for t in dec.get("investor_types", [])) + "</div></div>",
+                                        for t in dec.get("investor_types", []))
+                    + f"</div><div style='color:{MUTED};font-size:12.5px;margin-top:8px'>חשיפה מוצעת בתיק</div>"
+                    f"<div style='font-size:17px;font-weight:700'>{(dec.get('position') or {}).get('name', '—')} "
+                    f"<span style='color:{SECONDARY};font-size:14px'>({(dec.get('position') or {}).get('range', '')})</span></div>"
+                    f"<div style='color:{MUTED};font-size:12.5px'>{(dec.get('position') or {}).get('why', '')}</div></div>",
                     unsafe_allow_html=True)
 
                 # Checklist + decision matrix
@@ -1307,8 +1515,64 @@ elif page == "🔎 ניתוח חברה":
                 w2[1].markdown(f"<div class='ic-card' style='height:100%'><div class='ic-title'>מה עלול להשתבש?</div>"
                                + ("".join(f"<div class='ic-sub' style='margin:4px 0'>• {x}</div>" for x in dec.get("risks", []))
                                   or f"<div class='ic-sub'>{NEA}</div>") + "</div>", unsafe_allow_html=True)
+
+                # ---- Engine V2: thesis invalidators + catalysts timeline ----
+                w3 = st.columns(2)
+                w3[0].markdown(f"<div class='ic-card' style='height:100%'><div class='ic-title'>מה יפרוך את התזה?</div>"
+                               + "".join(f"<div class='ic-sub' style='margin:4px 0'>✗ {x}</div>"
+                                         for x in dec.get("invalidators", []))
+                               + f"<div class='ic-sub' style='color:{MUTED};font-size:13px;margin-top:6px'>"
+                               f"תנאי-כשל מדידים — אם אחד מתקיים, ההמלצה דורשת בחינה מחדש.</div></div>",
+                               unsafe_allow_html=True)
+                _cat_rows = "".join(
+                    f"<div style='display:flex;justify-content:space-between;gap:8px;padding:7px 2px;"
+                    f"border-bottom:1px solid {BORDER};font-size:14.5px'>"
+                    f"<span><b>{c['event']}</b></span><span style='color:{SECONDARY}'>{c['date']}</span>"
+                    f"<span style='color:{POSITIVE if c['direction']=='חיובי' else NEGATIVE if c['direction']=='שלילי' else MUTED}'>{c['direction']}</span>"
+                    f"<span style='color:{MUTED};font-size:13px'>השפעה {c['impact']}</span></div>"
+                    for c in dec.get("catalysts", []))
+                w3[1].markdown(f"<div class='ic-card' style='height:100%'><div class='ic-title'>קטליזטורים קרובים</div>"
+                               f"{_cat_rows}"
+                               f"<div class='ic-sub' style='color:{MUTED};font-size:13px;margin-top:6px'>"
+                               f"מוצגים רק אירועים ממקורות אמיתיים (דוחות/אנליסטים); אין מקור חינמי ליומן Fed/FDA פר-מניה.</div></div>",
+                               unsafe_allow_html=True)
                 st.caption("כל הערכים נגזרים מהמדדים המחושבים במערכת — הנתונים מצביעים, לא תחזית. "
                            "מחיר יעד/שווי הוגן = קונצנזוס אנליסטים. מידע בלבד, לא ייעוץ השקעות.")
+
+                # ---- Explainability: recommendation breakdown + blockers (Phase 0.5) ----
+                _bd = dec.get("breakdown") or {}
+                if _bd.get("contributions"):
+                    _mx_pts = max((p["points"] for p in _bd["contributions"]), default=1) or 1
+                    _rows_bd = "".join(
+                        f"<div style='display:flex;align-items:center;gap:10px;margin:4px 0'>"
+                        f"<span style='min-width:110px;color:{SECONDARY};font-size:14px'>{p['name']}</span>"
+                        f"<div class='miniprog' style='flex:1'><div style='width:{max(3, p['points']/_mx_pts*100):.0f}%;background:{PRIMARY}'></div></div>"
+                        f"<b style='min-width:56px;text-align:left'>+{p['points']}</b></div>"
+                        for p in _bd["contributions"])
+                    _blk = "".join(f"<div class='ic-sub' style='color:{WARNING}'>⛔ {b}</div>"
+                                   for b in _bd.get("blockers", []))
+                    st.markdown(f"<div class='ic-card'><div class='ic-title'>פירוק ההמלצה — מאיפה הציון מגיע</div>"
+                                f"<div style='margin-top:8px'>{_rows_bd}</div>{_blk}"
+                                f"<div class='ic-sub' style='font-size:13.5px;margin-top:6px'>נקודות-תרומה מהמודל המשוקלל (ניתן לשחזור). "
+                                f"⛔ = הגורם שמנע דירוג גבוה יותר.</div></div>", unsafe_allow_html=True)
+
+                # ---- Recommendation history (Phase 0.5) ----
+                _hist = rep.get("history") or []
+                if len(_hist) >= 2:
+                    with st.expander(f"📜 היסטוריית המלצות ({len(_hist)} רשומות)"):
+                        prev, cur = _hist[-2], _hist[-1]
+                        def _arrow(a, b):
+                            if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+                                return "—"
+                            return "↑ עלה" if b > a else "↓ ירד" if b < a else "→ ללא שינוי"
+                        st.markdown(
+                            f"<div class='ic-sub'><b>{prev['date']}:</b> {prev['recommendation']} · ביטחון {prev['confidence']}</div>"
+                            f"<div class='ic-sub'><b>{cur['date']}:</b> {cur['recommendation']} · ביטחון {cur['confidence']}</div>"
+                            f"<div class='ic-sub'>מגמה: המלצה {'ללא שינוי' if prev['recommendation'] == cur['recommendation'] else 'השתנתה!'} · "
+                            f"ביטחון {_arrow(prev.get('confidence'), cur.get('confidence'))} · "
+                            f"ציון V2 {_arrow(prev.get('score_v2'), cur.get('score_v2'))} · "
+                            f"יעד {_arrow(prev.get('target'), cur.get('target'))}</div>",
+                            unsafe_allow_html=True)
 
             # ---- Performance section (Phase 20) ----
             import technicals as _tech
@@ -1645,6 +1909,22 @@ elif page == "🔎 ניתוח חברה":
                         f"<div class='ic-sub'>מה ישנה את ההמלצה: {op['what_changes']}</div></div>", unsafe_allow_html=True)
 
             # ---- Export ----
+            import mywatch as _mw
+            _wcols2 = st.columns([1, 1, 3])
+            _watched = _mw.is_watched(tkin)
+            if _wcols2[0].button("★ ברשימת המעקב — הסר" if _watched else "⭐ הוסף למעקב",
+                                 key=f"star_{tkin}", use_container_width=True):
+                if _watched:
+                    _mw.remove(tkin)
+                else:
+                    _srl0 = (rep.get("technicals") or {}).get("sr_levels") or {}
+                    _mw.add(tkin, price=(rep.get("raw_metrics") or {}).get("price"),
+                            score_v2=(rep.get("scores") or {}).get("final_v2", {}).get("value"),
+                            recommendation=rep.get("opinion", {}).get("recommendation"),
+                            support=_srl0.get("support"))
+                st.rerun()
+            if _watched:
+                _wcols2[1].caption("נשמרה תמונת-מצב · מעקב בעמוד ⭐")
             st.download_button("📥 הורד דוח HTML", data=to_html(rep),
                                file_name=f"deepdive_{tkin}.html", mime="text/html")
             st.caption("עובדות: Yahoo Finance · ציונים: מנועי המערכת · תזה/דעה: מבוססת כללים על נתונים אמיתיים. "
@@ -1730,4 +2010,36 @@ elif page == "⚙️ הגדרות":
                 "<div class='ic-sub'>המערכת עונה: מה קורה · למה · מה הסיכונים · האם החברה אטרקטיבית · זול/הוגן/יקר.</div>"
                 "<div class='ic-sub'>⚠️ מידע בלבד, לא ייעוץ השקעות.</div></div>", unsafe_allow_html=True)
 
+    # ---- Reliability & provenance (Step 0) ----
+    st.markdown("#### אמינות נתונים ומקורות")
+    _rel = load_reliability()
+    if not _rel:
+        st.info("דוח אמינות טרם נוצר — הרץ סריקה (או המתן לריצה היומית).")
+    else:
+        _r = _rel.get("reliability", {})
+        _x = _rel.get("crosscheck", {})
+        _xs = {"ok": ("✓ תקין", POSITIVE), "disagreement": ("⚠️ מקורות סותרים", NEGATIVE),
+               "not_completed": ("לא הושלם", WARNING)}.get(_x.get("status"), ("לא הושלם", WARNING))
+        st.markdown(
+            f"<div class='ic-card'>"
+            f"<div class='ic-sub'>ציון אמינות נתונים: <b style='color:{score_color(_r.get('score'))}'>"
+            f"{_r.get('score', '—')}/100 · {_r.get('label', '')}</b></div>"
+            f"<div class='ic-sub'>מקור ראשי: {_rel.get('primary_source', '—')} · נוצר: {_rel.get('generated', '—')}</div>"
+            f"<div class='ic-sub'>אימות-צולב מול {_x.get('secondary_source', 'Stooq')}: "
+            f"<b style='color:{_xs[1]}'>{_xs[0]}</b> ({_x.get('compared', 0)} השוואות, סף ±{_x.get('tolerance_pct', 1)}%)</div>"
+            + "".join(
+                f"<div class='ic-sub' style='font-size:14px'>· {c['name']}: Yahoo {c['yahoo']} מול Stooq {c['stooq']} "
+                f"({'✓' if c['agree'] else ('✗' if c['agree'] is not None else '—')}"
+                + (f", פער {c['diff_pct']}%" if c.get('diff_pct') is not None else "") + ")</div>"
+                for c in _x.get("checks", []))
+            + "<div class='ic-sub' style='margin-top:6px'>טריות ארטיפקטים: "
+            + " · ".join(f"{n} <b style='color:{POSITIVE if a.get('status')=='fresh' else NEGATIVE}'>{a.get('status')}</b>"
+                         for n, a in _rel.get("artifacts", {}).items())
+            + "</div>"
+            + "".join(f"<div class='ic-sub' style='color:{MUTED};font-size:13.5px'>מגבלה: {lim}</div>"
+                      for lim in _rel.get("limitations", []))
+            + "</div>", unsafe_allow_html=True)
+
+# Global provenance footer — source + as-of + cross-check status on EVERY page (Step 0).
+st.caption(provenance_line())
 st.caption("לצרכי מידע בלבד, אין לראות בכך ייעוץ השקעות.")

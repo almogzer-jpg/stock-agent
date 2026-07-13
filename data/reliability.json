@@ -1,0 +1,102 @@
+{
+  "generated": "13/07/2026 09:14",
+  "primary_source": "Yahoo Finance (yfinance)",
+  "stale_after_days": 3,
+  "artifacts": {
+    "results": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    },
+    "market_overview": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    },
+    "universe": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    },
+    "global_markets": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    },
+    "alerts": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    },
+    "events": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    },
+    "backtest": {
+      "exists": true,
+      "age_days": 0.01,
+      "status": "fresh"
+    }
+  },
+  "missing_artifacts": [],
+  "data_completeness": 100.0,
+  "crosscheck": {
+    "status": "ok",
+    "secondary_source": "ECB (מט\"ח) + Stooq (מדדים, מיטב-מאמץ)",
+    "tolerance_pct": 1.0,
+    "fetched": 2,
+    "compared": 2,
+    "checks": [
+      {
+        "symbol": "^GSPC",
+        "name": "S&P 500",
+        "yahoo": 7575.39,
+        "stooq": null,
+        "stooq_date": null,
+        "secondary": null,
+        "diff_pct": null,
+        "agree": null
+      },
+      {
+        "symbol": "^DJI",
+        "name": "Dow Jones",
+        "yahoo": 52637.01,
+        "stooq": null,
+        "stooq_date": null,
+        "secondary": null,
+        "diff_pct": null,
+        "agree": null
+      },
+      {
+        "symbol": "EURUSD=X",
+        "name": "אירו/דולר",
+        "yahoo": 1.14,
+        "stooq": 1.143,
+        "stooq_date": "2026-07-10",
+        "secondary": "ECB",
+        "diff_pct": -0.26,
+        "agree": true
+      },
+      {
+        "symbol": "ILS=X",
+        "name": "דולר/שקל",
+        "yahoo": 3.024,
+        "stooq": 3.0068,
+        "stooq_date": "2026-07-10",
+        "secondary": "ECB",
+        "diff_pct": 0.57,
+        "agree": true
+      }
+    ]
+  },
+  "reliability": {
+    "score": 92,
+    "label": "גבוהה"
+  },
+  "limitations": [
+    "מקור ראשי יחיד (Yahoo) — ציון אמינות מוגבל ל-85 ללא אימות-צולב מוצלח",
+    "חדשות: ניתוח לקסיקון בסיסי",
+    "בקטסט: אות יחיד, מדגמים קטנים"
+  ]
+}

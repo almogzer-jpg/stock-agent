@@ -133,3 +133,67 @@ def test_money_and_pct_formatting():
     assert dd._money(None) == dd.NA
     assert dd._pct(3.456) == "+3.46%"
     assert dd._pct(None) == dd.NA
+
+
+def test_decision_breakdown_and_blockers():
+    r = _rep()
+    r["scores"]["final_v2"]["contributions"] = {"fundamental": 28.0, "technical": 17.5,
+                                                "sector": 13.0, "news": 5.0, "risk": 7.0}
+    d = dd.investment_decision(r)
+    bd = d["breakdown"]
+    assert bd["contributions"][0]["name"] == "פונדמנטלי"        # sorted by contribution
+    assert bd["contributions"][0]["points"] == 28.0
+    # valuation 55 is not <55 → no blocker; drop it low → blocker appears
+    r["scores"]["valuation"]["value"] = 20
+    bd2 = dd.investment_decision(r)["breakdown"]
+    assert any("תמחור" in b for b in bd2["blockers"])
+
+
+def test_engine_v2_thesis_confidence_and_position():
+    d = dd.investment_decision(_rep(), regime_score=80)
+    tc = d["thesis_confidence"]
+    assert 0 <= tc["score"] <= 100 and tc["label"] in ("גבוה", "בינוני", "נמוך")
+    assert set(tc["parts"]) == {"הסכמת אותות", "אימות היסטורי", "התאמה למשטר השוק", "עומק ראיות"}
+    # aligned dims (all ~70-80) + regime aligned → decent confidence
+    assert tc["score"] >= 60
+    pos = d["position"]
+    assert pos["name"] and pos["range"]
+    # negative recommendation → no position
+    d2 = dd.investment_decision(_rep(opinion={"recommendation": "Avoid · להימנע"}))
+    assert d2["position"]["range"] == "0%"
+
+
+def test_engine_v2_invalidators_catalysts_summary():
+    r = _rep()
+    r["raw_metrics"]["earnings_date"] = "30/07/2026"
+    d = dd.investment_decision(r, regime_score=80)
+    assert any("תמיכה" in x for x in d["invalidators"])          # measurable kill-condition
+    assert any("guidance" in x or "תחזית" in x for x in d["invalidators"])
+    cats = d["catalysts"]
+    assert any("דוח כספי" in c["event"] and c["date"] == "30/07/2026" for c in cats)
+    es = d["exec_summary_3"]
+    assert len(es) == 3 and all(isinstance(s, str) and len(s) > 20 for s in es)
+
+
+def test_engine_v2_rating_change_explanation():
+    hist = [{"date": "01/07/2026", "recommendation": "Watch · מעקב", "confidence": 60,
+             "score_v2": 62, "target": 100.0, "risk": "בינוני"},
+            {"date": "13/07/2026", "recommendation": "Buy · קנייה", "confidence": 75,
+             "score_v2": 74, "target": 118.0, "risk": "נמוך"}]
+    d = dd.investment_decision(_rep(history=hist))
+    rc = d["rating_change"]
+    assert rc and rc["from"].startswith("Watch") and rc["to"].startswith("Buy")
+    assert any("ציון V2" in x for x in rc["reasons"])
+    # unchanged recommendation → no explanation needed
+    hist2 = [dict(hist[1], date="12/07/2026"), hist[1]]
+    assert dd.investment_decision(_rep(history=hist2))["rating_change"] is None
+
+
+def test_engine_v2_checklist_extended():
+    d = dd.investment_decision(_rep(raw_metrics={**_rep()["raw_metrics"],
+                                                 "inst_held_pct": 72.0}))
+    names = [c[0] for c in d["checklist"]]
+    assert any("איכות רווחים" in n for n in names)
+    assert any("אחזקות מוסדיות" in n for n in names)
+    ch = {c[0]: c[2] for c in d["checklist"]}
+    assert ch["אחזקות מוסדיות"] == "good"                        # 72% ≥ 60

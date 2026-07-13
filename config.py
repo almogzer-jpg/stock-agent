@@ -33,6 +33,7 @@ BACKTEST_JSON = os.path.join(DATA_DIR, "backtest.json")        # per-ticker sign
 UNIVERSE_JSON = os.path.join(DATA_DIR, "universe.json")        # market-wide scan results (Market Scanner)
 SYSTEM_HEALTH_JSON = os.path.join(DATA_DIR, "system_health.json")  # pipeline health metrics
 GLOBAL_JSON = os.path.join(DATA_DIR, "global_markets.json")        # global macro/crypto/FX indicators
+RELIABILITY_JSON = os.path.join(DATA_DIR, "reliability.json")      # provenance/freshness/cross-check report
 
 # Market Scanner (Part 5): which index universe + how many top names to deeply enrich.
 SCAN_UNIVERSE = "ALL"          # SP500 / NASDAQ100 / ALL
