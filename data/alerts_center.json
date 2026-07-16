@@ -19,45 +19,45 @@
   },
   {
     "type": "דוחות",
-    "scope": "UNH",
+    "scope": "GOOGL",
     "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 1 ימים (2026-07-16)"
+    "message": "GOOGL — דוחות כספיים בעוד 6 ימים (2026-07-22)"
   },
   {
     "type": "דוחות",
-    "scope": "GOOGL",
+    "scope": "UNH",
     "severity": "בינונית",
-    "message": "GOOGL — דוחות כספיים בעוד 7 ימים (2026-07-22)"
+    "message": "UNH — דוחות כספיים בעוד 0 ימים (2026-07-16)"
   },
   {
     "type": "דוחות",
     "scope": "NFLX",
     "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 1 ימים (2026-07-16)"
+    "message": "NFLX — דוחות כספיים בעוד 0 ימים (2026-07-16)"
   },
   {
     "type": "דוחות",
     "scope": "TSLA",
     "severity": "בינונית",
-    "message": "TSLA — דוחות כספיים בעוד 7 ימים (2026-07-22)"
+    "message": "TSLA — דוחות כספיים בעוד 6 ימים (2026-07-22)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
-    "message": "V — כיסוי חדש:  → Overweight (Barclays)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Outperform → Outperform (Bernstein)"
+    "message": "V — אישרור: Outperform → Outperform (BMO Capital)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
-    "message": "JPM — אישרור: Buy → Buy (B of A Securities)"
+    "message": "JPM — אישרור: Neutral → Neutral (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Buy → Buy (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,15 +67,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NVDA",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (TD Cowen)"
+    "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,9 +85,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
+    "scope": "AMZN",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+    "message": "AMZN — reit: Market Outperform → Market Outperform (Citizens)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Outperform → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — reit: Buy → Buy (Guggenheim)"
   },
   {
     "type": "שינוי דירוג",
@@ -103,15 +115,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
+    "scope": "CRM",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (Argus Research)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "CRM — אישרור: Outperform → Outperform (Evercore ISI Group)"
   },
   {
     "type": "שינוי דירוג",
@@ -121,15 +127,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "CRM",
+    "scope": "COST",
     "severity": "מידע",
-    "message": "CRM — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NFLX",
-    "severity": "מידע",
-    "message": "NFLX — reit: Overweight → Overweight (Morgan Stanley)"
+    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -141,12 +141,12 @@
     "type": "רוטציית סקטורים",
     "scope": "פיננסים",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור פיננסים (ציון 84, חוזק יחסי +4.31%)"
+    "message": "כניסת הון לסקטור פיננסים (ציון 83, חוזק יחסי +4.51%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "שירותי תקשורת",
+    "scope": "חומרים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 20, חוזק יחסי -3.76%)"
+    "message": "יציאת הון מסקטור חומרים (ציון 30, חוזק יחסי -4.75%)"
   }
 ]
