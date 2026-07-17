@@ -1,5 +1,11 @@
 [
   {
+    "type": "פריצה",
+    "scope": "UNH",
+    "severity": "גבוהה",
+    "message": "UNH פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.07"
+  },
+  {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "גבוהה",
@@ -18,28 +24,22 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
+    "type": "זינוק נפח",
+    "scope": "UNH",
+    "severity": "בינונית",
+    "message": "UNH — נפח מסחר פי 2.07 מהממוצע"
+  },
+  {
     "type": "דוחות",
     "scope": "GOOGL",
     "severity": "בינונית",
-    "message": "GOOGL — דוחות כספיים בעוד 6 ימים (2026-07-22)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "UNH",
-    "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 0 ימים (2026-07-16)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "NFLX",
-    "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 0 ימים (2026-07-16)"
+    "message": "GOOGL — דוחות כספיים בעוד 5 ימים (2026-07-22)"
   },
   {
     "type": "דוחות",
     "scope": "TSLA",
     "severity": "בינונית",
-    "message": "TSLA — דוחות כספיים בעוד 6 ימים (2026-07-22)"
+    "message": "TSLA — דוחות כספיים בעוד 5 ימים (2026-07-22)"
   },
   {
     "type": "שינוי דירוג",
@@ -51,13 +51,7 @@
     "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Baird)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Citigroup)"
+    "message": "JPM — אישרור: Buy → Buy (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,33 +61,27 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
+    "scope": "LLY",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+    "message": "LLY — אישרור: Buy → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — שדרוג: Underperform → Neutral (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "NVDA",
     "severity": "מידע",
     "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Hold → Hold (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — reit: Market Outperform → Market Outperform (Citizens)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (Evercore ISI Group)"
   },
   {
     "type": "שינוי דירוג",
@@ -105,13 +93,19 @@
     "type": "שינוי דירוג",
     "scope": "PG",
     "severity": "מידע",
-    "message": "PG — אישרור: Buy → Buy (B of A Securities)"
+    "message": "PG — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "AMZN",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
+    "message": "AMZN — אישרור: Overweight → Overweight (Keybanc)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -121,15 +115,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "ADBE",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "ADBE — שדרוג: Hold → Buy (HSBC)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "MSFT — אישרור: Outperform → Outperform (Evercore ISI Group)"
   },
   {
     "type": "שינוי דירוג",
@@ -138,15 +126,21 @@
     "message": "TSLA — אישרור: Equal-Weight → Equal-Weight (Morgan Stanley)"
   },
   {
-    "type": "רוטציית סקטורים",
-    "scope": "פיננסים",
+    "type": "שינוי דירוג",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור פיננסים (ציון 83, חוזק יחסי +4.51%)"
+    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "חומרים",
+    "scope": "פיננסים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור חומרים (ציון 30, חוזק יחסי -4.75%)"
+    "message": "כניסת הון לסקטור פיננסים (ציון 87, חוזק יחסי +6.6%)"
+  },
+  {
+    "type": "רוטציית סקטורים",
+    "scope": "טכנולוגיה",
+    "severity": "מידע",
+    "message": "יציאת הון מסקטור טכנולוגיה (ציון 20, חוזק יחסי -7.06%)"
   }
 ]
