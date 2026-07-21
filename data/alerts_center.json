@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "UNH",
-    "severity": "גבוהה",
-    "message": "UNH פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.61"
-  },
-  {
     "type": "שינוי דירוג",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -19,21 +13,21 @@
   },
   {
     "type": "דוחות",
-    "scope": "GOOGL",
+    "scope": "V",
     "severity": "בינונית",
-    "message": "GOOGL — דוחות כספיים בעוד 2 ימים (2026-07-22)"
+    "message": "V — דוחות כספיים בעוד 7 ימים (2026-07-28)"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "NFLX",
+    "type": "דוחות",
+    "scope": "GOOGL",
     "severity": "בינונית",
-    "message": "NFLX — נפח מסחר פי 2.58 מהממוצע"
+    "message": "GOOGL — דוחות כספיים בעוד 1 ימים (2026-07-22)"
   },
   {
     "type": "דוחות",
     "scope": "TSLA",
     "severity": "בינונית",
-    "message": "TSLA — דוחות כספיים בעוד 2 ימים (2026-07-22)"
+    "message": "TSLA — דוחות כספיים בעוד 1 ימים (2026-07-22)"
   },
   {
     "type": "שינוי דירוג",
@@ -43,39 +37,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
     "message": "MA — כיסוי חדש:  → Overweight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "UNH",
     "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (Morgan Stanley)"
+    "message": "UNH — אישרור: Overweight → Overweight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "JPM",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Keybanc)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,15 +61,33 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Keybanc)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Buy → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "NVDA",
     "severity": "מידע",
     "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "COST",
+    "scope": "ADBE",
     "severity": "מידע",
-    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "ADBE — כיסוי חדש:  → Outperform (CLSA)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — כיסוי חדש:  → Hold (CLSA)"
   },
   {
     "type": "שינוי דירוג",
@@ -103,21 +97,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "מידע",
+    "message": "PG — אישרור: Overweight → Overweight (JP Morgan)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
+    "message": "MSFT — כיסוי חדש:  → Outperform (CLSA)"
   },
   {
     "type": "שינוי דירוג",
@@ -127,20 +121,32 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — reit: Buy → Buy (Guggenheim)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — אישרור: Equal-Weight → Equal-Weight (Morgan Stanley)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "בריאות",
+    "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור בריאות (ציון 86, חוזק יחסי +6.51%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 87, חוזק יחסי +6.43%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "שירותי תקשורת",
+    "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 25, חוזק יחסי -0.52%)"
+    "message": "יציאת הון מסקטור טכנולוגיה (ציון 25, חוזק יחסי -5.63%)"
   }
 ]
