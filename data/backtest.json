@@ -140,14 +140,14 @@
   "LLY": {
     "occurrences": 4,
     "win_rate": 25.0,
-    "avg_return": 3.36,
-    "median_return": -3.15,
+    "avg_return": 3.1,
+    "median_return": -3.66,
     "max_drawdown": -7.79,
-    "benchmark_rel": 2.64,
-    "avg_holding": 13.5,
+    "benchmark_rel": 2.42,
+    "avg_holding": 13.8,
     "is_win_rate": 50.0,
     "oos_win_rate": 0.0,
-    "oos_avg_return": -5.25,
+    "oos_avg_return": -5.76,
     "confidence": "נמוך"
   },
   "JPM": {
@@ -166,14 +166,14 @@
   "V": {
     "occurrences": 3,
     "win_rate": 33.3,
-    "avg_return": 0.79,
+    "avg_return": 0.55,
     "median_return": -0.7,
     "max_drawdown": -4.8,
-    "benchmark_rel": -2.28,
-    "avg_holding": 18.7,
+    "benchmark_rel": -2.47,
+    "avg_holding": 19,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 5.83,
+    "oos_avg_return": 5.11,
     "confidence": "נמוך"
   },
   "MA": {
@@ -192,14 +192,14 @@
   "UNH": {
     "occurrences": 2,
     "win_rate": 100.0,
-    "avg_return": 7.04,
-    "median_return": 7.04,
+    "avg_return": 6.45,
+    "median_return": 6.45,
     "max_drawdown": -0.87,
-    "benchmark_rel": 8.13,
-    "avg_holding": 11.5,
+    "benchmark_rel": 7.6,
+    "avg_holding": 12,
     "is_win_rate": 100.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 3.06,
+    "oos_avg_return": 1.87,
     "confidence": "נמוך"
   },
   "HD": {
