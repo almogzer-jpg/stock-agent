@@ -19,27 +19,57 @@
   },
   {
     "type": "דוחות",
-    "scope": "META",
+    "scope": "V",
     "severity": "בינונית",
-    "message": "META — דוחות כספיים בעוד 6 ימים (2026-07-29)"
+    "message": "V — דוחות כספיים בעוד 4 ימים (2026-07-28)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "MA",
+    "severity": "בינונית",
+    "message": "MA — דוחות כספיים בעוד 6 ימים (2026-07-30)"
   },
   {
     "type": "דוחות",
     "scope": "AAPL",
     "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 7 ימים (2026-07-30)"
+    "message": "AAPL — דוחות כספיים בעוד 6 ימים (2026-07-30)"
   },
   {
     "type": "דוחות",
     "scope": "MSFT",
     "severity": "בינונית",
-    "message": "MSFT — דוחות כספיים בעוד 6 ימים (2026-07-29)"
+    "message": "MSFT — דוחות כספיים בעוד 5 ימים (2026-07-29)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — דוחות כספיים בעוד 5 ימים (2026-07-29)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "PG",
+    "severity": "בינונית",
+    "message": "PG — דוחות כספיים בעוד 5 ימים (2026-07-29)"
+  },
+  {
+    "type": "זינוק נפח",
+    "scope": "GOOGL",
+    "severity": "בינונית",
+    "message": "GOOGL — נפח מסחר פי 2.01 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "AMZN",
     "severity": "בינונית",
-    "message": "AMZN — דוחות כספיים בעוד 7 ימים (2026-07-30)"
+    "message": "AMZN — דוחות כספיים בעוד 6 ימים (2026-07-30)"
+  },
+  {
+    "type": "זינוק נפח",
+    "scope": "TSLA",
+    "severity": "בינונית",
+    "message": "TSLA — נפח מסחר פי 2.69 מהממוצע"
   },
   {
     "type": "שינוי דירוג",
@@ -55,15 +85,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
     "message": "LLY — אישרור: Buy → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,33 +103,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — אישרור: Equal-Weight → Equal-Weight (Barclays)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "מידע",
-    "message": "AAPL — שדרוג: Hold → Buy (HSBC)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — reit: Market Outperform → Market Outperform (Citizens)"
+    "message": "AAPL — אישרור: Overweight → Overweight (Morgan Stanley)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "AMD — אישרור: Buy → Buy (Benchmark)"
   },
   {
     "type": "שינוי דירוג",
@@ -109,9 +121,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "PG",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "PG — אישרור: Equal-Weight → Equal-Weight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
@@ -121,26 +133,38 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "HD — reit: Buy → Buy (Guggenheim)"
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — reit: Outperform → Outperform (Wedbush)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — reit: Sell → Sell (GLJ Research)"
+    "message": "TSLA — אישרור: Neutral → Neutral (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — reit: Buy → Buy (Guggenheim)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 93, חוזק יחסי +9.16%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 93, חוזק יחסי +8.45%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "טכנולוגיה",
+    "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור טכנולוגיה (ציון 22, חוזק יחסי -6.53%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 12, חוזק יחסי -4.98%)"
   }
 ]
