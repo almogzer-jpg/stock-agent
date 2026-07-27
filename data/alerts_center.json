@@ -21,67 +21,49 @@
     "type": "דוחות",
     "scope": "V",
     "severity": "בינונית",
-    "message": "V — דוחות כספיים בעוד 4 ימים (2026-07-28)"
+    "message": "V — דוחות כספיים בעוד 1 ימים (2026-07-28)"
   },
   {
     "type": "דוחות",
     "scope": "MA",
     "severity": "בינונית",
-    "message": "MA — דוחות כספיים בעוד 6 ימים (2026-07-30)"
+    "message": "MA — דוחות כספיים בעוד 3 ימים (2026-07-30)"
   },
   {
     "type": "דוחות",
     "scope": "AAPL",
     "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 6 ימים (2026-07-30)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "MSFT",
-    "severity": "בינונית",
-    "message": "MSFT — דוחות כספיים בעוד 5 ימים (2026-07-29)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "META",
-    "severity": "בינונית",
-    "message": "META — דוחות כספיים בעוד 5 ימים (2026-07-29)"
+    "message": "AAPL — דוחות כספיים בעוד 3 ימים (2026-07-30)"
   },
   {
     "type": "דוחות",
     "scope": "PG",
     "severity": "בינונית",
-    "message": "PG — דוחות כספיים בעוד 5 ימים (2026-07-29)"
+    "message": "PG — דוחות כספיים בעוד 2 ימים (2026-07-29)"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "GOOGL",
+    "type": "דוחות",
+    "scope": "MSFT",
     "severity": "בינונית",
-    "message": "GOOGL — נפח מסחר פי 2.01 מהממוצע"
+    "message": "MSFT — דוחות כספיים בעוד 2 ימים (2026-07-29)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — דוחות כספיים בעוד 2 ימים (2026-07-29)"
   },
   {
     "type": "דוחות",
     "scope": "AMZN",
     "severity": "בינונית",
-    "message": "AMZN — דוחות כספיים בעוד 6 ימים (2026-07-30)"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "TSLA",
-    "severity": "בינונית",
-    "message": "TSLA — נפח מסחר פי 2.69 מהממוצע"
+    "message": "AMZN — דוחות כספיים בעוד 3 ימים (2026-07-30)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
-    "message": "V — אישרור: Outperform → Outperform (BMO Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
+    "message": "V — אישרור: Buy → Buy (Truist Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -91,15 +73,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "UNH",
+    "scope": "JPM",
     "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NVDA",
+    "scope": "MA",
     "severity": "מידע",
-    "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
+    "message": "MA — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -109,15 +97,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (Benchmark)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — reit: Outperform → Outperform (Bernstein)"
+    "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
@@ -127,9 +109,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
+    "message": "AMD — אישרור: Buy → Buy (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — reit: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
@@ -145,9 +133,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "TSLA",
+    "scope": "NFLX",
     "severity": "מידע",
-    "message": "TSLA — אישרור: Neutral → Neutral (UBS)"
+    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
   },
   {
     "type": "שינוי דירוג",
@@ -156,15 +144,21 @@
     "message": "HD — reit: Buy → Buy (Guggenheim)"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "TSLA",
+    "severity": "מידע",
+    "message": "TSLA — אישרור: Overweight → Overweight (Piper Sandler)"
+  },
+  {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 93, חוזק יחסי +8.45%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.56%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 12, חוזק יחסי -4.98%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 10, חוזק יחסי -5.65%)"
   }
 ]
