@@ -19,51 +19,51 @@
   },
   {
     "type": "דוחות",
-    "scope": "V",
+    "scope": "LLY",
     "severity": "בינונית",
-    "message": "V — דוחות כספיים בעוד 0 ימים (2026-07-28)"
+    "message": "LLY — דוחות כספיים בעוד 7 ימים (2026-08-05)"
   },
   {
     "type": "דוחות",
     "scope": "MA",
     "severity": "בינונית",
-    "message": "MA — דוחות כספיים בעוד 2 ימים (2026-07-30)"
+    "message": "MA — דוחות כספיים בעוד 1 ימים (2026-07-30)"
   },
   {
     "type": "דוחות",
     "scope": "PG",
     "severity": "בינונית",
-    "message": "PG — דוחות כספיים בעוד 1 ימים (2026-07-29)"
+    "message": "PG — דוחות כספיים בעוד 0 ימים (2026-07-29)"
   },
   {
     "type": "דוחות",
     "scope": "AAPL",
     "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 2 ימים (2026-07-30)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "MSFT",
-    "severity": "בינונית",
-    "message": "MSFT — דוחות כספיים בעוד 1 ימים (2026-07-29)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "META",
-    "severity": "בינונית",
-    "message": "META — דוחות כספיים בעוד 1 ימים (2026-07-29)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "AMZN",
-    "severity": "בינונית",
-    "message": "AMZN — דוחות כספיים בעוד 2 ימים (2026-07-30)"
+    "message": "AAPL — דוחות כספיים בעוד 1 ימים (2026-07-30)"
   },
   {
     "type": "דוחות",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 7 ימים (2026-08-04)"
+    "message": "AMD — דוחות כספיים בעוד 6 ימים (2026-08-04)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — דוחות כספיים בעוד 0 ימים (2026-07-29)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "AMZN",
+    "severity": "בינונית",
+    "message": "AMZN — דוחות כספיים בעוד 1 ימים (2026-07-30)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "MSFT",
+    "severity": "בינונית",
+    "message": "MSFT — דוחות כספיים בעוד 0 ימים (2026-07-29)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,15 +73,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
     "message": "LLY — אישרור: Buy → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -109,21 +109,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — אישרור: Outperform → Outperform (Mizuho)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
     "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
@@ -135,13 +129,13 @@
     "type": "שינוי דירוג",
     "scope": "AMZN",
     "severity": "מידע",
-    "message": "AMZN — reit: Outperform → Outperform (Wedbush)"
+    "message": "AMZN — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "AMD — אישרור: Outperform → Outperform (Mizuho)"
+    "message": "MSFT — reit: Market Outperform → Market Outperform (Citizens)"
   },
   {
     "type": "שינוי דירוג",
