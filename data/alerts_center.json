@@ -1,5 +1,17 @@
 [
   {
+    "type": "פריצה",
+    "scope": "MA",
+    "severity": "גבוהה",
+    "message": "MA פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.76"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "גבוהה",
+    "message": "ADBE — הורדת דירוג: Equal-Weight → Underweight (Morgan Stanley)"
+  },
+  {
     "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "גבוהה",
@@ -7,9 +19,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "ADBE",
+    "scope": "PG",
     "severity": "גבוהה",
-    "message": "ADBE — הורדת דירוג: Equal-Weight → Underweight (Morgan Stanley)"
+    "message": "PG — הורדת דירוג: Buy → Hold (HSBC)"
   },
   {
     "type": "אזהרת סיכון",
@@ -19,39 +31,33 @@
   },
   {
     "type": "דוחות",
-    "scope": "MA",
-    "severity": "בינונית",
-    "message": "MA — דוחות כספיים בעוד 0 ימים (2026-07-30)"
-  },
-  {
-    "type": "דוחות",
     "scope": "LLY",
     "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 6 ימים (2026-08-05)"
+    "message": "LLY — דוחות כספיים בעוד 5 ימים (2026-08-05)"
   },
   {
-    "type": "דוחות",
-    "scope": "AAPL",
+    "type": "זינוק נפח",
+    "scope": "MSFT",
     "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 0 ימים (2026-07-30)"
+    "message": "MSFT — נפח מסחר פי 3.12 מהממוצע"
   },
   {
-    "type": "דוחות",
+    "type": "זינוק נפח",
     "scope": "AMZN",
     "severity": "בינונית",
-    "message": "AMZN — דוחות כספיים בעוד 0 ימים (2026-07-30)"
+    "message": "AMZN — נפח מסחר פי 2.43 מהממוצע"
+  },
+  {
+    "type": "זינוק נפח",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — נפח מסחר פי 2.23 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 5 ימים (2026-08-04)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Overweight → Overweight (Piper Sandler)"
+    "message": "AMD — דוחות כספיים בעוד 4 ימים (2026-08-04)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,15 +67,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "V",
+    "severity": "מידע",
+    "message": "V — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
     "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "PG — אישרור: Equal-Weight → Equal-Weight (Barclays)"
+    "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,18 +97,6 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
-    "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — reit: Market Outperform → Market Outperform (Citizens)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
     "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
@@ -109,9 +109,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
-    "message": "AMD — אישרור: Outperform → Outperform (Mizuho)"
+    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
   },
   {
     "type": "שינוי דירוג",
@@ -129,12 +135,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 93, חוזק יחסי +11.13%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 95, חוזק יחסי +11.84%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "טכנולוגיה",
+    "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור טכנולוגיה (ציון 15, חוזק יחסי -8.49%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 16, חוזק יחסי -3.35%)"
   }
 ]
