@@ -3,7 +3,13 @@
     "type": "פריצה",
     "scope": "MA",
     "severity": "גבוהה",
-    "message": "MA פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.76"
+    "message": "MA פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.5"
+  },
+  {
+    "type": "פריצה",
+    "scope": "AMZN",
+    "severity": "גבוהה",
+    "message": "AMZN פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.83"
   },
   {
     "type": "שינוי דירוג",
@@ -13,15 +19,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "גבוהה",
-    "message": "CRM — הורדת דירוג: Overweight → Equal-Weight (Morgan Stanley)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "PG",
     "severity": "גבוהה",
     "message": "PG — הורדת דירוג: Buy → Hold (HSBC)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "גבוהה",
+    "message": "CRM — הורדת דירוג: Overweight → Equal-Weight (Morgan Stanley)"
   },
   {
     "type": "אזהרת סיכון",
@@ -30,46 +36,34 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "דוחות",
-    "scope": "LLY",
-    "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 5 ימים (2026-08-05)"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "MSFT",
-    "severity": "בינונית",
-    "message": "MSFT — נפח מסחר פי 3.12 מהממוצע"
-  },
-  {
     "type": "זינוק נפח",
     "scope": "AMZN",
     "severity": "בינונית",
-    "message": "AMZN — נפח מסחר פי 2.43 מהממוצע"
+    "message": "AMZN — נפח מסחר פי 2.83 מהממוצע"
+  },
+  {
+    "type": "דוחות",
+    "scope": "LLY",
+    "severity": "בינונית",
+    "message": "LLY — דוחות כספיים בעוד 2 ימים (2026-08-05)"
   },
   {
     "type": "זינוק נפח",
-    "scope": "META",
+    "scope": "AAPL",
     "severity": "בינונית",
-    "message": "META — נפח מסחר פי 2.23 מהממוצע"
+    "message": "AAPL — נפח מסחר פי 2.47 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 4 ימים (2026-08-04)"
+    "message": "AMD — דוחות כספיים בעוד 1 ימים (2026-08-04)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
-    "message": "MA — אישרור: Buy → Buy (Truist Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "MA — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,21 +73,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Buy → Buy (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "V",
+    "severity": "מידע",
+    "message": "V — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
     "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Overweight → Overweight (Morgan Stanley)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -103,15 +97,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "UNH",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (UBS)"
+    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
+    "scope": "AAPL",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
+    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -127,6 +121,12 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — אישרור: Overweight → Overweight (Piper Sandler)"
@@ -135,12 +135,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 95, חוזק יחסי +11.84%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +12.68%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "צריכה מחזורית",
+    "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 16, חוזק יחסי -3.35%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 23, חוזק יחסי -1.45%)"
   }
 ]
