@@ -1,5 +1,5 @@
 {
-  "generated": "03/08/2026 07:36",
+  "generated": "04/08/2026 06:34",
   "primary_source": "Yahoo Finance (yfinance)",
   "stale_after_days": 3,
   "artifacts": {
@@ -61,21 +61,21 @@
       {
         "symbol": "EURUSD=X",
         "name": "אירו/דולר",
-        "yahoo": 1.153,
-        "stooq": 1.1485,
-        "stooq_date": "2026-07-31",
+        "yahoo": 1.151,
+        "stooq": 1.1535,
+        "stooq_date": "2026-08-03",
         "secondary": "ECB",
-        "diff_pct": 0.39,
+        "diff_pct": -0.22,
         "agree": true
       },
       {
         "symbol": "ILS=X",
         "name": "דולר/שקל",
-        "yahoo": 3.046,
-        "stooq": 3.0574,
-        "stooq_date": "2026-07-31",
+        "yahoo": 3.041,
+        "stooq": 3.0511,
+        "stooq_date": "2026-08-03",
         "secondary": "ECB",
-        "diff_pct": -0.37,
+        "diff_pct": -0.33,
         "agree": true
       },
       {

@@ -13,6 +13,12 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "גבוהה",
+    "message": "CRM — הורדת דירוג: Overweight → Equal-Weight (Morgan Stanley)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "ADBE",
     "severity": "גבוהה",
     "message": "ADBE — הורדת דירוג: Equal-Weight → Underweight (Morgan Stanley)"
@@ -22,12 +28,6 @@
     "scope": "PG",
     "severity": "גבוהה",
     "message": "PG — הורדת דירוג: Buy → Hold (HSBC)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "גבוהה",
-    "message": "CRM — הורדת דירוג: Overweight → Equal-Weight (Morgan Stanley)"
   },
   {
     "type": "אזהרת סיכון",
@@ -45,7 +45,7 @@
     "type": "דוחות",
     "scope": "LLY",
     "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 2 ימים (2026-08-05)"
+    "message": "LLY — דוחות כספיים בעוד 1 ימים (2026-08-05)"
   },
   {
     "type": "זינוק נפח",
@@ -57,19 +57,19 @@
     "type": "דוחות",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 1 ימים (2026-08-04)"
+    "message": "AMD — דוחות כספיים בעוד 0 ימים (2026-08-04)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
-    "message": "MA — אישרור: Buy → Buy (UBS)"
+    "message": "MA — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
+    "scope": "V",
     "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
+    "message": "V — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,21 +79,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "V",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "V — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
     "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -109,6 +103,12 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
     "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
@@ -121,15 +121,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
-    "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — אישרור: Overweight → Overweight (Piper Sandler)"
+    "message": "TSLA — אישרור: Buy → Buy (Stifel)"
   },
   {
     "type": "רוטציית סקטורים",
