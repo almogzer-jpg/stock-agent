@@ -52,17 +52,17 @@
     "confidence": "בינוני"
   },
   "AMZN": {
-    "occurrences": 3,
-    "win_rate": 33.3,
-    "avg_return": 1.26,
-    "median_return": -3.42,
+    "occurrences": 4,
+    "win_rate": 50.0,
+    "avg_return": 1.48,
+    "median_return": -0.63,
     "max_drawdown": -8.87,
     "benchmark_rel": -1.14,
-    "avg_holding": 14.7,
+    "avg_holding": 11.5,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 16.06,
-    "confidence": "נמוך"
+    "oos_avg_return": 9.1,
+    "confidence": "בינוני"
   },
   "META": {
     "occurrences": 3,
@@ -179,27 +179,27 @@
   "MA": {
     "occurrences": 3,
     "win_rate": 0.0,
-    "avg_return": -3.0,
+    "avg_return": -3.12,
     "median_return": -3.66,
     "max_drawdown": -4.62,
-    "benchmark_rel": -4.85,
-    "avg_holding": 11.7,
+    "benchmark_rel": -6.07,
+    "avg_holding": 12.3,
     "is_win_rate": 0.0,
     "oos_win_rate": 0.0,
-    "oos_avg_return": -0.74,
+    "oos_avg_return": -1.08,
     "confidence": "נמוך"
   },
   "UNH": {
     "occurrences": 2,
     "win_rate": 50.0,
-    "avg_return": 4.45,
-    "median_return": 4.45,
-    "max_drawdown": -2.12,
-    "benchmark_rel": 5.66,
-    "avg_holding": 15.5,
+    "avg_return": 3.64,
+    "median_return": 3.64,
+    "max_drawdown": -3.74,
+    "benchmark_rel": 3.22,
+    "avg_holding": 16.5,
     "is_win_rate": 100.0,
     "oos_win_rate": 0.0,
-    "oos_avg_return": -2.12,
+    "oos_avg_return": -3.74,
     "confidence": "נמוך"
   },
   "HD": {

@@ -1,27 +1,9 @@
 [
   {
-    "type": "פריצה",
-    "scope": "MA",
-    "severity": "גבוהה",
-    "message": "MA פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.5"
-  },
-  {
-    "type": "פריצה",
-    "scope": "AMZN",
-    "severity": "גבוהה",
-    "message": "AMZN פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.83"
-  },
-  {
     "type": "שינוי דירוג",
-    "scope": "CRM",
+    "scope": "AAPL",
     "severity": "גבוהה",
-    "message": "CRM — הורדת דירוג: Overweight → Equal-Weight (Morgan Stanley)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "גבוהה",
-    "message": "ADBE — הורדת דירוג: Equal-Weight → Underweight (Morgan Stanley)"
+    "message": "AAPL — הורדת דירוג: Buy → Hold (China Renaissance)"
   },
   {
     "type": "שינוי דירוג",
@@ -36,34 +18,22 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "AMZN",
-    "severity": "בינונית",
-    "message": "AMZN — נפח מסחר פי 2.83 מהממוצע"
-  },
-  {
     "type": "דוחות",
     "scope": "LLY",
     "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 1 ימים (2026-08-05)"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "AAPL",
-    "severity": "בינונית",
-    "message": "AAPL — נפח מסחר פי 2.47 מהממוצע"
-  },
-  {
-    "type": "דוחות",
-    "scope": "AMD",
-    "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 0 ימים (2026-08-04)"
+    "message": "LLY — דוחות כספיים בעוד 0 ימים (2026-08-05)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "MA — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,9 +49,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
@@ -91,27 +67,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (JP Morgan)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "מידע",
     "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
   },
   {
     "type": "שינוי דירוג",
@@ -129,12 +87,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +12.68%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 93, חוזק יחסי +7.5%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "שירותי תקשורת",
+    "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 23, חוזק יחסי -1.45%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 29, חוזק יחסי -5.27%)"
   }
 ]

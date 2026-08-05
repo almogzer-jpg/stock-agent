@@ -1,17 +1,17 @@
 {
   "scanned": 20,
-  "signals": 2,
+  "signals": 0,
   "data_completeness": 100.0,
   "failed_pulls": 0,
-  "avg_confidence": 58.8,
-  "avg_trust": 57.9,
+  "avg_confidence": 63.5,
+  "avg_trust": 58.5,
   "sector_distribution": {
     "Technology": 7,
+    "Communication Services": 3,
     "Financial Services": 3,
     "Consumer Cyclical": 3,
-    "Communication Services": 3,
     "Healthcare": 2,
     "Consumer Defensive": 2
   },
-  "date": "04/08/2026"
+  "date": "05/08/2026"
 }
