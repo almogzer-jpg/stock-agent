@@ -1,5 +1,11 @@
 [
   {
+    "type": "פריצה",
+    "scope": "LLY",
+    "severity": "גבוהה",
+    "message": "LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.45"
+  },
+  {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "גבוהה",
@@ -18,28 +24,22 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "דוחות",
+    "type": "זינוק נפח",
     "scope": "LLY",
     "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 0 ימים (2026-08-05)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Buy → Buy (UBS)"
+    "message": "LLY — נפח מסחר פי 2.45 מהממוצע"
   },
   {
     "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
-    "message": "V — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
+    "message": "V — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Buy → Buy (Truist Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,27 +49,27 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
+    "message": "MSFT — אישרור: Buy → Buy (Tigress Financial)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
+    "scope": "JPM",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Baird)"
+    "message": "JPM — אישרור: Buy → Buy (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — אישרור: Buy → Buy (DA Davidson)"
   },
   {
     "type": "שינוי דירוג",
@@ -87,12 +87,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 93, חוזק יחסי +7.5%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 77, חוזק יחסי +1.96%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 29, חוזק יחסי -5.27%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 23, חוזק יחסי -7.39%)"
   }
 ]
