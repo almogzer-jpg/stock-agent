@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "LLY",
-    "severity": "גבוהה",
-    "message": "LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.45"
-  },
-  {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "גבוהה",
@@ -24,16 +18,16 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "LLY",
-    "severity": "בינונית",
-    "message": "LLY — נפח מסחר פי 2.45 מהממוצע"
-  },
-  {
     "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
     "message": "V — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -43,9 +37,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "JPM",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (UBS)"
+    "message": "JPM — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -55,21 +49,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
+    "scope": "AMZN",
     "severity": "מידע",
-    "message": "JPM — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
+    "message": "AMZN — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (DA Davidson)"
+    "message": "AMD — אישרור: Buy → Buy (Argus Research)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,14 +73,14 @@
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "אנרגיה",
+    "scope": "פיננסים",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 77, חוזק יחסי +1.96%)"
+    "message": "כניסת הון לסקטור פיננסים (ציון 77, חוזק יחסי +2.13%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 23, חוזק יחסי -7.39%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 23, חוזק יחסי -7.4%)"
   }
 ]
