@@ -1,15 +1,15 @@
 [
   {
     "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "גבוהה",
-    "message": "AAPL — הורדת דירוג: Buy → Hold (China Renaissance)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "PG",
     "severity": "גבוהה",
     "message": "PG — הורדת דירוג: Buy → Hold (Argus Research)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "גבוהה",
+    "message": "AAPL — הורדת דירוג: Hold → Underperform (Jefferies)"
   },
   {
     "type": "אזהרת סיכון",
@@ -18,22 +18,16 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Buy → Buy (Truist Securities)"
+    "type": "דוחות",
+    "scope": "HD",
+    "severity": "בינונית",
+    "message": "HD — דוחות כספיים בעוד 7 ימים (2026-08-18)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
     "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Buy → Buy (Truist Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,9 +43,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "V",
+    "severity": "מידע",
+    "message": "V — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
     "message": "MSFT — אישרור: Buy → Buy (Tigress Financial)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Buy → Buy (Truist Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,26 +67,20 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
-    "severity": "מידע",
-    "message": "HD — אישרור: Buy → Buy (DA Davidson)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — אישרור: Buy → Buy (Stifel)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "חומרים",
+    "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור חומרים (ציון 78, חוזק יחסי +2.34%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 91, חוזק יחסי +6.91%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 26, חוזק יחסי -6.2%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 22, חוזק יחסי -7.37%)"
   }
 ]
