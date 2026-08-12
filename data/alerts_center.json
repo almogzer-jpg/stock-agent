@@ -1,15 +1,15 @@
 [
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "גבוהה",
-    "message": "PG — הורדת דירוג: Buy → Hold (Argus Research)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "גבוהה",
     "message": "AAPL — הורדת דירוג: Hold → Underperform (Jefferies)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "גבוהה",
+    "message": "PG — הורדת דירוג: Buy → Hold (Argus Research)"
   },
   {
     "type": "אזהרת סיכון",
@@ -21,25 +21,7 @@
     "type": "דוחות",
     "scope": "HD",
     "severity": "בינונית",
-    "message": "HD — דוחות כספיים בעוד 7 ימים (2026-08-18)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (UBS)"
+    "message": "HD — דוחות כספיים בעוד 6 ימים (2026-08-18)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,9 +31,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
+    "scope": "LLY",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (Tigress Financial)"
+    "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — reit: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,9 +55,27 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Buy → Buy (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Buy → Buy (Tigress Financial)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
     "message": "AMD — אישרור: Buy → Buy (Argus Research)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -75,12 +87,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 91, חוזק יחסי +6.91%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 85, חוזק יחסי +4.55%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 22, חוזק יחסי -7.37%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 23, חוזק יחסי -7.4%)"
   }
 ]
