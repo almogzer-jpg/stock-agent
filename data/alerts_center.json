@@ -21,19 +21,7 @@
     "type": "דוחות",
     "scope": "HD",
     "severity": "בינונית",
-    "message": "HD — דוחות כספיים בעוד 6 ימים (2026-08-18)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Buy → Buy (Truist Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
+    "message": "HD — דוחות כספיים בעוד 5 ימים (2026-08-18)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,6 +37,30 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — אישרור: Neutral → Neutral (UBS)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "V",
+    "severity": "מידע",
+    "message": "V — אישרור: Buy → Buy (Truist Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "MA",
     "severity": "מידע",
     "message": "MA — אישרור: Buy → Buy (Truist Securities)"
@@ -61,12 +73,6 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (Tigress Financial)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
     "message": "AMD — אישרור: Buy → Buy (Argus Research)"
@@ -75,7 +81,7 @@
     "type": "שינוי דירוג",
     "scope": "HD",
     "severity": "מידע",
-    "message": "HD — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "HD — אישרור: Sector Perform → Sector Perform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -87,12 +93,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 85, חוזק יחסי +4.55%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 84, חוזק יחסי +4.45%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 23, חוזק יחסי -7.4%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 25, חוזק יחסי -6.77%)"
   }
 ]
