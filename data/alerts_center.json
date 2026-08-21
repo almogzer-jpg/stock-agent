@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "LLY",
-    "severity": "גבוהה",
-    "message": "LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.62"
-  },
-  {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "גבוהה",
@@ -33,13 +27,13 @@
     "type": "דוחות",
     "scope": "NVDA",
     "severity": "בינונית",
-    "message": "NVDA — דוחות כספיים בעוד 6 ימים (2026-08-26)"
+    "message": "NVDA — דוחות כספיים בעוד 5 ימים (2026-08-26)"
   },
   {
     "type": "דוחות",
     "scope": "CRM",
     "severity": "בינונית",
-    "message": "CRM — דוחות כספיים בעוד 6 ימים (2026-08-26)"
+    "message": "CRM — דוחות כספיים בעוד 5 ימים (2026-08-26)"
   },
   {
     "type": "שינוי דירוג",
@@ -51,19 +45,7 @@
     "type": "שינוי דירוג",
     "scope": "NVDA",
     "severity": "מידע",
-    "message": "NVDA — reit: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — אישרור: Neutral → Neutral (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "NVDA — reit: Outperform → Outperform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,15 +61,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
+    "scope": "CRM",
     "severity": "מידע",
-    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
+    "message": "CRM — אישרור: Outperform → Outperform (BMO Capital)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "JPM",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (Argus Research)"
+    "message": "JPM — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -96,15 +78,21 @@
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
+  },
+  {
     "type": "רוטציית סקטורים",
     "scope": "בריאות",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור בריאות (ציון 92, חוזק יחסי +6.98%)"
+    "message": "כניסת הון לסקטור בריאות (ציון 89, חוזק יחסי +6.23%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 31, חוזק יחסי -4.65%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 24, חוזק יחסי -6.6%)"
   }
 ]
