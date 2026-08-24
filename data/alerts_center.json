@@ -6,18 +6,6 @@
     "message": "AAPL — הורדת דירוג: Hold → Underperform (Jefferies)"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "גבוהה",
-    "message": "PG — הורדת דירוג: Buy → Hold (Argus Research)"
-  },
-  {
-    "type": "אזהרת סיכון",
-    "scope": "AVGO",
-    "severity": "גבוהה",
-    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
-  },
-  {
     "type": "אזהרת סיכון",
     "scope": "TSLA",
     "severity": "גבוהה",
@@ -27,25 +15,19 @@
     "type": "דוחות",
     "scope": "NVDA",
     "severity": "בינונית",
-    "message": "NVDA — דוחות כספיים בעוד 5 ימים (2026-08-26)"
+    "message": "NVDA — דוחות כספיים בעוד 2 ימים (2026-08-26)"
   },
   {
     "type": "דוחות",
     "scope": "CRM",
     "severity": "בינונית",
-    "message": "CRM — דוחות כספיים בעוד 5 ימים (2026-08-26)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Truist Securities)"
+    "message": "CRM — דוחות כספיים בעוד 2 ימים (2026-08-26)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "NVDA",
     "severity": "מידע",
-    "message": "NVDA — reit: Outperform → Outperform (RBC Capital)"
+    "message": "NVDA — כיסוי חדש: Outperform → Outperform (BMO Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,6 +55,18 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — כיסוי חדש: Outperform → Outperform (BMO Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — כיסוי חדש: Outperform → Outperform (BMO Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
@@ -87,12 +81,12 @@
     "type": "רוטציית סקטורים",
     "scope": "בריאות",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור בריאות (ציון 89, חוזק יחסי +6.23%)"
+    "message": "כניסת הון לסקטור בריאות (ציון 85, חוזק יחסי +4.57%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 24, חוזק יחסי -6.6%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 18, חוזק יחסי -11.0%)"
   }
 ]
