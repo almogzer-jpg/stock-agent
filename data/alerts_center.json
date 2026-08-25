@@ -1,9 +1,9 @@
 [
   {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
+    "type": "אזהרת סיכון",
+    "scope": "AVGO",
     "severity": "גבוהה",
-    "message": "AAPL — הורדת דירוג: Hold → Underperform (Jefferies)"
+    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
   },
   {
     "type": "אזהרת סיכון",
@@ -15,25 +15,31 @@
     "type": "דוחות",
     "scope": "NVDA",
     "severity": "בינונית",
-    "message": "NVDA — דוחות כספיים בעוד 2 ימים (2026-08-26)"
+    "message": "NVDA — דוחות כספיים בעוד 1 ימים (2026-08-26)"
   },
   {
     "type": "דוחות",
     "scope": "CRM",
     "severity": "בינונית",
-    "message": "CRM — דוחות כספיים בעוד 2 ימים (2026-08-26)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש: Outperform → Outperform (BMO Capital)"
+    "message": "CRM — דוחות כספיים בעוד 1 ימים (2026-08-26)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
     "message": "MSFT — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -45,13 +51,7 @@
     "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
-    "message": "CRM — אישרור: Outperform → Outperform (BMO Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "CRM — reit: Buy → Buy (BTIG)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,9 +61,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "HD",
     "severity": "מידע",
-    "message": "AMD — כיסוי חדש: Outperform → Outperform (BMO Capital)"
+    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,20 +73,20 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
+    "message": "AMD — כיסוי חדש: Outperform → Outperform (BMO Capital)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "בריאות",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור בריאות (ציון 85, חוזק יחסי +4.57%)"
+    "message": "כניסת הון לסקטור בריאות (ציון 84, חוזק יחסי +4.21%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 18, חוזק יחסי -11.0%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 19, חוזק יחסי -9.88%)"
   }
 ]
