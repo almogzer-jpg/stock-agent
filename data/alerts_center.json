@@ -1,21 +1,21 @@
 [
   {
     "type": "אזהרת סיכון",
+    "scope": "AVGO",
+    "severity": "גבוהה",
+    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
+  },
+  {
+    "type": "אזהרת סיכון",
     "scope": "TSLA",
     "severity": "גבוהה",
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "CRM",
-    "severity": "בינונית",
-    "message": "CRM — נפח מסחר פי 2.08 מהממוצע"
-  },
-  {
     "type": "דוחות",
     "scope": "AVGO",
     "severity": "בינונית",
-    "message": "AVGO — דוחות כספיים בעוד 6 ימים (2026-09-02)"
+    "message": "AVGO — דוחות כספיים בעוד 5 ימים (2026-09-02)"
   },
   {
     "type": "שינוי דירוג",
@@ -37,27 +37,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (Wolfe Research)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "ADBE",
     "severity": "מידע",
     "message": "ADBE — אישרור: Underperform → Underperform (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AAPL",
+    "scope": "MA",
     "severity": "מידע",
-    "message": "AAPL — שדרוג: Neutral → Buy (Rothschild & Co)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — כיסוי חדש: Outperform → Outperform (BMO Capital)"
+    "message": "MA — אישרור: Outperform → Outperform (Wolfe Research)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,9 +55,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — שדרוג: Neutral → Buy (Rothschild & Co)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "מידע",
     "message": "NFLX — אישרור: Outperform → Outperform (Wolfe Research)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — כיסוי חדש: Outperform → Outperform (BMO Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,26 +79,26 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
-    "severity": "מידע",
-    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
+  },
+  {
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 95, חוזק יחסי +7.07%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 78, חוזק יחסי +2.17%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 22, חוזק יחסי -9.7%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 23, חוזק יחסי -7.55%)"
   }
 ]
