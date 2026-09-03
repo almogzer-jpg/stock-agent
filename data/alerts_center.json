@@ -1,27 +1,21 @@
 [
   {
     "type": "אזהרת סיכון",
+    "scope": "AVGO",
+    "severity": "גבוהה",
+    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
+  },
+  {
+    "type": "אזהרת סיכון",
     "scope": "TSLA",
     "severity": "גבוהה",
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
     "type": "דוחות",
-    "scope": "AVGO",
+    "scope": "ADBE",
     "severity": "בינונית",
-    "message": "AVGO — דוחות כספיים בעוד 0 ימים (2026-09-02)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Neutral → Neutral (Rosenblatt)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (B of A Securities)"
+    "message": "ADBE — דוחות כספיים בעוד 7 ימים (2026-09-10)"
   },
   {
     "type": "שינוי דירוג",
@@ -31,21 +25,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — אישרור: Neutral → Neutral (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — אישרור: Buy → Buy (TD Cowen)"
+    "message": "MSFT — אישרור: Buy → Buy (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -55,9 +37,33 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — reit: Overweight → Overweight (Morgan Stanley)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AVGO",
     "severity": "מידע",
     "message": "AVGO — reit: Sector Perform → Sector Perform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — reit: Buy → Buy (Needham)"
   },
   {
     "type": "שינוי דירוג",
@@ -72,21 +78,15 @@
     "message": "AMD — שדרוג: Outperform → Strong Buy (Raymond James)"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "HD",
-    "severity": "מידע",
-    "message": "HD — אישרור: Outperform → Outperform (Mizuho)"
-  },
-  {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 94, חוזק יחסי +8.28%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.37%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 20, חוזק יחסי -3.18%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 17, חוזק יחסי -3.7%)"
   }
 ]
