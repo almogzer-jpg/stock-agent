@@ -12,40 +12,16 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
+    "type": "זינוק נפח",
+    "scope": "AVGO",
+    "severity": "בינונית",
+    "message": "AVGO — נפח מסחר פי 2.67 מהממוצע"
+  },
+  {
     "type": "דוחות",
     "scope": "ADBE",
     "severity": "בינונית",
-    "message": "ADBE — דוחות כספיים בעוד 7 ימים (2026-09-10)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — אישרור: Buy → Buy (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (B of A Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — אישרור: Outperform → Outperform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+    "message": "ADBE — דוחות כספיים בעוד 6 ימים (2026-09-10)"
   },
   {
     "type": "שינוי דירוג",
@@ -55,9 +31,27 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AVGO",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "AVGO — reit: Sector Perform → Sector Perform (RBC Capital)"
+    "message": "NVDA — אישרור: Buy → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "V",
+    "severity": "מידע",
+    "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Buy → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,9 +61,39 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — שדרוג: Neutral → Outperform (Macquarie)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "מידע",
     "message": "NFLX — אישרור: Outperform → Outperform (Wolfe Research)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Equal-Weight → Equal-Weight (Barclays)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Buy → Buy (Rosenblatt)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
   },
   {
     "type": "שינוי דירוג",
@@ -78,15 +102,21 @@
     "message": "AMD — שדרוג: Outperform → Strong Buy (Raymond James)"
   },
   {
-    "type": "רוטציית סקטורים",
-    "scope": "אנרגיה",
+    "type": "שינוי דירוג",
+    "scope": "TSLA",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.37%)"
+    "message": "TSLA — reit: Buy → Buy (StoneX)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "צריכה מחזורית",
+    "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 17, חוזק יחסי -3.7%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +12.44%)"
+  },
+  {
+    "type": "רוטציית סקטורים",
+    "scope": "תעשייה",
+    "severity": "מידע",
+    "message": "יציאת הון מסקטור תעשייה (ציון 22, חוזק יחסי -6.64%)"
   }
 ]
