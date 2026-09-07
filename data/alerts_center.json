@@ -12,28 +12,10 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "AVGO",
-    "severity": "בינונית",
-    "message": "AVGO — נפח מסחר פי 2.67 מהממוצע"
-  },
-  {
     "type": "דוחות",
     "scope": "ADBE",
     "severity": "בינונית",
-    "message": "ADBE — דוחות כספיים בעוד 6 ימים (2026-09-10)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — reit: Overweight → Overweight (Morgan Stanley)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — אישרור: Buy → Buy (Citigroup)"
+    "message": "ADBE — דוחות כספיים בעוד 3 ימים (2026-09-10)"
   },
   {
     "type": "שינוי דירוג",
@@ -45,13 +27,19 @@
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (B of A Securities)"
+    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — reit: Overweight → Overweight (Morgan Stanley)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,27 +49,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AVGO",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "AVGO — שדרוג: Neutral → Outperform (Macquarie)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NFLX",
-    "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Wolfe Research)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — אישרור: Equal-Weight → Equal-Weight (Barclays)"
+    "message": "AMD — שדרוג: Outperform → Strong Buy (Raymond James)"
   },
   {
     "type": "שינוי דירוג",
@@ -91,32 +61,56 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — אישרור: Buy → Buy (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Equal-Weight → Equal-Weight (Barclays)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — אישרור: Outperform → Outperform (Wolfe Research)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
     "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — שדרוג: Outperform → Strong Buy (Raymond James)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — reit: Buy → Buy (StoneX)"
+    "message": "TSLA — reit: Sell → Sell (GLJ Research)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +12.44%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 94, חוזק יחסי +10.03%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "תעשייה",
+    "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור תעשייה (ציון 22, חוזק יחסי -6.64%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 18, חוזק יחסי -2.81%)"
   }
 ]
