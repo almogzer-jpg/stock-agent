@@ -15,25 +15,13 @@
     "type": "דוחות",
     "scope": "ADBE",
     "severity": "בינונית",
-    "message": "ADBE — דוחות כספיים בעוד 2 ימים (2026-09-10)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
+    "message": "ADBE — דוחות כספיים בעוד 1 ימים (2026-09-10)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "מידע",
-    "message": "AAPL — reit: Overweight → Overweight (Morgan Stanley)"
+    "message": "AAPL — reit: Buy → Buy (HSBC)"
   },
   {
     "type": "שינוי דירוג",
@@ -43,21 +31,21 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
     "message": "CRM — reit: Buy → Buy (Needham)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "V",
     "severity": "מידע",
-    "message": "AMD — שדרוג: Outperform → Strong Buy (Raymond James)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — אישרור: Buy → Buy (Citigroup)"
+    "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,9 +61,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
+    "scope": "AVGO",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Wolfe Research)"
+    "message": "AVGO — אישרור: Buy → Buy (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -93,7 +81,7 @@
     "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
-    "message": "COST — אישרור: Neutral → Neutral (DA Davidson)"
+    "message": "COST — שדרוג: Hold → Buy (Freedom Broker)"
   },
   {
     "type": "שינוי דירוג",
@@ -105,12 +93,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 94, חוזק יחסי +10.03%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +13.73%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 18, חוזק יחסי -2.81%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 14, חוזק יחסי -3.81%)"
   }
 ]

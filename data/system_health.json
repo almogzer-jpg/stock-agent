@@ -3,8 +3,8 @@
   "signals": 0,
   "data_completeness": 100.0,
   "failed_pulls": 0,
-  "avg_confidence": 59.7,
-  "avg_trust": 57.9,
+  "avg_confidence": 59.0,
+  "avg_trust": 56.8,
   "sector_distribution": {
     "Technology": 7,
     "Financial Services": 3,
@@ -13,5 +13,5 @@
     "Healthcare": 2,
     "Consumer Defensive": 2
   },
-  "date": "08/09/2026"
+  "date": "09/09/2026"
 }
