@@ -12,10 +12,22 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
+    "type": "זינוק נפח",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — נפח מסחר פי 2.07 מהממוצע"
+  },
+  {
     "type": "דוחות",
     "scope": "ADBE",
     "severity": "בינונית",
-    "message": "ADBE — דוחות כספיים בעוד 1 ימים (2026-09-10)"
+    "message": "ADBE — דוחות כספיים בעוד 0 ימים (2026-09-10)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
   },
   {
     "type": "שינוי דירוג",
@@ -31,12 +43,6 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
     "message": "CRM — reit: Buy → Buy (Needham)"
@@ -46,12 +52,6 @@
     "scope": "V",
     "severity": "מידע",
     "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — אישרור: Equal-Weight → Equal-Weight (Barclays)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,6 +73,12 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Hold → Hold (Stifel)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMZN",
     "severity": "מידע",
     "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
@@ -90,15 +96,21 @@
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — אישרור: Market Perform → Market Perform (Bernstein)"
+  },
+  {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +13.73%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 92, חוזק יחסי +10.03%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 14, חוזק יחסי -3.81%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 11, חוזק יחסי -4.52%)"
   }
 ]
