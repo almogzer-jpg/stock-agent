@@ -1,5 +1,11 @@
 [
   {
+    "type": "פריצה",
+    "scope": "AAPL",
+    "severity": "גבוהה",
+    "message": "AAPL פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.66"
+  },
+  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -13,33 +19,21 @@
   },
   {
     "type": "זינוק נפח",
-    "scope": "META",
-    "severity": "בינונית",
-    "message": "META — נפח מסחר פי 2.07 מהממוצע"
-  },
-  {
-    "type": "דוחות",
     "scope": "ADBE",
     "severity": "בינונית",
-    "message": "ADBE — דוחות כספיים בעוד 0 ימים (2026-09-10)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — אישרור: Buy → Buy (Rosenblatt)"
+    "message": "ADBE — נפח מסחר פי 2.2 מהממוצע"
   },
   {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "מידע",
-    "message": "AAPL — reit: Buy → Buy (HSBC)"
+    "message": "AAPL — reit: Buy → Buy (TD Cowen)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
+    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,21 +43,27 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "V",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
+    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Hold → Hold (Stifel)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "AVGO",
     "severity": "מידע",
-    "message": "AVGO — אישרור: Buy → Buy (Citigroup)"
+    "message": "AVGO — כיסוי חדש:  → Overweight (Piper Sandler)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,9 +73,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "ADBE",
+    "scope": "LLY",
     "severity": "מידע",
-    "message": "ADBE — אישרור: Hold → Hold (Stifel)"
+    "message": "LLY — אישרור: Reduce → Reduce (HSBC)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "V",
+    "severity": "מידע",
+    "message": "V — אישרור: Outperform → Outperform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -91,26 +103,26 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "TSLA",
-    "severity": "מידע",
-    "message": "TSLA — reit: Sell → Sell (GLJ Research)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "HD",
     "severity": "מידע",
     "message": "HD — אישרור: Market Perform → Market Perform (Bernstein)"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "TSLA",
+    "severity": "מידע",
+    "message": "TSLA — reit: Sell → Sell (GLJ Research)"
+  },
+  {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 92, חוזק יחסי +10.03%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 90, חוזק יחסי +8.33%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 11, חוזק יחסי -4.52%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 12, חוזק יחסי -4.34%)"
   }
 ]

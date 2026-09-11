@@ -28,14 +28,14 @@
   "NVDA": {
     "occurrences": 3,
     "win_rate": 33.3,
-    "avg_return": -1.96,
-    "median_return": -1.89,
+    "avg_return": -2.7,
+    "median_return": -4.11,
     "max_drawdown": -9.78,
-    "benchmark_rel": -1.94,
-    "avg_holding": 14.3,
+    "benchmark_rel": -2.49,
+    "avg_holding": 14.7,
     "is_win_rate": 50.0,
     "oos_win_rate": 0.0,
-    "oos_avg_return": -1.89,
+    "oos_avg_return": -4.11,
     "confidence": "נמוך"
   },
   "GOOGL": {
@@ -166,14 +166,14 @@
   "V": {
     "occurrences": 4,
     "win_rate": 50.0,
-    "avg_return": 1.69,
-    "median_return": 0.84,
+    "avg_return": 1.67,
+    "median_return": 0.81,
     "max_drawdown": -4.8,
-    "benchmark_rel": 0.06,
-    "avg_holding": 19,
+    "benchmark_rel": 0.19,
+    "avg_holding": 19.2,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 5.1,
+    "oos_avg_return": 5.08,
     "confidence": "בינוני"
   },
   "MA": {
