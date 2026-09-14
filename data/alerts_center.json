@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "AAPL",
-    "severity": "גבוהה",
-    "message": "AAPL פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.66"
-  },
-  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -21,67 +15,7 @@
     "type": "זינוק נפח",
     "scope": "ADBE",
     "severity": "בינונית",
-    "message": "ADBE — נפח מסחר פי 2.2 מהממוצע"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — reit: Buy → Buy (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — reit: Buy → Buy (Needham)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — אישרור: Hold → Hold (Stifel)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Buy → Buy (Rosenblatt)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Reduce → Reduce (HSBC)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+    "message": "ADBE — נפח מסחר פי 2.17 מהממוצע"
   },
   {
     "type": "שינוי דירוג",
@@ -91,9 +25,69 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — reit: Buy → Buy (TD Cowen)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — reit: Buy → Buy (Needham)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Neutral → Neutral (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Buy → Buy (Rosenblatt)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Reduce → Reduce (HSBC)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMZN",
     "severity": "מידע",
     "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AVGO",
+    "severity": "מידע",
+    "message": "AVGO — כיסוי חדש:  → Overweight (Piper Sandler)"
   },
   {
     "type": "שינוי דירוג",
@@ -117,12 +111,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 90, חוזק יחסי +8.33%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 90, חוזק יחסי +7.92%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 12, חוזק יחסי -4.34%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 16, חוזק יחסי -3.0%)"
   }
 ]
