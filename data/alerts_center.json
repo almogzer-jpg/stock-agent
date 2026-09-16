@@ -12,22 +12,16 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
+    "type": "זינוק נפח",
+    "scope": "JPM",
+    "severity": "בינונית",
+    "message": "JPM — נפח מסחר פי 2.25 מהממוצע"
+  },
+  {
     "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
     "message": "CRM — reit: Buy → Buy (Needham)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Hold → Hold (Stifel)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Buy → Buy (Rosenblatt)"
   },
   {
     "type": "שינוי דירוג",
@@ -37,27 +31,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "ADBE",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "ADBE — אישרור: Buy → Buy (DA Davidson)"
+    "message": "MSFT — reit: Market Outperform → Market Outperform (Citizens)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+    "message": "GOOGL — אישרור: Buy → Buy (Rosenblatt)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,9 +49,33 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Buy → Buy (DA Davidson)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AVGO",
     "severity": "מידע",
     "message": "AVGO — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,9 +85,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "NFLX",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
+    "message": "NFLX — אישרור: Outperform → Outperform (Evercore ISI Group)"
   },
   {
     "type": "שינוי דירוג",
@@ -99,12 +105,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 89, חוזק יחסי +7.98%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 90, חוזק יחסי +9.06%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 16, חוזק יחסי -2.75%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 11, חוזק יחסי -4.18%)"
   }
 ]

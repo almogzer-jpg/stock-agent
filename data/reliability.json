@@ -1,5 +1,5 @@
 {
-  "generated": "15/09/2026 09:20",
+  "generated": "16/09/2026 09:13",
   "primary_source": "Yahoo Finance (yfinance)",
   "stale_after_days": 3,
   "artifacts": {
@@ -49,44 +49,44 @@
     "compared": 2,
     "checks": [
       {
-        "symbol": "ILS=X",
-        "name": "דולר/שקל",
-        "yahoo": 3.052,
-        "stooq": 3.0534,
-        "stooq_date": "2026-09-14",
+        "symbol": "EURUSD=X",
+        "name": "אירו/דולר",
+        "yahoo": 1.155,
+        "stooq": 1.1539,
+        "stooq_date": "2026-09-15",
         "secondary": "ECB",
-        "diff_pct": -0.05,
+        "diff_pct": 0.1,
         "agree": true
       },
       {
         "symbol": "^DJI",
         "name": "Dow Jones",
-        "yahoo": 52421.2,
+        "yahoo": 52093.11,
         "stooq": null,
         "stooq_date": null,
         "secondary": null,
         "diff_pct": null,
         "agree": null
+      },
+      {
+        "symbol": "ILS=X",
+        "name": "דולר/שקל",
+        "yahoo": 3.027,
+        "stooq": 3.0413,
+        "stooq_date": "2026-09-15",
+        "secondary": "ECB",
+        "diff_pct": -0.47,
+        "agree": true
       },
       {
         "symbol": "^GSPC",
         "name": "S&P 500",
-        "yahoo": 7619.98,
+        "yahoo": 7585.73,
         "stooq": null,
         "stooq_date": null,
         "secondary": null,
         "diff_pct": null,
         "agree": null
-      },
-      {
-        "symbol": "EURUSD=X",
-        "name": "אירו/דולר",
-        "yahoo": 1.154,
-        "stooq": 1.1551,
-        "stooq_date": "2026-09-14",
-        "secondary": "ECB",
-        "diff_pct": -0.1,
-        "agree": true
       }
     ]
   },
