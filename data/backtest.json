@@ -2,14 +2,14 @@
   "AAPL": {
     "occurrences": 6,
     "win_rate": 66.7,
-    "avg_return": 1.29,
-    "median_return": 1.94,
+    "avg_return": 1.53,
+    "median_return": 2.43,
     "max_drawdown": -8.75,
-    "benchmark_rel": 0.91,
-    "avg_holding": 13.7,
+    "benchmark_rel": 0.95,
+    "avg_holding": 13.8,
     "is_win_rate": 75.0,
     "oos_win_rate": 50.0,
-    "oos_avg_return": -3.48,
+    "oos_avg_return": -2.78,
     "confidence": "בינוני"
   },
   "MSFT": {
