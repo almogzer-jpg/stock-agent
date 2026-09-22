@@ -1,21 +1,9 @@
 [
   {
     "type": "פריצה",
-    "scope": "AAPL",
-    "severity": "גבוהה",
-    "message": "AAPL פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.99"
-  },
-  {
-    "type": "פריצה",
-    "scope": "MSFT",
-    "severity": "גבוהה",
-    "message": "MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.88"
-  },
-  {
-    "type": "פריצה",
     "scope": "AMD",
     "severity": "גבוהה",
-    "message": "AMD פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.67"
+    "message": "AMD פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.15"
   },
   {
     "type": "אזהרת סיכון",
@@ -37,45 +25,27 @@
   },
   {
     "type": "זינוק נפח",
-    "scope": "V",
+    "scope": "AMD",
     "severity": "בינונית",
-    "message": "V — נפח מסחר פי 3.12 מהממוצע"
+    "message": "AMD — נפח מסחר פי 2.15 מהממוצע"
   },
   {
     "type": "זינוק נפח",
-    "scope": "MA",
+    "scope": "META",
     "severity": "בינונית",
-    "message": "MA — נפח מסחר פי 2.07 מהממוצע"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "JPM",
-    "severity": "בינונית",
-    "message": "JPM — נפח מסחר פי 2.64 מהממוצע"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "NFLX",
-    "severity": "בינונית",
-    "message": "NFLX — נפח מסחר פי 3.7 מהממוצע"
+    "message": "META — נפח מסחר פי 2.38 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "COST",
     "severity": "בינונית",
-    "message": "COST — דוחות כספיים בעוד 3 ימים (2026-09-24)"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "HD",
-    "severity": "בינונית",
-    "message": "HD — נפח מסחר פי 2.09 מהממוצע"
+    "message": "COST — דוחות כספיים בעוד 2 ימים (2026-09-24)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AAPL",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "AAPL — אישרור: Outperform → Outperform (Evercore ISI Group)"
+    "message": "MSFT — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,15 +55,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — reit: Market Outperform → Market Outperform (Citizens)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
     "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — אישרור: Outperform → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
   },
   {
     "type": "שינוי דירוג",
@@ -112,12 +88,6 @@
     "scope": "AVGO",
     "severity": "מידע",
     "message": "AVGO — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
   },
   {
     "type": "שינוי דירוג",
@@ -147,12 +117,12 @@
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 78, חוזק יחסי +3.99%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 84, חוזק יחסי +4.92%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 8, חוזק יחסי -5.89%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 4, חוזק יחסי -8.04%)"
   }
 ]
