@@ -3,7 +3,7 @@
     "type": "פריצה",
     "scope": "AMD",
     "severity": "גבוהה",
-    "message": "AMD פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.15"
+    "message": "AMD פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.16"
   },
   {
     "type": "אזהרת סיכון",
@@ -15,7 +15,7 @@
     "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "גבוהה",
-    "message": "NFLX — הורדת דירוג: Equal-Weight → Underweight (Wells Fargo)"
+    "message": "NFLX — הורדת דירוג: Buy → Hold (HSBC)"
   },
   {
     "type": "אזהרת סיכון",
@@ -27,37 +27,25 @@
     "type": "זינוק נפח",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — נפח מסחר פי 2.15 מהממוצע"
+    "message": "AMD — נפח מסחר פי 2.16 מהממוצע"
   },
   {
     "type": "זינוק נפח",
     "scope": "META",
     "severity": "בינונית",
-    "message": "META — נפח מסחר פי 2.38 מהממוצע"
+    "message": "META — נפח מסחר פי 2.39 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "COST",
     "severity": "בינונית",
-    "message": "COST — דוחות כספיים בעוד 2 ימים (2026-09-24)"
+    "message": "COST — דוחות כספיים בעוד 1 ימים (2026-09-24)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+    "message": "MSFT — אישרור: Outperform → Outperform (Oppenheimer)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,6 +61,18 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
     "message": "CRM — reit: Market Outperform → Market Outperform (Citizens)"
@@ -81,7 +81,7 @@
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
-    "message": "LLY — אישרור: Buy → Buy (Guggenheim)"
+    "message": "LLY — reit: Buy → Buy (TD Cowen)"
   },
   {
     "type": "שינוי דירוג",
@@ -103,15 +103,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "HD",
-    "severity": "מידע",
-    "message": "HD — אישרור: Market Perform → Market Perform (Bernstein)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — reit: Neutral → Neutral (Goldman Sachs)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "HD",
+    "severity": "מידע",
+    "message": "HD — אישרור: Market Perform → Market Perform (Bernstein)"
   },
   {
     "type": "רוטציית סקטורים",
