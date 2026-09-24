@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "AMD",
-    "severity": "גבוהה",
-    "message": "AMD פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 2.16"
-  },
-  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -24,40 +18,10 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "AMD",
-    "severity": "בינונית",
-    "message": "AMD — נפח מסחר פי 2.16 מהממוצע"
-  },
-  {
-    "type": "זינוק נפח",
-    "scope": "META",
-    "severity": "בינונית",
-    "message": "META — נפח מסחר פי 2.39 מהממוצע"
-  },
-  {
     "type": "דוחות",
     "scope": "COST",
     "severity": "בינונית",
-    "message": "COST — דוחות כספיים בעוד 1 ימים (2026-09-24)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (Oppenheimer)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
+    "message": "COST — דוחות כספיים בעוד 0 ימים (2026-09-24)"
   },
   {
     "type": "שינוי דירוג",
@@ -67,9 +31,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+    "message": "MSFT — שדרוג: Hold → Buy (Stifel)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — reit: Buy → Buy (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,9 +49,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "LLY",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "LLY — reit: Buy → Buy (TD Cowen)"
+    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
   },
   {
     "type": "שינוי דירוג",
@@ -97,9 +73,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — reit: Buy → Buy (TD Cowen)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
-    "message": "COST — reit: Outperform → Outperform (Oppenheimer)"
+    "message": "COST — reit: Buy → Buy (BTIG)"
   },
   {
     "type": "שינוי דירוג",
@@ -108,21 +90,15 @@
     "message": "TSLA — reit: Neutral → Neutral (Goldman Sachs)"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "HD",
-    "severity": "מידע",
-    "message": "HD — אישרור: Market Perform → Market Perform (Bernstein)"
-  },
-  {
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 84, חוזק יחסי +4.92%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 87, חוזק יחסי +6.27%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 4, חוזק יחסי -8.04%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 6, חוזק יחסי -6.79%)"
   }
 ]
