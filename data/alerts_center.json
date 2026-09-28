@@ -1,5 +1,11 @@
 [
   {
+    "type": "פריצה",
+    "scope": "MSFT",
+    "severity": "גבוהה",
+    "message": "MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.75"
+  },
+  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -18,58 +24,10 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "דוחות",
-    "scope": "COST",
-    "severity": "בינונית",
-    "message": "COST — דוחות כספיים בעוד 0 ימים (2026-09-24)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
     "message": "MSFT — שדרוג: Hold → Buy (Stifel)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — reit: Buy → Buy (B of A Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — reit: Market Outperform → Market Outperform (Citizens)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — כיסוי חדש:  → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "ADBE",
-    "severity": "מידע",
-    "message": "ADBE — אישרור: Buy → Buy (DA Davidson)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,26 +37,56 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — reit: Buy → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — reit: Market Outperform → Market Outperform (Citizens)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "מידע",
+    "message": "ADBE — אישרור: Buy → Buy (DA Davidson)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
-    "message": "COST — reit: Buy → Buy (BTIG)"
+    "message": "COST — אישרור: Buy → Buy (Freedom Broker)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — reit: Neutral → Neutral (Goldman Sachs)"
+    "message": "TSLA — reit: Buy → Buy (StoneX)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 87, חוזק יחסי +6.27%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 88, חוזק יחסי +6.59%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 6, חוזק יחסי -6.79%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 2, חוזק יחסי -9.41%)"
   }
 ]
