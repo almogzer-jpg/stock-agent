@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "MSFT",
-    "severity": "גבוהה",
-    "message": "MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.75"
-  },
-  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -33,13 +27,7 @@
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
-    "message": "LLY — reit: Buy → Buy (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
+    "message": "LLY — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,9 +37,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Strong Buy → Strong Buy (Tigress Financial)"
+    "message": "AMD — אישרור: Buy → Buy (B of A Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,32 +49,38 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "ADBE",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "ADBE — אישרור: Buy → Buy (DA Davidson)"
+    "message": "GOOGL — reit: Overweight → Overweight (Piper Sandler)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
-    "message": "COST — אישרור: Buy → Buy (Freedom Broker)"
+    "message": "COST — אישרור: Buy → Buy (Deutsche Bank)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Hold → Hold (HSBC)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — reit: Buy → Buy (StoneX)"
+    "message": "TSLA — אישרור: Neutral → Neutral (JP Morgan)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 88, חוזק יחסי +6.59%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 78, חוזק יחסי +3.87%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 2, חוזק יחסי -9.41%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 2, חוזק יחסי -7.82%)"
   }
 ]
