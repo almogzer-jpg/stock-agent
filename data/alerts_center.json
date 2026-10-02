@@ -13,27 +13,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Overweight → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "NVDA",
     "severity": "מידע",
     "message": "NVDA — reit: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AAPL",
+    "scope": "MSFT",
     "severity": "מידע",
-    "message": "AAPL — reit: Overweight → Overweight (Morgan Stanley)"
+    "message": "MSFT — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "LLY",
+    "scope": "AAPL",
     "severity": "מידע",
-    "message": "LLY — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "AAPL — אישרור: Overweight → Overweight (Morgan Stanley)"
   },
   {
     "type": "שינוי דירוג",
@@ -43,21 +37,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — reit: Overweight → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
     "message": "CRM — reit: Market Outperform → Market Outperform (Citizens)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "LLY",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (Rosenblatt)"
+    "message": "LLY — אישרור: Overweight → Overweight (JP Morgan)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — reit: Overweight → Overweight (Piper Sandler)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,9 +67,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Buy → Buy (Rosenblatt)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "מידע",
-    "message": "NFLX — שדרוג: Hold → Buy (Deutsche Bank)"
+    "message": "NFLX — אישרור: Buy → Buy (Guggenheim)"
   },
   {
     "type": "שינוי דירוג",
@@ -93,12 +93,12 @@
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 83, חוזק יחסי +5.53%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 90, חוזק יחסי +7.38%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "צריכה מחזורית",
+    "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 8, חוזק יחסי -5.99%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 8, חוזק יחסי -6.54%)"
   }
 ]
