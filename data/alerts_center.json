@@ -37,9 +37,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "CRM",
+    "scope": "GOOGL",
     "severity": "מידע",
-    "message": "CRM — reit: Market Outperform → Market Outperform (Citizens)"
+    "message": "GOOGL — reit: Overweight → Overweight (Piper Sandler)"
   },
   {
     "type": "שינוי דירוג",
@@ -49,21 +49,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
+    "scope": "COST",
     "severity": "מידע",
-    "message": "GOOGL — reit: Overweight → Overweight (Piper Sandler)"
+    "message": "COST — אישרור: Buy → Buy (Deutsche Bank)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
     "message": "JPM — אישרור: Hold → Hold (HSBC)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — אישרור: Buy → Buy (Deutsche Bank)"
   },
   {
     "type": "שינוי דירוג",
@@ -93,12 +87,12 @@
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 90, חוזק יחסי +7.38%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 93, חוזק יחסי +8.22%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 8, חוזק יחסי -6.54%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 7, חוזק יחסי -6.7%)"
   }
 ]
