@@ -1,9 +1,9 @@
 [
   {
-    "type": "אזהרת סיכון",
-    "scope": "AVGO",
+    "type": "פריצה",
+    "scope": "PG",
     "severity": "גבוהה",
-    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
+    "message": "PG פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.6"
   },
   {
     "type": "אזהרת סיכון",
@@ -15,13 +15,13 @@
     "type": "דוחות",
     "scope": "UNH",
     "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 7 ימים (2026-10-13)"
+    "message": "UNH — דוחות כספיים בעוד 6 ימים (2026-10-13)"
   },
   {
     "type": "דוחות",
     "scope": "JPM",
     "severity": "בינונית",
-    "message": "JPM — דוחות כספיים בעוד 7 ימים (2026-10-13)"
+    "message": "JPM — דוחות כספיים בעוד 6 ימים (2026-10-13)"
   },
   {
     "type": "שינוי דירוג",
@@ -45,13 +45,13 @@
     "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (Stifel)"
+    "message": "AMD — אישרור: Buy → Buy (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
-    "message": "GOOGL — reit: Overweight → Overweight (Piper Sandler)"
+    "message": "GOOGL — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,9 +61,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "מידע",
+    "message": "PG — שדרוג: In-Line → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMZN",
     "severity": "מידע",
-    "message": "AMZN — reit: Buy → Buy (TD Cowen)"
+    "message": "AMZN — אישרור: Buy → Buy (Tigress Financial)"
   },
   {
     "type": "שינוי דירוג",
@@ -85,12 +91,6 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — reit: Hold → Hold (TD Cowen)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — אישרור: Neutral → Neutral (JP Morgan)"
@@ -99,12 +99,12 @@
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 92, חוזק יחסי +7.83%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 89, חוזק יחסי +6.69%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 7, חוזק יחסי -6.77%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 13, חוזק יחסי -5.05%)"
   }
 ]

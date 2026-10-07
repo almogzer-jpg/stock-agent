@@ -1,10 +1,10 @@
 {
   "scanned": 20,
-  "signals": 0,
+  "signals": 1,
   "data_completeness": 100.0,
   "failed_pulls": 0,
-  "avg_confidence": 58.1,
-  "avg_trust": 58.1,
+  "avg_confidence": 62.8,
+  "avg_trust": 58.4,
   "sector_distribution": {
     "Technology": 7,
     "Communication Services": 3,
@@ -13,5 +13,5 @@
     "Healthcare": 2,
     "Consumer Defensive": 2
   },
-  "date": "06/10/2026"
+  "date": "07/10/2026"
 }
