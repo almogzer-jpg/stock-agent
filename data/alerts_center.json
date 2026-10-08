@@ -1,11 +1,5 @@
 [
   {
-    "type": "פריצה",
-    "scope": "PG",
-    "severity": "גבוהה",
-    "message": "PG פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.6"
-  },
-  {
     "type": "אזהרת סיכון",
     "scope": "TSLA",
     "severity": "גבוהה",
@@ -15,13 +9,13 @@
     "type": "דוחות",
     "scope": "UNH",
     "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 6 ימים (2026-10-13)"
+    "message": "UNH — דוחות כספיים בעוד 5 ימים (2026-10-13)"
   },
   {
     "type": "דוחות",
     "scope": "JPM",
     "severity": "בינונית",
-    "message": "JPM — דוחות כספיים בעוד 6 ימים (2026-10-13)"
+    "message": "JPM — דוחות כספיים בעוד 5 ימים (2026-10-13)"
   },
   {
     "type": "שינוי דירוג",
@@ -33,7 +27,13 @@
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Sector Outperform → Sector Outperform (Scotiabank)"
+    "message": "MSFT — אישרור: Outperform → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
@@ -51,19 +51,7 @@
     "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — אישרור: Overweight → Overweight (JP Morgan)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — שדרוג: In-Line → Outperform (Evercore ISI Group)"
+    "message": "GOOGL — reit: Buy → Buy (Needham)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,9 +67,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NFLX",
+    "scope": "PG",
     "severity": "מידע",
-    "message": "NFLX — reit: Buy → Buy (TD Cowen)"
+    "message": "PG — שדרוג: In-Line → Outperform (Evercore ISI Group)"
   },
   {
     "type": "שינוי דירוג",
@@ -91,20 +79,26 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — אישרור: Overweight → Overweight (Morgan Stanley)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — אישרור: Neutral → Neutral (JP Morgan)"
+    "message": "TSLA — אישרור: Neutral → Neutral (UBS)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 89, חוזק יחסי +6.69%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 86, חוזק יחסי +5.65%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 13, חוזק יחסי -5.05%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 10, חוזק יחסי -6.27%)"
   }
 ]
