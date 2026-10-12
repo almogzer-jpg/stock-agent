@@ -15,14 +15,14 @@
   "MSFT": {
     "occurrences": 2,
     "win_rate": 50.0,
-    "avg_return": -0.3,
-    "median_return": -0.3,
+    "avg_return": 0.96,
+    "median_return": 0.96,
     "max_drawdown": -6.44,
-    "benchmark_rel": -0.36,
-    "avg_holding": 10,
+    "benchmark_rel": 0.59,
+    "avg_holding": 10.5,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 5.84,
+    "oos_avg_return": 8.36,
     "confidence": "נמוך"
   },
   "NVDA": {
@@ -86,17 +86,17 @@
     "confidence": "נמוך"
   },
   "AMD": {
-    "occurrences": 6,
-    "win_rate": 50.0,
-    "avg_return": 5.0,
-    "median_return": 1.86,
+    "occurrences": 5,
+    "win_rate": 40.0,
+    "avg_return": 3.81,
+    "median_return": -4.95,
     "max_drawdown": -20.42,
-    "benchmark_rel": 4.11,
-    "avg_holding": 14.2,
-    "is_win_rate": 50.0,
+    "benchmark_rel": 3.15,
+    "avg_holding": 13.2,
+    "is_win_rate": 33.3,
     "oos_win_rate": 50.0,
-    "oos_avg_return": 4.46,
-    "confidence": "בינוני"
+    "oos_avg_return": 3.3,
+    "confidence": "נמוך"
   },
   "AVGO": {
     "occurrences": 3,
@@ -213,14 +213,14 @@
   "PG": {
     "occurrences": 3,
     "win_rate": 33.3,
-    "avg_return": -1.09,
+    "avg_return": -0.94,
     "median_return": -1.87,
     "max_drawdown": -2.86,
-    "benchmark_rel": -0.54,
-    "avg_holding": 6.3,
+    "benchmark_rel": -0.6,
+    "avg_holding": 6.7,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 1.47,
+    "oos_avg_return": 1.9,
     "confidence": "נמוך"
   },
   "CRM": {
