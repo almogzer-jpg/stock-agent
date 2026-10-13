@@ -6,6 +6,12 @@
     "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "ADBE",
+    "severity": "גבוהה",
+    "message": "ADBE — הורדת דירוג: Overweight → Underweight (Wells Fargo)"
+  },
+  {
     "type": "אזהרת סיכון",
     "scope": "TSLA",
     "severity": "גבוהה",
@@ -15,19 +21,19 @@
     "type": "דוחות",
     "scope": "UNH",
     "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 1 ימים (2026-10-13)"
+    "message": "UNH — דוחות כספיים בעוד 0 ימים (2026-10-13)"
   },
   {
     "type": "דוחות",
     "scope": "JPM",
     "severity": "בינונית",
-    "message": "JPM — דוחות כספיים בעוד 1 ימים (2026-10-13)"
+    "message": "JPM — דוחות כספיים בעוד 0 ימים (2026-10-13)"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — reit: Overweight → Overweight (Cantor Fitzgerald)"
+    "type": "דוחות",
+    "scope": "NFLX",
+    "severity": "בינונית",
+    "message": "NFLX — דוחות כספיים בעוד 7 ימים (2026-10-20)"
   },
   {
     "type": "שינוי דירוג",
@@ -39,19 +45,19 @@
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
-    "message": "LLY — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
+    "message": "LLY — reit: Outperform → Outperform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "AAPL",
     "severity": "מידע",
-    "message": "AAPL — אישרור: Overweight → Overweight (Morgan Stanley)"
+    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMD",
+    "scope": "NVDA",
     "severity": "מידע",
-    "message": "AMD — אישרור: Buy → Buy (Citigroup)"
+    "message": "NVDA — reit: Overweight → Overweight (Cantor Fitzgerald)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,15 +67,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
+    "scope": "V",
     "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (Baird)"
+    "message": "V — אישרור: Outperform → Outperform (Baird)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "UNH",
+    "scope": "MA",
     "severity": "מידע",
-    "message": "UNH — אישרור: Hold → Hold (TD Cowen)"
+    "message": "MA — אישרור: Outperform → Outperform (Baird)"
   },
   {
     "type": "שינוי דירוג",
@@ -79,9 +85,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "UNH",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Cantor Fitzgerald)"
+    "message": "UNH — אישרור: Hold → Hold (TD Cowen)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMD",
+    "severity": "מידע",
+    "message": "AMD — אישרור: Buy → Buy (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -94,6 +106,12 @@
     "scope": "PG",
     "severity": "מידע",
     "message": "PG — שדרוג: In-Line → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
   },
   {
     "type": "שינוי דירוג",
@@ -111,18 +129,18 @@
     "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — אישרור: Buy → Buy (Tigress Financial)"
+    "message": "TSLA — אישרור: Hold → Hold (Jefferies)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 85, חוזק יחסי +4.55%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 78, חוזק יחסי +2.79%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותים ציבוריים",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 16, חוזק יחסי -4.79%)"
+    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 20, חוזק יחסי -3.03%)"
   }
 ]
