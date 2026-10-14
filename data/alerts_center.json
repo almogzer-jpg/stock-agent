@@ -9,7 +9,7 @@
     "type": "שינוי דירוג",
     "scope": "ADBE",
     "severity": "גבוהה",
-    "message": "ADBE — הורדת דירוג: Overweight → Underweight (Wells Fargo)"
+    "message": "ADBE — הורדת דירוג: Buy → Hold (HSBC)"
   },
   {
     "type": "אזהרת סיכון",
@@ -18,40 +18,28 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "דוחות",
+    "type": "זינוק נפח",
     "scope": "UNH",
     "severity": "בינונית",
-    "message": "UNH — דוחות כספיים בעוד 0 ימים (2026-10-13)"
+    "message": "UNH — נפח מסחר פי 2.29 מהממוצע"
   },
   {
     "type": "דוחות",
-    "scope": "JPM",
+    "scope": "META",
     "severity": "בינונית",
-    "message": "JPM — דוחות כספיים בעוד 0 ימים (2026-10-13)"
+    "message": "META — דוחות כספיים בעוד 7 ימים (2026-10-21)"
   },
   {
     "type": "דוחות",
     "scope": "NFLX",
     "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 7 ימים (2026-10-20)"
+    "message": "NFLX — דוחות כספיים בעוד 6 ימים (2026-10-20)"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
-    "severity": "מידע",
-    "message": "LLY — reit: Outperform → Outperform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
+    "type": "דוחות",
+    "scope": "TSLA",
+    "severity": "בינונית",
+    "message": "TSLA — דוחות כספיים בעוד 7 ימים (2026-10-21)"
   },
   {
     "type": "שינוי דירוג",
@@ -61,9 +49,27 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Overweight → Overweight (Barclays)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "CRM",
     "severity": "מידע",
     "message": "CRM — שדרוג: Underperform → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "LLY",
+    "severity": "מידע",
+    "message": "LLY — reit: Outperform → Outperform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -97,15 +103,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "COST",
+    "scope": "META",
     "severity": "מידע",
-    "message": "COST — reit: Sector Perform → Sector Perform (RBC Capital)"
+    "message": "META — אישרור: Buy → Buy (Pivotal Research)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "PG",
     "severity": "מידע",
     "message": "PG — שדרוג: In-Line → Outperform (Evercore ISI Group)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — reit: Sector Perform → Sector Perform (RBC Capital)"
   },
   {
     "type": "שינוי דירוג",
@@ -123,7 +135,7 @@
     "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Overweight → Overweight (Morgan Stanley)"
+    "message": "NFLX — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
@@ -135,12 +147,12 @@
     "type": "רוטציית סקטורים",
     "scope": "טכנולוגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 78, חוזק יחסי +2.79%)"
+    "message": "כניסת הון לסקטור טכנולוגיה (ציון 83, חוזק יחסי +4.2%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "שירותים ציבוריים",
+    "scope": "צריכה מחזורית",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 20, חוזק יחסי -3.03%)"
+    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 22, חוזק יחסי -2.65%)"
   }
 ]
