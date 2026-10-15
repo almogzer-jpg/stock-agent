@@ -1,15 +1,15 @@
 [
   {
-    "type": "אזהרת סיכון",
-    "scope": "AVGO",
-    "severity": "גבוהה",
-    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
-  },
-  {
     "type": "שינוי דירוג",
     "scope": "ADBE",
     "severity": "גבוהה",
     "message": "ADBE — הורדת דירוג: Buy → Hold (HSBC)"
+  },
+  {
+    "type": "אזהרת סיכון",
+    "scope": "AVGO",
+    "severity": "גבוהה",
+    "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
   },
   {
     "type": "אזהרת סיכון",
@@ -18,52 +18,28 @@
     "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "UNH",
+    "type": "דוחות",
+    "scope": "PG",
     "severity": "בינונית",
-    "message": "UNH — נפח מסחר פי 2.29 מהממוצע"
+    "message": "PG — דוחות כספיים בעוד 7 ימים (2026-10-22)"
   },
   {
     "type": "דוחות",
     "scope": "META",
     "severity": "בינונית",
-    "message": "META — דוחות כספיים בעוד 7 ימים (2026-10-21)"
+    "message": "META — דוחות כספיים בעוד 6 ימים (2026-10-21)"
   },
   {
     "type": "דוחות",
     "scope": "NFLX",
     "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 6 ימים (2026-10-20)"
+    "message": "NFLX — דוחות כספיים בעוד 5 ימים (2026-10-20)"
   },
   {
     "type": "דוחות",
     "scope": "TSLA",
     "severity": "בינונית",
-    "message": "TSLA — דוחות כספיים בעוד 7 ימים (2026-10-21)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — reit: Overweight → Overweight (Cantor Fitzgerald)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Overweight → Overweight (Barclays)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — שדרוג: Underperform → Buy (B of A Securities)"
+    "message": "TSLA — דוחות כספיים בעוד 6 ימים (2026-10-21)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,9 +49,51 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "AAPL",
+    "severity": "מידע",
+    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Overweight → Overweight (Barclays)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — שדרוג: Underperform → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
     "message": "V — אישרור: Outperform → Outperform (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — reit: Sector Perform → Sector Perform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — reit: Overweight → Overweight (Cantor Fitzgerald)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "UNH",
+    "severity": "מידע",
+    "message": "UNH — אישרור: Overweight → Overweight (Piper Sandler)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "מידע",
+    "message": "PG — אישרור: Buy → Buy (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -87,13 +105,7 @@
     "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
-    "message": "GOOGL — reit: Overweight → Overweight (Cantor Fitzgerald)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Hold → Hold (TD Cowen)"
+    "message": "GOOGL — אישרור: Neutral → Neutral (UBS)"
   },
   {
     "type": "שינוי דירוג",
@@ -109,18 +121,6 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — שדרוג: In-Line → Outperform (Evercore ISI Group)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — reit: Sector Perform → Sector Perform (RBC Capital)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "AMZN",
     "severity": "מידע",
     "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
@@ -129,7 +129,7 @@
     "type": "שינוי דירוג",
     "scope": "JPM",
     "severity": "מידע",
-    "message": "JPM — אישרור: Buy → Buy (UBS)"
+    "message": "JPM — אישרור: Hold → Hold (Truist Securities)"
   },
   {
     "type": "שינוי דירוג",
@@ -145,14 +145,14 @@
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "טכנולוגיה",
+    "scope": "בריאות",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור טכנולוגיה (ציון 83, חוזק יחסי +4.2%)"
+    "message": "כניסת הון לסקטור בריאות (ציון 77, חוזק יחסי +2.4%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "צריכה מחזורית",
+    "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור צריכה מחזורית (ציון 22, חוזק יחסי -2.65%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 16, חוזק יחסי -4.25%)"
   }
 ]
