@@ -1,21 +1,9 @@
 [
   {
     "type": "פריצה",
-    "scope": "LLY",
+    "scope": "AAPL",
     "severity": "גבוהה",
-    "message": "LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.56"
-  },
-  {
-    "type": "פריצה",
-    "scope": "UNH",
-    "severity": "גבוהה",
-    "message": "UNH פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.71"
-  },
-  {
-    "type": "פריצה",
-    "scope": "PG",
-    "severity": "גבוהה",
-    "message": "PG פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.94"
+    "message": "AAPL פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.62"
   },
   {
     "type": "שינוי דירוג",
@@ -39,25 +27,25 @@
     "type": "דוחות",
     "scope": "PG",
     "severity": "בינונית",
-    "message": "PG — דוחות כספיים בעוד 6 ימים (2026-10-22)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "META",
-    "severity": "בינונית",
-    "message": "META — דוחות כספיים בעוד 5 ימים (2026-10-21)"
+    "message": "PG — דוחות כספיים בעוד 3 ימים (2026-10-22)"
   },
   {
     "type": "דוחות",
     "scope": "NFLX",
     "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 4 ימים (2026-10-20)"
+    "message": "NFLX — דוחות כספיים בעוד 1 ימים (2026-10-20)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "META",
+    "severity": "בינונית",
+    "message": "META — דוחות כספיים בעוד 2 ימים (2026-10-21)"
   },
   {
     "type": "דוחות",
     "scope": "TSLA",
     "severity": "בינונית",
-    "message": "TSLA — דוחות כספיים בעוד 5 ימים (2026-10-21)"
+    "message": "TSLA — דוחות כספיים בעוד 2 ימים (2026-10-21)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,12 +61,6 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Outperform → Outperform (Baird)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
     "message": "COST — אישרור: Buy → Buy (Tigress Financial)"
@@ -87,7 +69,7 @@
     "type": "שינוי דירוג",
     "scope": "UNH",
     "severity": "מידע",
-    "message": "UNH — reit: Hold → Hold (TD Cowen)"
+    "message": "UNH — אישרור: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
@@ -97,21 +79,15 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "MA",
+    "severity": "מידע",
+    "message": "MA — אישרור: Outperform → Outperform (Baird)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Overweight → Overweight (JP Morgan)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — שדרוג: Underperform → Buy (B of A Securities)"
+    "message": "MSFT — אישרור: Buy → Buy (StoneX)"
   },
   {
     "type": "שינוי דירוג",
@@ -121,9 +97,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "META",
+    "scope": "CRM",
     "severity": "מידע",
-    "message": "META — אישרור: Buy → Buy (Pivotal Research)"
+    "message": "CRM — שדרוג: Underperform → Buy (B of A Securities)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
@@ -135,7 +123,13 @@
     "type": "שינוי דירוג",
     "scope": "NFLX",
     "severity": "מידע",
-    "message": "NFLX — אישרור: Overweight → Overweight (Keybanc)"
+    "message": "NFLX — אישרור: Outperform → Outperform (BMO Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "META",
+    "severity": "מידע",
+    "message": "META — אישרור: Buy → Buy (Pivotal Research)"
   },
   {
     "type": "שינוי דירוג",
@@ -145,26 +139,20 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "בריאות",
+    "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור בריאות (ציון 81, חוזק יחסי +3.47%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 86, חוזק יחסי +6.18%)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "שירותים ציבוריים",
+    "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותים ציבוריים (ציון 27, חוזק יחסי -1.01%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 22, חוזק יחסי -1.77%)"
   }
 ]
