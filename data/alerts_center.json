@@ -1,9 +1,9 @@
 [
   {
     "type": "פריצה",
-    "scope": "AAPL",
+    "scope": "AMZN",
     "severity": "גבוהה",
-    "message": "AAPL פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.62"
+    "message": "AMZN פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.54"
   },
   {
     "type": "שינוי דירוג",
@@ -25,33 +25,45 @@
   },
   {
     "type": "דוחות",
-    "scope": "PG",
+    "scope": "V",
     "severity": "בינונית",
-    "message": "PG — דוחות כספיים בעוד 3 ימים (2026-10-22)"
+    "message": "V — דוחות כספיים בעוד 7 ימים (2026-10-27)"
   },
   {
     "type": "דוחות",
-    "scope": "NFLX",
+    "scope": "PG",
     "severity": "בינונית",
-    "message": "NFLX — דוחות כספיים בעוד 1 ימים (2026-10-20)"
+    "message": "PG — דוחות כספיים בעוד 2 ימים (2026-10-22)"
   },
   {
     "type": "דוחות",
     "scope": "META",
     "severity": "בינונית",
-    "message": "META — דוחות כספיים בעוד 2 ימים (2026-10-21)"
+    "message": "META — דוחות כספיים בעוד 1 ימים (2026-10-21)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "NFLX",
+    "severity": "בינונית",
+    "message": "NFLX — דוחות כספיים בעוד 0 ימים (2026-10-20)"
   },
   {
     "type": "דוחות",
     "scope": "TSLA",
     "severity": "בינונית",
-    "message": "TSLA — דוחות כספיים בעוד 2 ימים (2026-10-21)"
+    "message": "TSLA — דוחות כספיים בעוד 1 ימים (2026-10-21)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "LLY",
     "severity": "מידע",
     "message": "LLY — reit: Outperform → Outperform (RBC Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "AMZN",
+    "severity": "מידע",
+    "message": "AMZN — אישרור: Overweight → Overweight (Morgan Stanley)"
   },
   {
     "type": "שינוי דירוג",
@@ -64,12 +76,6 @@
     "scope": "COST",
     "severity": "מידע",
     "message": "COST — אישרור: Buy → Buy (Tigress Financial)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
@@ -87,13 +93,13 @@
     "type": "שינוי דירוג",
     "scope": "MSFT",
     "severity": "מידע",
-    "message": "MSFT — אישרור: Buy → Buy (StoneX)"
+    "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AAPL",
+    "scope": "UNH",
     "severity": "מידע",
-    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "UNH — אישרור: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
@@ -103,27 +109,21 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
+    "scope": "AAPL",
     "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
+    "message": "AAPL — אישרור: Overweight → Overweight (JP Morgan)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "GOOGL",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "GOOGL — אישרור: Overweight → Overweight (Keybanc)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "JPM",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NFLX",
-    "severity": "מידע",
-    "message": "NFLX — אישרור: Outperform → Outperform (BMO Capital)"
+    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
   },
   {
     "type": "שינוי דירוג",
@@ -139,6 +139,12 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "מידע",
+    "message": "NFLX — אישרור: Outperform → Outperform (BMO Capital)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
     "message": "TSLA — reit: Sell → Sell (GLJ Research)"
@@ -147,12 +153,12 @@
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 86, חוזק יחסי +6.18%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 85, חוזק יחסי +5.53%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 22, חוזק יחסי -1.77%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 25, חוזק יחסי -0.85%)"
   }
 ]
