@@ -1,15 +1,15 @@
 {
   "AAPL": {
     "occurrences": 6,
-    "win_rate": 50.0,
-    "avg_return": 1.17,
-    "median_return": 0.85,
+    "win_rate": 66.7,
+    "avg_return": 1.39,
+    "median_return": 1.5,
     "max_drawdown": -8.75,
-    "benchmark_rel": -0.02,
-    "avg_holding": 13.3,
+    "benchmark_rel": 0.1,
+    "avg_holding": 13.5,
     "is_win_rate": 50.0,
-    "oos_win_rate": 50.0,
-    "oos_avg_return": 1.54,
+    "oos_win_rate": 100.0,
+    "oos_avg_return": 2.2,
     "confidence": "בינוני"
   },
   "MSFT": {
@@ -53,16 +53,16 @@
   },
   "AMZN": {
     "occurrences": 4,
-    "win_rate": 50.0,
-    "avg_return": 1.34,
-    "median_return": -0.91,
+    "win_rate": 25.0,
+    "avg_return": 1.31,
+    "median_return": -0.96,
     "max_drawdown": -8.87,
-    "benchmark_rel": -0.54,
-    "avg_holding": 13.2,
+    "benchmark_rel": -0.71,
+    "avg_holding": 13.5,
     "is_win_rate": 50.0,
-    "oos_win_rate": 50.0,
-    "oos_avg_return": -0.91,
-    "confidence": "בינוני"
+    "oos_win_rate": 0.0,
+    "oos_avg_return": -0.96,
+    "confidence": "נמוך"
   },
   "META": {
     "occurrences": 2,
@@ -135,14 +135,14 @@
   "LLY": {
     "occurrences": 6,
     "win_rate": 50.0,
-    "avg_return": 3.09,
+    "avg_return": 2.91,
     "median_return": -0.1,
     "max_drawdown": -7.79,
-    "benchmark_rel": 2.87,
-    "avg_holding": 12.8,
+    "benchmark_rel": 2.61,
+    "avg_holding": 13,
     "is_win_rate": 25.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 1.62,
+    "oos_avg_return": 1.1,
     "confidence": "בינוני"
   },
   "JPM": {
@@ -187,14 +187,14 @@
   "UNH": {
     "occurrences": 3,
     "win_rate": 66.7,
-    "avg_return": 3.46,
-    "median_return": 3.1,
+    "avg_return": 3.27,
+    "median_return": 2.54,
     "max_drawdown": -3.74,
-    "benchmark_rel": 3.31,
-    "avg_holding": 12,
+    "benchmark_rel": 2.93,
+    "avg_holding": 12.3,
     "is_win_rate": 50.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 3.1,
+    "oos_avg_return": 2.54,
     "confidence": "נמוך"
   },
   "HD": {
@@ -208,14 +208,14 @@
   "PG": {
     "occurrences": 3,
     "win_rate": 33.3,
-    "avg_return": 0.87,
+    "avg_return": 0.32,
     "median_return": -1.87,
     "max_drawdown": -2.86,
-    "benchmark_rel": 1.64,
-    "avg_holding": 9,
+    "benchmark_rel": 0.9,
+    "avg_holding": 9.3,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 7.35,
+    "oos_avg_return": 5.68,
     "confidence": "נמוך"
   },
   "CRM": {
