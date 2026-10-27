@@ -7,6 +7,12 @@
   },
   {
     "type": "אזהרת סיכון",
+    "scope": "META",
+    "severity": "גבוהה",
+    "message": "META — סיכון גבוה ומתחת לממוצע 200"
+  },
+  {
+    "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
     "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
@@ -18,52 +24,52 @@
     "message": "NFLX — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)"
   },
   {
-    "type": "אזהרת סיכון",
-    "scope": "TSLA",
-    "severity": "גבוהה",
-    "message": "TSLA — סיכון גבוה ומתחת לממוצע 200"
-  },
-  {
     "type": "דוחות",
     "scope": "LLY",
     "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 3 ימים (2026-10-29)"
+    "message": "LLY — דוחות כספיים בעוד 2 ימים (2026-10-29)"
   },
   {
     "type": "דוחות",
     "scope": "V",
     "severity": "בינונית",
-    "message": "V — דוחות כספיים בעוד 1 ימים (2026-10-27)"
+    "message": "V — דוחות כספיים בעוד 0 ימים (2026-10-27)"
   },
   {
     "type": "דוחות",
     "scope": "MA",
     "severity": "בינונית",
-    "message": "MA — דוחות כספיים בעוד 3 ימים (2026-10-29)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "AAPL",
-    "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 7 ימים (2026-11-02)"
+    "message": "MA — דוחות כספיים בעוד 2 ימים (2026-10-29)"
   },
   {
     "type": "דוחות",
     "scope": "MSFT",
     "severity": "בינונית",
-    "message": "MSFT — דוחות כספיים בעוד 2 ימים (2026-10-28)"
+    "message": "MSFT — דוחות כספיים בעוד 1 ימים (2026-10-28)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "AAPL",
+    "severity": "בינונית",
+    "message": "AAPL — דוחות כספיים בעוד 6 ימים (2026-11-02)"
   },
   {
     "type": "דוחות",
     "scope": "AMZN",
     "severity": "בינונית",
-    "message": "AMZN — דוחות כספיים בעוד 3 ימים (2026-10-29)"
+    "message": "AMZN — דוחות כספיים בעוד 2 ימים (2026-10-29)"
+  },
+  {
+    "type": "דוחות",
+    "scope": "AMD",
+    "severity": "בינונית",
+    "message": "AMD — דוחות כספיים בעוד 7 ימים (2026-11-03)"
   },
   {
     "type": "דוחות",
     "scope": "GOOGL",
     "severity": "בינונית",
-    "message": "GOOGL — דוחות כספיים בעוד 2 ימים (2026-10-28)"
+    "message": "GOOGL — דוחות כספיים בעוד 1 ימים (2026-10-28)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,21 +79,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — שדרוג: Hold → Buy (Freedom Broker)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "COST",
-    "severity": "מידע",
-    "message": "COST — כיסוי חדש:  → Outperform (CICC)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
-    "message": "V — אישרור: Buy → Buy (Truist Securities)"
+    "message": "V — אישרור: Positive → Positive (Susquehanna)"
   },
   {
     "type": "שינוי דירוג",
@@ -97,9 +91,33 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "PG",
+    "severity": "מידע",
+    "message": "PG — אישרור: Equal-Weight → Equal-Weight (Barclays)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "COST",
+    "severity": "מידע",
+    "message": "COST — כיסוי חדש:  → Outperform (CICC)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "UNH",
     "severity": "מידע",
     "message": "UNH — אישרור: Outperform → Outperform (Mizuho)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "JPM",
+    "severity": "מידע",
+    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Outperform → Outperform (Oppenheimer)"
   },
   {
     "type": "שינוי דירוג",
@@ -115,15 +133,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
+    "scope": "AMZN",
     "severity": "מידע",
-    "message": "MSFT — reit: Buy → Buy (Guggenheim)"
+    "message": "AMZN — אישרור: Buy → Buy (UBS)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "JPM",
+    "scope": "HD",
     "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
+    "message": "HD — אישרור: Hold → Hold (Stifel)"
   },
   {
     "type": "שינוי דירוג",
@@ -133,27 +151,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AMZN",
+    "scope": "AMD",
     "severity": "מידע",
-    "message": "AMZN — אישרור: Overweight → Overweight (Morgan Stanley)"
+    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "META",
     "severity": "מידע",
     "message": "META — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Market Outperform → Market Outperform (Citizens)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
   },
   {
     "type": "שינוי דירוג",
@@ -165,18 +171,24 @@
     "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — אישרור: Neutral → Neutral (UBS)"
+    "message": "TSLA — שדרוג: Equal-Weight → Overweight (Barclays)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Market Outperform → Market Outperform (Citizens)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 95, חוזק יחסי +11.8%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 97, חוזק יחסי +13.11%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 6, חוזק יחסי -6.4%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 4, חוזק יחסי -7.2%)"
   }
 ]
