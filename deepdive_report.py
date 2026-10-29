@@ -55,8 +55,8 @@ def to_html(r: dict) -> str:
             + _bar("פונדמנטלי", sc["fundamental"]["value"]) + _bar("סקטור", sc["sector"]["value"])
             + _bar("חדשות", sc["news"]["value"]) + _bar("אמון", sc["trust"]["value"])
             + _bar("שווי", sc["valuation"]["value"]))
-    pros = "".join(f"<li>{x}</li>" for x in pc["pros"])
-    cons = "".join(f"<li>{x}</li>" for x in pc["cons"])
+    pros = "".join(f"<li>{x}</li>" for x in pc["pros"] if x != "—") or "<li>אין יתרונות בולטים כרגע.</li>"
+    cons = "".join(f"<li>{x}</li>" for x in pc["cons"] if x != "—") or "<li>לא זוהו חסרונות בולטים.</li>"
     sector_risks = "".join(f"<li>{x}</li>" for x in r["regulation_risks"]["sector_risks"])
 
     return f"""<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8">
@@ -107,10 +107,11 @@ def to_html(r: dict) -> str:
 
   <h2>11. דעה סופית</h2><div class="card">
     <div class="rec">{op['recommendation']}</div>
-    <div style="margin-top:8px">{op['attractive']}</div>
-    <div class="muted" style="margin-top:6px">טווח הקצאה מוצע: <b>{op['allocation_pct']}%</b> ·
+    <div style="margin-top:8px">{(r.get('verdict') or {}).get('why', op['attractive'])}</div>
+    <div class="muted" style="margin-top:6px">אם יש לך את המניה: <b>{(r.get('verdict') or {}).get('holder_label', '—')}</b> ·
+      אמינות הנתונים: <b>{((r.get('verdict') or {}).get('reliability') or {}).get('label', '—')}</b> ·
       פרופיל משקיע: {op['investor_profile']}</div>
-    <div class="muted" style="margin-top:6px">מה ישנה את ההמלצה: {op['what_changes']}</div></div>
+    <div class="muted" style="margin-top:6px">מה ישנה את התמונה: {' · '.join((r.get('verdict') or {}).get('conditions') or [op['what_changes']])}</div></div>
 
   <div class="dis">⚠️ {r['disclaimer']} · עובדות: Yahoo Finance · ציונים: מנועי המערכת ·
     תזה/דעה: מבוססת כללים על נתונים אמיתיים, לא ייעוץ.</div>

@@ -20,6 +20,13 @@ Companion to `DESIGN_SYSTEM.md`. Binding for every future change.
 
 ## 2. Product Identity
 
+> **Concept (29/10/2026): Simple by Default, Professional on Demand.** The default
+> experience (`dashboard/simple.py`) is written for someone with basic market
+> knowledge and answers three questions in plain Hebrew: should I consider buying,
+> wait, or review a sale — why — and what are the risks. The professional view keeps
+> every existing analysis and is one click away (`?mode=pro`). Both views show the
+> SAME verdict for the same stock, produced by one engine (`verdict.py`).
+
 **We are:** האנליסט השקוף — a research analyst that never hides its work. Every number is real, sourced, reproducible; every recommendation explains itself; every uncertainty is admitted ("אין נתון זמין" is a feature).
 **We are NOT:** a trading terminal, a tips machine, an AI oracle, a data firehose, a toy dashboard.
 **Why trust us:** radical transparency (decomposable scores, labeled facts vs. estimates, visible methodology, honest limitations) + consistency (same answer structure everywhere) + WCAG-tested readability.
@@ -66,3 +73,8 @@ Companion to `DESIGN_SYSTEM.md`. Binding for every future change.
 Plus: 105+ unit tests green · DOM-verified desktop + `?m=1` · benchmark note (better/worse vs Bloomberg/Koyfin/TradingView/Finviz/SA).
 
 15. **Decision language, not data language** — every metric is displayed as its investment meaning, not a bare number: "המחיר 2.4% מעל תמיכה מרכזית — יחס סיכון/סיכוי נוח" not "Support=$145"; "התמחור 18% מעל חציון הסקטור" not "P/E=36"; "מומנטום חזק אך מתקרב לקנוי-יתר" not "RSI=67". Raw numbers stay available one layer down (tooltip/expander). Every screen answers "מה לעשות עכשיו?". Benchmark = Bloomberg+Koyfin+Finviz+Morningstar+SeekingAlpha combined, with better UX.
+16. **One verdict per stock, app-wide.** Every page, report and e-mail derives its call from `verdict.py` via `stockdata.py`. No page may compute its own recommendation.
+17. **Evidence before rules.** A rule that changes a verdict must have historical support (see `research/`). Untested or refuted rules may be shown as information, never as a gate.
+18. **No uncalibrated numbers.** No probability, success rate or price target is shown unless it is a real external figure (e.g. analyst consensus, labeled as such) or a measured base rate with its sample size.
+19. **Data reliability is one number** (`verdict.reliability`), shown next to every verdict. Below the floor → "אין מספיק מידע אמין", never a guess.
+20. **Simple view first.** Every new capability ships with its plain-Hebrew answer in the simple view and its full detail in the professional view, with professional terms explained (`glossary.py`).

@@ -535,6 +535,49 @@ def page_learn(ctx):
           "<li>3. <b>כמה אפשר לסמוך על הנתונים?</b> כשהנתונים לא מספיקים, המערכת לא נותנת המלצה.</li>"
           "</ul><div class='s-note'>מכאן יוצא פסק דין אחד: 🟢 שווה לשקול קנייה · 🟡 להמתין להזדמנות · "
           "🔴 לא עכשיו · ⚪ אין מספיק מידע. אותו פסק דין מופיע בכל מקום במערכת.</div>")
+    _study_section()
+
+
+STUDY_CHECKS = [
+    ("לחכות כשהמניה 'קנויה-יתר' (RSI 75 ומעלה)", "uptrend · RSI >= 75", "uptrend · RSI 50-70"),
+    ("לחכות כשהמחיר צמוד להתנגדות", "uptrend · <=2% under resistance", "uptrend · >2% under resistance"),
+    ("לחכות כשיחס הסיכוי/סיכון נמוך מ-1", "uptrend · R/R < 1", "uptrend · R/R >= 2"),
+    ("לחכות לירידה לאזור התמיכה", "uptrend · within 3% above support", "uptrend · >8% above support"),
+    ("להימנע ממניות במגמת ירידה", "below MA200", "uptrend (above MA50 & MA200)"),
+]
+
+
+def _study_section():
+    ev = V._load_evidence()
+    if not ev or "groups" not in ev:
+        return
+    g = ev["groups"]
+    rows = []
+    for label, a, b in STUDY_CHECKS:
+        ga, gb = g.get(a) or {}, g.get(b) or {}
+        if ga.get("insufficient") or gb.get("insufficient") or "excess_3m" not in ga or "excess_3m" not in gb:
+            continue
+        diff = ga["excess_3m"] - gb["excess_3m"]
+        se = (ga["excess_se"] ** 2 + gb["excess_se"] ** 2) ** 0.5
+        if abs(diff) < 2 * se:
+            verdict_txt, col = "לא נמצא הבדל מובהק", MUTED
+        elif diff > 0:
+            verdict_txt, col = "במצב הזה דווקא היה טוב יותר", POSITIVE
+        else:
+            verdict_txt, col = "במצב הזה היה גרוע יותר", NEGATIVE
+        rows.append(f"<li><b>{label}</b><br><span style='color:{SECONDARY}'>"
+                    f"{ga['excess_3m']:+.1f}% מול {gb['excess_3m']:+.1f}% מעל המדד, בשלושה חודשים "
+                    f"({ga['n']:,} מול {gb['n']:,} מקרים)</span> · <b style='color:{col}'>{verdict_txt}</b></li>")
+    if not rows:
+        return
+    m = ev["meta"]
+    st.markdown("<div class='s-h'>מה בדקנו בנתוני העבר</div>", unsafe_allow_html=True)
+    _card(f"<div class='s-why' style='margin-top:0'>לפני שכלל משפיע על פסק הדין, בודקים אותו על נתוני עבר אמיתיים: "
+          f"{m['tickers']} מניות S&P 500, {m['first_date'][:4]}–{m['last_date'][:4]}, {m['samples']:,} מקרים.</div>"
+          f"<ul class='s-list'>{''.join(rows)}</ul>"
+          f"<div class='s-note'>כללים שלא הוכיחו את עצמם לא משנים את פסק הדין, גם אם הם נשמעים הגיוניים. "
+          f"מגמת ירידה כן נלקחת בחשבון, אבל כשיקול סיכון: בעבר היו בה ירידות עמוקות יותר בדרך. "
+          f"הבדיקה כוללת רק מניות שנמצאות היום במדד, ולכן משווים קבוצות זו לזו ולא מסתכלים על המספר עצמו.</div>")
 
 
 # ---------------------------------------------------------------- shell
