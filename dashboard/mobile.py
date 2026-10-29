@@ -428,8 +428,7 @@ def _analysis(mkt, lookup, nc):
     # --- Header: ticker, name, price, change, recommendation ---
     reco = (dec or {}).get("recommendation") or rep["opinion"].get("recommendation", "—")
     reco_he = reco.split("·")[-1].strip() if isinstance(reco, str) else "—"
-    reco_c = (POSITIVE if "Buy" in str(reco) else NEGATIVE if ("Avoid" in str(reco) or "Reduce" in str(reco))
-              else WARNING)
+    reco_c = _TONE_COL.get(((dec or {}).get("verdict") or rep.get("verdict") or {}).get("tone"), MUTED)
     st.markdown(f"<div class='mcard'>"
                 f"<div><span class='mtick'>{tk}</span>"
                 f"<span class='mrec' style='color:{reco_c}'>{reco_he}</span></div>"

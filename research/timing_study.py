@@ -81,7 +81,7 @@ def _download(tickers):
 
 def _samples(t, df, spy):
     close = df["Close"]
-    ma50, ma200 = close.rolling(50).mean(), close.rolling(200).mean()
+    ma20, ma50, ma200 = close.rolling(20).mean(), close.rolling(50).mean(), close.rolling(200).mean()
     rsi = _rsi(close)
     hi252 = close.rolling(252).max()
     ret63_back = close / close.shift(63) - 1
@@ -105,7 +105,8 @@ def _samples(t, df, spy):
             continue
         fwd = p1 / p0 - 1
         path = close.iloc[i:i + HORIZON + 1]
-        m = {"Price": float(p0), "MA50": float(ma50.iloc[i]), "MA200": float(ma200.iloc[i]),
+        m = {"Price": float(p0), "MA20": float(ma20.iloc[i]), "MA50": float(ma50.iloc[i]),
+             "MA200": float(ma200.iloc[i]),
              "RSI14": float(rsi.iloc[i]) if rsi.iloc[i] == rsi.iloc[i] else 50.0,
              "DistFromHigh%": float((hi252.iloc[i] - p0) / hi252.iloc[i] * 100),
              "VolRatio": (float(vol.iloc[i] / avgvol.iloc[i])

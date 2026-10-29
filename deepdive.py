@@ -1051,8 +1051,8 @@ def executive_summary_3(rep: dict, dec: dict) -> list:
                "בתמחור מתוח" if isinstance(val, (int, float)) else "בתמחור שאינו ניתן להערכה")
     s2 = (f"החברה מדורגת {val_txt}, עם רמת סיכון {rep.get('risk', {}).get('category', '—')} — "
           f"השילוב הזה קובע את יחס הסיכון/סיכוי של ההשקעה.")
-    s3 = (f"ההמלצה: {(dec or {}).get('recommendation', '—')} לאופק {(dec or {}).get('horizon', '—')}; "
-          f"איכות הכניסה כרגע: {ent.get('label', '—')}.")
+    s3 = (f"ההמלצה: {(dec or {}).get('recommendation', '—')} לאופק {(dec or {}).get('horizon', '—')}. "
+          f"מיקום המחיר: {ent.get('label', '—')}.")
     return [s1, s2, s3]
 
 

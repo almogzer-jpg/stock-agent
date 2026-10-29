@@ -19,7 +19,7 @@ signal carry information?
   `scanners.breakout.is_breakout`, RSI-14, MA50/MA200). No look-ahead.
 - Outcome: 63-trading-day return in excess of SPY, the deepest drawdown inside
   those 63 days, and the 10th-percentile return.
-- Statistics are averaged per sample date first, then across dates; the ± column
+- Statistics are averaged per sample date first, then across dates. The ± column
   is the standard error across dates. A difference is called significant only
   when it exceeds twice the combined standard error.
 - **Bias.** Survivorship: only today's members are sampled, which inflates absolute
@@ -35,7 +35,26 @@ signal carry information?
 | Price ≤ 2% under resistance | +2.0% ±0.8 | > 2% under: +4.0% ±0.8 | Not significant, equal medians |
 | Reward/risk < 1 | +3.8% ±0.8 | R/R ≥ 2: +2.4% ±1.2 | Not supported |
 | Wait for a pullback to support | within 3% of support: +0.9% ±0.9 | > 8% above: +6.0% ±0.9 | Refuted (waiting did worse) |
-| Below the 200-day average | +4.1% ±0.8 | uptrend: +4.5% ±0.7 | Return difference not significant; deeper drawdowns (−12.5% vs −11.3%) and worse 10th percentile (−14.3% vs −13.1%) |
+| Below the 200-day average | +4.1% ±0.8 | uptrend: +4.5% ±0.7 | Return difference not significant. Deeper drawdowns (−12.5% vs −11.3%) and worse 10th percentile (−14.3% vs −13.1%) |
+
+**Model check: the technical score and the breakout signal (second run, same samples).**
+
+| Group | 3-month excess | Avg. interim drawdown | n |
+|---|---|---|---|
+| Technical score 0-35 | +5.5% ±0.9 | −12.6% | 16,378 |
+| Technical score 35-50 | +3.0% ±1.0 | −11.5% | 12,034 |
+| Technical score 50-65 | +3.5% ±1.0 | −11.9% | 10,874 |
+| Technical score 65-80 | +4.5% ±1.0 | −10.3% | 16,348 |
+| Technical score 80-100 | +3.6% ±1.0 | −10.4% | 10,991 |
+| Breakout signal (app definition) | +2.5% ±1.1 | −9.1% | 1,827 |
+| No breakout signal | +5.1% ±0.6 | −12.0% | 64,798 |
+
+Reading: the technical score (25% of Score V2) shows no monotonic link to 3-month excess
+return, but higher scores came with shallower interim drawdowns, so it behaves as a risk
+measure rather than a return predictor. The breakout signal underperformed the rest of the
+sample by about 2.6 points (≈2.1 combined standard errors). Survivorship bias flatters the weak
+groups, so this is evidence, not proof. **No weights were changed**: Score V2 is the product's
+investment model and a change belongs to the owner's decision (see V4 approval notes).
 
 **Decisions taken in `verdict.py`.**
 - None of the timing rules gates the verdict (`TIMING_EVIDENCE`, all inactive, each

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>הזדמנויות · מחשב</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2547C9;text-decoration:none}a:hover{text-decoration:underline}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1500px; background: {{t.bg}}; color: {{t.text}}; font-family: Heebo, Arial, sans-serif; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<nav aria-label="ניווט ראשי" style="flex: 0 0 248px; box-sizing: border-box; background: {{t.surface}}; border-left: 1px solid {{t.border}}; padding: 20px 16px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 6px">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{t.accent}}" stroke-width="2" aria-hidden="true"><path d="M3 17l5-5 4 4 8-8"></path><path d="M15 8h5v5"></path></svg>
+<div style="font-size: 17px; font-weight: 700">Stock Agent</div>
+</div>
+<form role="search" style="display: flex; gap: 6px">
+<label for="o-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden">חיפוש חברה</label>
+<input id="o-search" type="search" placeholder="חיפוש חברה או סימול" style="flex: 1; min-width: 0; height: 38px; border-radius: 6px; border: 1px solid {{t.borderStrong}}; background: {{t.surface2}}; color: {{t.text}}; padding: 0 10px; font: 400 13.5px Heebo, sans-serif">
+<button type="submit" aria-label="חיפוש" style="width: 38px; height: 38px; border-radius: 6px; border: none; background: {{t.accent}}; color: {{t.onAccent}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg></button>
+</form>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 12.5px; font-weight: 600; color: {{t.text3}}; padding: 6px 10px">ראשי</div>
+<a href="#" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 6px; color: {{t.text2}}; font-size: 14.5px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path></svg>היום</a>
+<a href="#" aria-current="page" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 6px; background: {{t.accentSoft}}; color: {{t.accent}}; font-size: 14.5px; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg>הזדמנויות</a>
+<a href="#" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 6px; color: {{t.text2}}; font-size: 14.5px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>ניתוח חברה</a>
+<div style="font-size: 12.5px; font-weight: 600; color: {{t.text3}}; padding: 14px 10px 6px">שווקים</div>
+<a href="#" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 6px; color: {{t.text2}}; font-size: 14.5px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path></svg>שווקים</a>
+<a href="#" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 6px; color: {{t.text2}}; font-size: 14.5px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 16V11a6 6 0 1112 0v5l2 2H4z"></path></svg>התראות</a>
+<div style="font-size: 12.5px; font-weight: 600; color: {{t.text3}}; padding: 14px 10px 6px">שלי</div>
+<a href="#" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 6px; color: {{t.text2}}; font-size: 14.5px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg>רשימת מעקב</a>
+</div>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 28px 40px 56px">
+<div style="max-width: 1180px; display: flex; flex-direction: column; gap: 20px">
+
+<header>
+<h1 style="margin: 0; font-size: 28px; line-height: 36px; font-weight: 700">הזדמנויות</h1>
+<p style="margin: 4px 0 0; font-size: 15px; line-height: 24px; color: {{t.text2}}">57 מניות שנותחו לעומק היום מתוך 500 שנסרקו. לכל אחת פסק דין, הסבר ורמות מחיר.</p>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 12px">
+<div role="group" aria-label="סינון לפי הערכה" style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 8px; background: {{t.surface2}}">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{f.on}}" style="height: 32px; padding: 0 12px; border: none; border-radius: 6px; font: 600 13px Heebo, sans-serif; background: {{f.bg}}; color: {{f.fg}}; box-shadow: {{f.sh}}">{{f.label}} <span style="font-weight: 500; color: {{t.text3}}">{{f.n}}</span></button>
+</sc-for>
+</div>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{t.text2}}">ענף
+<select style="height: 34px; border-radius: 6px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: 400 13.5px Heebo, sans-serif; padding: 0 8px"><option>כל הענפים</option></select>
+</label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: {{t.text2}}">סיכון
+<select style="height: 34px; border-radius: 6px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: 400 13.5px Heebo, sans-serif; padding: 0 8px"><option>כל הרמות</option></select>
+</label>
+<div style="display: flex; gap: 6px; margin-right: auto">
+<sc-for list="{{lists}}" as="l" hint-placeholder-count="3">
+<button type="button" style="height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text2}}; font: 500 13px Heebo, sans-serif">{{l}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="overflow-x: auto; background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 1000px">
+<caption style="position: absolute; width: 1px; height: 1px; overflow: hidden">הזדמנויות בפסק דין לשקול קנייה, ממוינות לפי ציון</caption>
+<thead>
+<tr style="background: {{t.surface2}}; color: {{t.text2}}; font-size: 12.5px; text-align: right">
+<th scope="col" style="padding: 11px 16px; font-weight: 600">חברה</th>
+<th scope="col" style="padding: 11px 12px; font-weight: 600">ענף</th>
+<th scope="col" style="padding: 11px 12px; font-weight: 600">מחיר</th>
+<th scope="col" style="padding: 11px 12px; font-weight: 600">הערכה</th>
+<th scope="col" aria-sort="descending" style="padding: 11px 12px; font-weight: 600; color: {{t.text}}">ציון ↓</th>
+<th scope="col" style="padding: 11px 12px; font-weight: 600">סיכון</th>
+<th scope="col" style="padding: 11px 12px; font-weight: 600">3 חודשים</th>
+<th scope="col" style="padding: 11px 12px; font-weight: 600">עד התמיכה</th>
+<th scope="col" style="padding: 11px 16px; font-weight: 600">יעד אנליסטים</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<tr style="border-top: 1px solid {{t.border}}; height: 54px; background: {{r.rowBg}}; outline: {{r.outline}}; outline-offset: -2px">
+<td style="padding: 8px 16px"><a href="#" style="color: {{t.text}}; display: block"><b dir="ltr">{{r.tk}}</b><div style="font-size: 12.5px; color: {{t.text3}}">{{r.name}}</div></a></td>
+<td style="padding: 8px 12px; color: {{t.text2}}">{{r.sector}}</td>
+<td style="padding: 8px 12px; font-variant-numeric: tabular-nums"><div dir="ltr" style="text-align: right; font-weight: 600">{{r.price}}</div><div dir="ltr" style="text-align: right; font-size: 12.5px; font-weight: 600; color: {{r.chgColor}}">{{r.chg}}</div></td>
+<td style="padding: 8px 12px"><span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 6px; font-size: 13px; font-weight: 600; background: {{t.posSoft}}; color: {{t.positive}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>לשקול קנייה</span></td>
+<td style="padding: 8px 12px"><div style="display: flex; align-items: center; gap: 8px"><b style="font-variant-numeric: tabular-nums; min-width: 22px">{{r.score}}</b><div style="width: 56px; height: 5px; border-radius: 3px; background: {{t.surface2}}"><div style="height: 5px; border-radius: 3px; width: {{r.scoreW}}; background: {{t.accent}}"></div></div></div></td>
+<td style="padding: 8px 12px; color: {{t.text2}}">{{r.risk}}</td>
+<td dir="ltr" style="padding: 8px 12px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; color: {{r.momColor}}">{{r.mom}}</td>
+<td dir="ltr" style="padding: 8px 12px; text-align: right; font-variant-numeric: tabular-nums; color: {{t.text2}}">{{r.sup}}</td>
+<td style="padding: 8px 16px; font-variant-numeric: tabular-nums"><div dir="ltr" style="text-align: right; font-weight: 600; color: {{r.upColor}}">{{r.up}}</div><div style="font-size: 12.5px; color: {{t.text3}}">{{r.upNote}}</div></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<div style="font-size: 13.5px; color: {{t.text2}}">מציג 12 מתוך 37 · 443 מניות נוספות נסרקו טכנית בלבד, ולכן אין להן פסק דין. אפשר לחפש כל אחת בניתוח חברה.</div>
+<button type="button" style="height: 38px; padding: 0 16px; border-radius: 6px; border: 1px solid {{t.borderStrong}}; background: {{t.surface}}; color: {{t.text}}; font: 600 13.5px Heebo, sans-serif">הצגת עוד</button>
+</div>
+<div style="font-size: 12.5px; color: {{t.text3}}">שורה מודגשת = מיקוד מקלדת. Enter פותח ניתוח מלא · יעד אנליסטים: ממוצע הקונצנזוס מ-29/10/2026 · מחירים לסגירת 28/10/2026</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') === 'dark';
+    const t = dark ? {
+      bg: '#0E1218', surface: '#151B23', surface2: '#1C2430', border: '#273141', borderStrong: '#344055',
+      text: '#E8ECF2', text2: '#AAB4C2', text3: '#8E99AA', accent: '#8FA9FF', accentSoft: '#1D2847', onAccent: '#0E1218',
+      positive: '#55C795', warning: '#E2B14E', negative: '#F38B81', posSoft: '#13291F', shadowSm: 'none', segOn: '#273141',
+      hover: '#1A2230'
+    } : {
+      bg: '#F6F5F2', surface: '#FFFFFF', surface2: '#F1EFEA', border: '#E6E3DC', borderStrong: '#D6D2C8',
+      text: '#111827', text2: '#475467', text3: '#5F6B7C', accent: '#2547C9', accentSoft: '#EDF1FD', onAccent: '#FFFFFF',
+      positive: '#0B7A4B', warning: '#94580A', negative: '#B42318', posSoft: '#E8F4EE', shadowSm: '0 1px 2px rgba(17,24,39,.08)',
+      segOn: '#FFFFFF', hover: '#F8F7F3'
+    };
+    const sign = (x, d) => (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(d) + '%';
+    const filters = [['הכול', 57], ['לשקול קנייה', 37], ['להמתין', 13], ['לא עכשיו', 7]].map(([label, n]) => {
+      const on = label === 'לשקול קנייה';
+      return { label, n, on: on ? 'true' : 'false', bg: on ? t.segOn : 'transparent', fg: on ? t.text : t.text2, sh: on ? t.shadowSm : 'none' };
+    });
+    const R = [
+      ['XOM', 'Exxon Mobil', 'אנרגיה', '$182.02', 1.17, 83, 'נמוך', 16.7, '−21.0%', -1.4],
+      ['LLY', 'Eli Lilly', 'בריאות', '$1,288.30', 0.50, 81, 'נמוך', 11.7, '−12.2%', 3.7],
+      ['V', 'Visa', 'פיננסים', '$400.60', -0.31, 80, 'נמוך', 9.6, '−10.2%', 9.1],
+      ['NUE', 'Nucor', 'חומרים', '$271.79', 0.37, 80, 'נמוך', 6.0, '−12.4%', 6.1],
+      ['OKE', 'ONEOK', 'אנרגיה', '$94.54', -1.53, 80, 'נמוך', 7.4, '−0.5%', 6.9],
+      ['MA', 'Mastercard', 'פיננסים', '$610.31', 0.08, 79, 'נמוך', 5.9, '−9.0%', 10.8],
+      ['EBAY', 'eBay', 'צריכה מחזורית', '$118.02', 0.16, 79, 'נמוך', 4.3, '−10.1%', -0.9],
+      ['PKG', 'Packaging Corp. of America', 'צריכה מחזורית', '$248.44', -1.81, 79, 'נמוך', 0.6, '−9.9%', 8.4],
+      ['MSFT', 'Microsoft', 'טכנולוגיה', '$531.01', -0.06, 78, 'בינוני', 17.9, '−34.4%', 14.0],
+      ['WST', 'West Pharmaceutical', 'בריאות', '$403.64', 1.34, 78, 'נמוך', 18.9, '−13.5%', 3.2],
+      ['PPG', 'PPG Industries', 'חומרים', '$118.44', 4.41, 77, 'בינוני', 6.4, '−8.1%', 6.2],
+      ['AES', 'AES Corp.', 'שירותים ציבוריים', '$14.98', -0.33, 76, 'נמוך', 2.1, '−0.3%', 0.1]
+    ];
+    const rows = R.map(([tk, name, sector, price, chg, score, risk, mom, sup, up], i) => ({
+      tk, name, sector, price, score, risk, sup, chg: sign(chg, 2), chgColor: chg >= 0 ? t.positive : t.negative,
+      scoreW: score + '%', mom: sign(mom, 1), momColor: mom >= 0 ? t.positive : t.negative,
+      up: sign(up, 1), upColor: up >= 0 ? t.positive : t.warning, upNote: up >= 0 ? '' : 'המחיר מעל היעד',
+      rowBg: i === 1 ? t.hover : 'transparent', outline: i === 1 ? '2px solid ' + t.accent : 'none'
+    }));
+    return { t, filters, rows, lists: ['מוערכות בחסר', 'מומנטום', 'איכות גבוהה'] };
+  }
+}
+</script>
+</body>
+</html>

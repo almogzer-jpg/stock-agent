@@ -13,6 +13,7 @@ data/*
 !data/system_health.json
 !data/universe.json
 !data/reliability.json
+!data/global_markets.json
 !data/scores_today.json
 !data/scores_prev.json
 # keep ignoring logs, excel, caches and the timestamped outputs/

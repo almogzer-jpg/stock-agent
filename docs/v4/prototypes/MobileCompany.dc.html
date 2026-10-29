@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>ניתוח חברה · טלפון</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2547C9;text-decoration:none}a:hover{text-decoration:underline}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 2300px; box-sizing: border-box; position: relative; overflow: hidden; background: {{t.bg}}; color: {{t.text}}; font-family: Heebo, Arial, sans-serif">
+
+<header style="height: 56px; box-sizing: border-box; padding: 0 4px; display: flex; align-items: center; justify-content: space-between; background: {{t.surface}}; border-bottom: 1px solid {{t.border}}">
+<a href="#" aria-label="חזרה" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: {{t.text}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<b dir="ltr" style="font-size: 16px">LLY</b>
+<div style="display: flex">
+<button type="button" aria-label="שמירה למעקב" style="width: 44px; height: 44px; border: none; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button>
+<button type="button" aria-label="חיפוש חברה" style="width: 44px; height: 44px; border: none; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg></button>
+</div>
+</header>
+
+<div style="padding: 16px; display: flex; flex-direction: column; gap: 16px">
+<div>
+<h1 style="margin: 0; font-size: 22px; line-height: 30px; font-weight: 700"><bdi>Eli Lilly</bdi> <span style="font-size: 15px; color: {{t.text3}}; font-weight: 500">אלי לילי</span></h1>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px">
+<span dir="ltr" style="font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums">$1,373.72</span>
+<span dir="ltr" style="font-size: 14px; font-weight: 600; color: {{t.positive}}">+6.63% היום</span>
+</div>
+<div style="font-size: 12.5px; color: {{t.text3}}; margin-top: 2px">בריאות · שווי שוק <bdi>$1.22T</bdi> · ניתוח חי 29/10/2026</div>
+</div>
+
+<section aria-labelledby="md-h" style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 14px; padding: 16px; box-shadow: {{t.shadowSm}}">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 12.5px; font-weight: 600; color: {{t.text3}}">ההערכה של המערכת</span>
+<span style="font-size: 12.5px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: {{t.posSoft}}; color: {{t.positive}}">אמינות גבוהה</span>
+</div>
+<h2 id="md-h" style="margin: 8px 0 4px; display: flex; align-items: center; gap: 8px; font-size: 22px; line-height: 30px; font-weight: 700; color: {{t.positive}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>שווה לשקול קנייה</h2>
+<p style="margin: 0; font-size: 15.5px; line-height: 25px">חברה חזקה: המכירות גדלות מהר, והמניה במגמת עלייה. ציון איכות 81 מתוך 100.</p>
+<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid {{t.border}}; font-size: 14px; line-height: 21px"><b>אם כבר יש לך את המניה:</b> <span style="color: {{t.positive}}; font-weight: 600">להמשיך להחזיק</span></div>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 12px"><div style="font-size: 12.5px; color: {{t.text3}}">יעד אנליסטים · 29</div><div dir="ltr" style="text-align: right; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums">$1,336.61</div><div style="font-size: 12.5px; font-weight: 600; color: {{t.warning}}">המחיר מעל היעד ב-2.7%</div></div>
+<div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 12px"><div style="font-size: 12.5px; color: {{t.text3}}">תמיכה</div><div dir="ltr" style="text-align: right; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums">$1,131.21</div><div style="font-size: 12.5px; color: {{t.text2}}">17.7% מתחת למחיר</div></div>
+<div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 12px"><div style="font-size: 12.5px; color: {{t.text3}}">התנגדות</div><div style="font-size: 16px; font-weight: 700; line-height: 27px">אין מעל המחיר</div><div style="font-size: 12.5px; color: {{t.text2}}">מעל כל השיאים</div></div>
+<div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 12px"><div style="font-size: 12.5px; color: {{t.text3}}">רמת סיכון</div><div style="font-size: 16px; font-weight: 700; line-height: 27px">נמוכה</div><div style="font-size: 12.5px; color: {{t.text2}}">תנודתיות 35% בשנה</div></div>
+</div>
+
+<section aria-labelledby="mr-h" style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 14px 16px">
+<h2 id="mr-h" style="margin: 0 0 6px; font-size: 15px; font-weight: 600; color: {{t.positive}}">למה כן</h2>
+<ul style="margin: 0; padding: 0 18px 0 0; font-size: 14.5px; line-height: 23px">
+<li>המכירות גדלות מהר: <bdi>+47.7%</bdi> בשנה</li>
+<li>מכל 100 דולר מכירות נשארים כ-54 דולר רווח תפעולי</li>
+<li>תשואה גבוהה על ההון (<bdi>ROIC 38.6%</bdi>)</li>
+</ul>
+<h2 style="margin: 14px 0 6px; font-size: 15px; font-weight: 600; color: {{t.negative}}">מה הסיכונים</h2>
+<ul style="margin: 0; padding: 0 18px 0 0; font-size: 14.5px; line-height: 23px">
+<li>דוחות כספיים היום: המחיר עלול לזוז בחדות</li>
+<li>המחיר כבר מעל יעד האנליסטים</li>
+<li>חוב גבוה ביחס להון (<bdi>1.62</bdi>)</li>
+</ul>
+<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid {{t.border}}; font-size: 14px; line-height: 21px"><b>מה ישנה את התמונה:</b> <span style="color: {{t.text2}}">ירידה מתחת ל-<bdi>$1,131</bdi>.</span></div>
+</section>
+
+<section aria-labelledby="mch-h" style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 14px 16px">
+<h2 id="mch-h" style="margin: 0 0 10px; font-size: 16px; font-weight: 600">מחיר</h2>
+<div role="group" aria-label="תקופה" style="display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: {{t.surface2}}; margin-bottom: 10px">
+<sc-for list="{{periods}}" as="p" hint-placeholder-count="6">
+<button type="button" aria-pressed="{{p.on}}" style="flex: 1; height: 36px; border: none; border-radius: 6px; font: 600 13px Heebo, sans-serif; background: {{p.bg}}; color: {{p.fg}}; box-shadow: {{p.sh}}">{{p.label}}</button>
+</sc-for>
+</div>
+<svg width="100%" viewBox="0 0 342 166" role="img" aria-label="גרף מחיר שבועי של LLY לשנה" style="display: block">
+<line x1="0" y1="16.9" x2="342" y2="16.9" stroke="{{t.warning}}" stroke-width="1.2" stroke-dasharray="4 4"></line>
+<line x1="0" y1="72" x2="342" y2="72" stroke="{{t.positive}}" stroke-width="1.2" stroke-dasharray="4 4"></line>
+<path d="M0.0,145.3 L6.6,128.9 L13.2,101.7 L19.7,92.5 L26.3,88.3 L32.9,105.7 L39.5,101.1 L46.0,89.4 L52.6,87.7 L59.2,87.0 L65.8,91.5 L72.3,98.2 L78.9,91.3 L85.5,98.5 L92.1,92.9 L98.7,97.3 L105.2,105.5 L111.8,94.1 L118.4,110.6 L125.0,112.0 L131.5,132.9 L138.1,140.5 L144.7,125.2 L151.3,124.2 L157.8,127.5 L164.4,139.0 L171.0,117.8 L177.6,121.7 L184.2,106.2 L190.7,90.1 L197.3,79.4 L203.9,72.4 L210.5,71.9 L217.0,81.2 L223.6,51.9 L230.2,50.3 L236.8,57.1 L243.3,59.6 L249.9,55.1 L256.5,67.7 L263.1,57.9 L269.7,58.9 L276.2,38.7 L282.8,60.4 L289.4,67.1 L296.0,76.2 L302.5,66.2 L309.1,58.0 L315.7,68.9 L322.3,59.1 L328.8,38.3 L335.4,33.9 L342.0,7.2" fill="none" stroke="{{t.accent}}" stroke-width="2" stroke-linejoin="round"></path>
+<text x="4" y="12" font-size="12" fill="{{t.warning}}" font-family="Heebo">יעד $1,337</text>
+<text x="4" y="66" font-size="12" fill="{{t.positive}}" font-family="Heebo">תמיכה $1,131</text>
+<text x="0" y="163" font-size="12" fill="{{t.text3}}" font-family="Heebo">10/25</text>
+<text x="308" y="163" font-size="12" fill="{{t.text3}}" font-family="Heebo">10/26</text>
+</svg>
+<div style="font-size: 13.5px; line-height: 20px; color: {{t.text2}}; margin-top: 6px">עלתה 60% בשנה, עם ירידה של עד 18% באמצע הדרך.</div>
+</section>
+
+<section aria-labelledby="mh-h" style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; padding: 14px 16px">
+<h2 id="mh-h" style="margin: 0 0 6px; font-size: 16px; font-weight: 600">מה קרה בעבר במצבים דומים</h2>
+<p style="margin: 0; font-size: 14.5px; line-height: 23px">ב-5,156 מקרים דומים, המניה ירדה בממוצע 10% בשלב כלשהו בשלושת החודשים שאחרי, וב-1 מכל 10 מקרים סיימה בירידה של 14% או יותר.</p>
+<div style="font-size: 12.5px; color: {{t.text3}}; margin-top: 4px">תיאור של העבר, לא תחזית.</div>
+</section>
+
+<section aria-labelledby="ms-h">
+<h2 id="ms-h" style="margin: 0 0 8px; font-size: 16px; font-weight: 600">הניתוח המלא</h2>
+<div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: 10px; overflow: hidden">
+<sc-for list="{{sections}}" as="s" hint-placeholder-count="8">
+<details style="border-top: 1px solid {{s.topBorder}}">
+<summary style="min-height: 48px; display: flex; align-items: center; padding: 0 16px; font-size: 15px; font-weight: 600; cursor: pointer">{{s.title}}</summary>
+<div style="padding: 0 16px 14px; font-size: 14px; color: {{t.text2}}">{{s.sub}}</div>
+</details>
+</sc-for>
+</div>
+</section>
+<div style="font-size: 12.5px; line-height: 18px; color: {{t.text3}}">מקור: Yahoo Finance, מקור יחיד · חישובים: מנועי המערכת · לא ייעוץ השקעות אישי.</div>
+</div>
+
+<nav aria-label="ניווט ראשי" style="position: absolute; bottom: 0; right: 0; left: 0; height: 64px; background: {{t.surface}}; border-top: 1px solid {{t.border}}; display: flex">
+<sc-for list="{{tabs}}" as="b" hint-placeholder-count="5">
+<a href="#" aria-current="{{b.current}}" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12.5px; font-weight: 600; color: {{b.color}}">
+<span style="display: flex; align-items: center; justify-content: center; width: 52px; height: 28px; border-radius: 14px; background: {{b.pill}}">
+<sc-if value="{{b.isToday}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path></svg></sc-if>
+<sc-if value="{{b.isOpp}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg></sc-if>
+<sc-if value="{{b.isSearch}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg></sc-if>
+<sc-if value="{{b.isWatch}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></sc-if>
+<sc-if value="{{b.isMore}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="12" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="18" cy="12" r="1.5"></circle></svg></sc-if>
+</span>{{b.label}}</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":2300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = (this.props.theme ?? 'light') === 'dark';
+    const t = dark ? {
+      bg: '#0E1218', surface: '#151B23', surface2: '#1C2430', border: '#273141',
+      text: '#E8ECF2', text2: '#AAB4C2', text3: '#8E99AA', accent: '#8FA9FF', accentSoft: '#1D2847',
+      positive: '#55C795', warning: '#E2B14E', negative: '#F38B81', posSoft: '#13291F',
+      shadowSm: 'none', segOn: '#273141'
+    } : {
+      bg: '#F6F5F2', surface: '#FFFFFF', surface2: '#F1EFEA', border: '#E6E3DC',
+      text: '#111827', text2: '#475467', text3: '#5F6B7C', accent: '#2547C9', accentSoft: '#EDF1FD',
+      positive: '#0B7A4B', warning: '#94580A', negative: '#B42318', posSoft: '#E8F4EE',
+      shadowSm: '0 1px 2px rgba(17,24,39,.06)', segOn: '#FFFFFF'
+    };
+    const periods = ['1M', '3M', '6M', '1Y', '5Y', 'עוד'].map((label) => {
+      const on = label === '1Y';
+      return { label, on: on ? 'true' : 'false', bg: on ? t.segOn : 'transparent', fg: on ? t.text : t.text2, sh: on ? t.shadowSm : 'none' };
+    });
+    const sections = ['ביצועים כספיים', 'סקירת העסק', 'תמחור', 'ניתוח טכני', 'סיכון', 'קטליזטורים', 'שינויים היסטוריים', 'ראיות ומקורות']
+      .map((title, i) => ({ title, sub: 'פתיחה מציגה את הפירוט המקצועי של הסעיף.', topBorder: i === 0 ? 'transparent' : t.border }));
+    const tabs = [['today', 'היום'], ['opp', 'הזדמנויות'], ['search', 'חיפוש'], ['watch', 'מעקב'], ['more', 'עוד']].map(([k, label]) => ({
+      label, current: k === 'search' ? 'page' : 'false', color: k === 'search' ? t.accent : t.text2,
+      pill: k === 'search' ? t.accentSoft : 'transparent',
+      isToday: k === 'today', isOpp: k === 'opp', isSearch: k === 'search', isWatch: k === 'watch', isMore: k === 'more'
+    }));
+    return { t, periods, sections, tabs };
+  }
+}
+</script>
+</body>
+</html>

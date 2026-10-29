@@ -1202,7 +1202,7 @@ elif page == "🗺️ סקטורים":
             return f"<div class='miniprog'><div style='width:{p:.0f}%;background:{color}'></div></div>"
         headx = "".join(f"<th>{h}</th>" for h in
                         ["#", "סקטור", "חוזק הסקטור", "מומנטום 3ח׳", "המלצה", "הזדמנויות",
-                         "חברה מובילה", "ציון V2 ממוצע", "תמחור ממוצע", "סיכון ממוצע"])
+                         "חברה מובילה", "ציון V2 ממוצע"])
         bodyx = ""
         for i, r in enumerate(sec_rows, 1):
             acol = score_color(r["avg_score"]) if isinstance(r["avg_score"], (int, float)) else MUTED
@@ -1216,13 +1216,11 @@ elif page == "🗺️ סקטורים":
                       f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['sector_score'], ssc)}"
                       f"<b style='color:{ssc}'>{int(r['sector_score']) if isinstance(r['sector_score'], (int, float)) else '—'}</b></div></td>"
                       f"<td><span style='color:{mcol}'>{ms}</span></td>"
-                      f"<td><span class='tbadge' style='color:{reco_col[r['reco']]}'>{reco_he[r['reco']]}</span></td>"
+                      f"<td><span class='tbadge' style='color:{reco_col[r['reco']]};white-space:nowrap'>{reco_he[r['reco']]}</span></td>"
                       f"<td><b>{r['n']}</b></td><td><b>{r['top'] or '—'}</b></td>"
                       f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['avg_score'], acol)}"
                       f"<b style='color:{acol}'>{int(r['avg_score']) if r['avg_score'] is not None else '—'}</b></div></td>"
-                      f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['avg_val'], vcol)}"
-                      f"<b style='color:{vcol}'>{int(r['avg_val']) if r['avg_val'] is not None else '—'}</b></div></td>"
-                      f"<td><span style='color:{risk_col2.get(r['avg_risk'], MUTED)}'>{r['avg_risk'] or '—'}</span></td></tr>")
+                      f"</tr>")
         st.markdown(f"<table class='sectbl'><thead><tr>{headx}</tr></thead><tbody>{bodyx}</tbody></table>",
                     unsafe_allow_html=True)
         st.caption("המלצה = חוזק הסקטור בלבד (מגמה, מומנטום וחוזק יחסי של תעודת הסל הענפית): הגדלה ≥66 · הקטנה <40. "
