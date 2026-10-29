@@ -1062,7 +1062,7 @@ elif page == "💎 הזדמנויות":
         def _full_card(r):
             tk = r["Ticker"]
             nm = VW.company_name(tk, lookup, nc)
-            sv = _num(r.get("ScoreV2"))
+            sv = _num((VMAP.get(tk) or {}).get("quality")) or _num(r.get("ScoreV2"))
             scol = VW.score_band_color(sv)
             rb = VW.risk_badge(r.get("RiskLevel"))
             sec_he = market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—")
@@ -1071,7 +1071,7 @@ elif page == "💎 הזדמנויות":
             qual = _num(r.get("ScoreFundamental"))
             mom_c = POSITIVE if (mom or 0) >= 0 else NEGATIVE
             mom_s = f"{VW.momentum_emoji(mom)} {'+' if (mom or 0) >= 0 else ''}{_i(mom)}%"
-            badges = (_badge(sec_he, PRIMARY) + _badge(f"Score V2 {_i(sv)}", scol)
+            badges = (vbadge(tk, 13) + " " + _badge(sec_he, PRIMARY) + _badge(f"Score V2 {_i(sv)}", scol)
                       + _badge(f"{rb[0]} {rb[1]} / {rb[2]}", rb[3]))
             return (f"<div class='ocard' title='לחץ \"ניתוח מניה\" לדוח מלא' style='border-right:5px solid {scol}'>"
                     f"<div class='oc-head'><div class='oc-av' style='background:{scol}'>{tk[:2]}</div>"
@@ -1088,7 +1088,7 @@ elif page == "💎 הזדמנויות":
         def _panel_item(r):
             tk = r["Ticker"]
             nm = VW.company_name(tk, lookup, nc)
-            sv = _num(r.get("ScoreV2"))
+            sv = _num((VMAP.get(tk) or {}).get("quality")) or _num(r.get("ScoreV2"))
             scol = VW.score_band_color(sv)
             rb = VW.risk_badge(r.get("RiskLevel"))
             sec_he = market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—")
@@ -1192,11 +1192,14 @@ elif page == "💎 הזדמנויות":
                 rows = []
                 for rank, (_, r) in enumerate(vv.iterrows(), 1):
                     rb = VW.risk_badge(r.get("RiskLevel"))
+                    _v = VMAP.get(r["Ticker"]) or {}
+                    _q = _v.get("quality") if _v.get("quality") is not None else r.get("ScoreV2")
                     rows.append({
                         "דירוג": rank, "סימול": r["Ticker"],
                         "חברה": VW.company_name(r["Ticker"], lookup, nc),
+                        "פסק דין": f"{_v.get('emoji', '⚪')} {_v.get('short', 'אין מספיק מידע')}",
                         "סקטור": market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—"),
-                        "Score V2": int(r["ScoreV2"]) if _num(r.get("ScoreV2")) is not None else None,
+                        "Score V2": int(_q) if _num(_q) is not None else None,
                         "מומנטום 3ח׳": round(r["Ret3m"], 1) if _num(r.get("Ret3m")) is not None else None,
                         "תמחור": _val_badge(r.get("Valuation")), "סיכון": f"{rb[0]} {rb[1]}",
                         "תמיכה": _sr_cell(r.get("Support"), r.get("DistSupport%")),
@@ -1265,8 +1268,8 @@ elif page == "🗺️ סקטורים":
             p = max(0, min(100, (val or 0) / mx * 100))
             return f"<div class='miniprog'><div style='width:{p:.0f}%;background:{color}'></div></div>"
         headx = "".join(f"<th>{h}</th>" for h in
-                        ["#", "סקטור", "הזדמנויות", "חברה מובילה", "ציון V2 ממוצע", "תמחור ממוצע",
-                         "מומנטום 3ח׳", "סיכון ממוצע", "המלצה"])
+                        ["#", "סקטור", "חוזק הסקטור", "מומנטום 3ח׳", "המלצה", "הזדמנויות",
+                         "חברה מובילה", "ציון V2 ממוצע", "תמחור ממוצע", "סיכון ממוצע"])
         bodyx = ""
         for i, r in enumerate(sec_rows, 1):
             acol = score_color(r["avg_score"]) if isinstance(r["avg_score"], (int, float)) else MUTED
@@ -1274,36 +1277,40 @@ elif page == "🗺️ סקטורים":
             m3 = r.get("ret_3m")
             mcol = POSITIVE if isinstance(m3, (int, float)) and m3 >= 0 else NEGATIVE
             ms = (f"{'+' if m3 >= 0 else ''}{m3}%" if isinstance(m3, (int, float)) else "—")
+            ssc = score_color(r["sector_score"]) if isinstance(r["sector_score"], (int, float)) else MUTED
             bodyx += (f"<tr><td>{i}</td>"
                       f"<td><span class='tbadge' style='color:{PRIMARY}'>{r['sector_he']}</span></td>"
-                      f"<td><b>{r['n']}</b></td><td><b>{r['top']}</b></td>"
+                      f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['sector_score'], ssc)}"
+                      f"<b style='color:{ssc}'>{int(r['sector_score']) if isinstance(r['sector_score'], (int, float)) else '—'}</b></div></td>"
+                      f"<td><span style='color:{mcol}'>{ms}</span></td>"
+                      f"<td><span class='tbadge' style='color:{reco_col[r['reco']]}'>{reco_he[r['reco']]}</span></td>"
+                      f"<td><b>{r['n']}</b></td><td><b>{r['top'] or '—'}</b></td>"
                       f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['avg_score'], acol)}"
                       f"<b style='color:{acol}'>{int(r['avg_score']) if r['avg_score'] is not None else '—'}</b></div></td>"
                       f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(r['avg_val'], vcol)}"
                       f"<b style='color:{vcol}'>{int(r['avg_val']) if r['avg_val'] is not None else '—'}</b></div></td>"
-                      f"<td><span style='color:{mcol}'>{ms}</span></td>"
-                      f"<td><span style='color:{risk_col2.get(r['avg_risk'], MUTED)}'>{r['avg_risk'] or '—'}</span></td>"
-                      f"<td><span class='tbadge' style='color:{reco_col[r['reco']]}'>{reco_he[r['reco']]}</span></td></tr>")
+                      f"<td><span style='color:{risk_col2.get(r['avg_risk'], MUTED)}'>{r['avg_risk'] or '—'}</span></td></tr>")
         st.markdown(f"<table class='sectbl'><thead><tr>{headx}</tr></thead><tbody>{bodyx}</tbody></table>",
                     unsafe_allow_html=True)
-        st.caption("המלצה נגזרת מחוזק הסקטור (הגדלה ≥66 · הקטנה <40) — דטרמיניסטי, מנתוני ETF סקטוריאליים.")
+        st.caption("המלצה = חוזק הסקטור בלבד (מגמה, מומנטום וחוזק יחסי של תעודת הסל הענפית): הגדלה ≥66 · הקטנה <40. "
+                   "ממוצע ציוני ה-V2 מתייחס רק למניות שהועשרו בסריקה, ולכן הוא מידע משלים.")
 
         # ---- Drill-down: the best stocks inside a sector ----
         st.markdown("#### המניות המובילות בסקטור")
         he2en = {r["sector_he"]: r["sector"] for r in sec_rows}
         sel_he = st.selectbox("בחר סקטור", [r["sector_he"] for r in sec_rows], key="sec_drill")
         sel_en = he2en.get(sel_he)
-        pool = [x for x in uni_s.get("all", []) if x.get("Sector") == sel_en] or \
-               [x for x in uni_s.get("opportunities", []) if x.get("Sector") == sel_en]
+        pool = [x for x in ROWS.values() if x.get("Sector") == sel_en and x.get("_tier") in ("full", "enriched")]
         pool = sorted(pool, key=lambda x: -(x.get("ScoreV2") or 0))[:5]
         if not pool:
-            st.caption("אין מניות מועשרות בסקטור זה בסריקה הנוכחית.")
+            st.caption("אין בסקטור הזה מניות שנותחו לעומק היום (רשימת המעקב או ההזדמנויות המועשרות).")
         else:
             lookup_s = VW.build_lookup(uni_s)
             nc_s = VW.names_cache()
             dbody = ""
             for x in pool:
-                svx = x.get("ScoreV2")
+                svx = (VMAP.get(x["Ticker"]) or {}).get("quality")
+                svx = x.get("ScoreV2") if svx is None else svx
                 svx = int(svx) if isinstance(svx, (int, float)) else None
                 rbx = VW.risk_badge(x.get("RiskLevel"))
                 m3x = x.get("Ret3m")
@@ -1311,10 +1318,11 @@ elif page == "🗺️ סקטורים":
                           f"<div style='color:{MUTED};font-size:13px'>{VW.company_name(x['Ticker'], lookup_s, nc_s)}</div></td>"
                           f"<td><div style='display:flex;align-items:center;gap:8px'>{_sbarx(svx, score_color(svx))}"
                           f"<b style='color:{score_color(svx)}'>{svx if svx is not None else '—'}</b></div></td>"
+                          f"<td>{vbadge(x['Ticker'])}</td>"
                           f"<td><span class='tbadge' style='color:{rbx[3]}'>{rbx[0]} {rbx[1]}</span></td>"
                           f"<td style='color:{POSITIVE if isinstance(m3x,(int,float)) and m3x>=0 else NEGATIVE}'>"
                           f"{f'{m3x:+.0f}%' if isinstance(m3x,(int,float)) else '—'}</td></tr>")
-            st.markdown(f"<table class='sectbl'><thead><tr><th>חברה</th><th>ציון V2</th>"
+            st.markdown(f"<table class='sectbl'><thead><tr><th>חברה</th><th>ציון V2</th><th>פסק דין</th>"
                         f"<th>סיכון</th><th>מומנטום 3ח׳</th></tr></thead><tbody>{dbody}</tbody></table>",
                         unsafe_allow_html=True)
             dcols = st.columns(len(pool))
@@ -2168,10 +2176,14 @@ elif page == "⚙️ הגדרות":
         f"<div class='ic-sub'><b>ציון V2</b> = שקלול דטרמיניסטי: "
         + " · ".join(f"{_wl_he.get(k, k)} {v:.0%}" for k, v in _W.items())
         + " (ממדים חסרים → המשקלים מנורמלים מחדש; הפירוק המלא מוצג בכל ניתוח).</div>"
-        f"<div class='ic-sub'><b>סולם ההמלצות:</b> ‎78+ קנייה חזקה · ‎68+ קנייה · ‎55+ מעקב · ‎45+ החזקה · ‎35+ הקטנה · אחרת להימנע. "
-        f"סיכון 'גבוה מאוד' או אמון נמוך (<40) מורידים דרגה אוטומטית.</div>"
-        f"<div class='ic-sub'><b>כללי אמינות:</b> מקור יחיד ללא אימות-צולב לעולם אינו 'גבוהה' (תקרה 74); "
-        f"מקורות סותרים → 'נמוכה'; אמינות לא-מספקת → ההמלצה מדוכאת ('אין מספיק מידע אמין').</div>"
+        f"<div class='ic-sub'><b>פסק הדין (מנוע אחד לכל המערכת):</b> 🟢 שווה לשקול קנייה = ציון 68+ ומגמה תקינה · "
+        f"🟡 להמתין = ציון 55–67, או חברה חזקה במגמת ירידה · 🔴 לא עכשיו = ציון מתחת ל-45, או מגמת ירידה בלי חברה חזקה, "
+        f"או סיכון גבוה מאוד · ⚪ אין מספיק מידע = נתונים חסרים או אמינות מתחת ל-55.</div>"
+        f"<div class='ic-sub'><b>כללי תזמון:</b> נבדקו היסטורית (S&P 500, 2015–2026, 66,625 מקרים). "
+        f"קנוי-יתר, יחס סיכוי/סיכון, קרבה להתנגדות והמתנה לתמיכה לא שיפרו תשואה, ולכן לא משנים את פסק הדין "
+        f"(research/timing_study.py).</div>"
+        f"<div class='ic-sub'><b>אמינות הנתונים:</b> שלמות 50 · טריות 25 · רמות מחיר 15 · מקור 10. "
+        f"מקור יחיד (Yahoo) ללא אימות צולב למניות → תקרה 90. מתחת ל-55 → אין המלצה.</div>"
         f"<div class='ic-sub'><b>עקרונות:</b> אפס LLM · הכל ניתן-שחזור · עובדה/מחושב/תרחיש מתויגים · "
         f"'אין נתון זמין' במקום המצאה · כל המלצה עם סיבות, סיכונים ותנאי-פירכה.</div>"
         f"<div class='ic-sub' style='color:{MUTED};font-size:13px'>תיעוד מלא: RELIABILITY.md · DATA_GOVERNANCE.md בריפו.</div>"

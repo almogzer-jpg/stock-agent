@@ -105,27 +105,31 @@ def ranking_rows(uni: dict, key: str, lookup=None, nc=None, n: int = 10) -> list
 
 
 def sector_intel(uni: dict, mkt: dict) -> list:
-    """Per-sector intelligence rows from enriched opportunities + market sectors.
+    """Per-sector intelligence rows — EVERY market sector, even with no enriched
+    opportunity (otherwise a sector the home page calls "leading" can vanish).
 
-    rank · sector · n_opportunities · top company · avg ScoreV2 · avg risk ·
-    momentum · relative strength · recommendation (Overweight/Neutral/Underweight).
+    The recommendation is driven by sector strength (ETF trend/momentum/RS), the
+    same number shown in the table — never by the opportunity average.
     """
     by = {}
     for r in uni.get("opportunities", []):
         s = r.get("Sector")
         if s:
             by.setdefault(s, []).append(r)
+    he2en = {v: k for k, v in SECTOR_EN_TO_HE.items()}
     msec = {s.get("sector"): s for s in (mkt.get("sectors") or [])}
+    names = {SECTOR_EN_TO_HE.get(en, en) for en in by} | set(msec)
     rows = []
-    for sec_en, items in by.items():
+    for he in names:
+        sec_en = he2en.get(he, he)
+        items = by.get(sec_en, [])
         scores = [x.get("ScoreV2") for x in items if isinstance(x.get("ScoreV2"), (int, float))]
         avg_score = round(sum(scores) / len(scores)) if scores else None
         vals = [x.get("Valuation") for x in items if isinstance(x.get("Valuation"), (int, float))]
         avg_val = round(sum(vals) / len(vals)) if vals else None
-        top = max(items, key=lambda x: x.get("ScoreV2") or 0)
+        top = max(items, key=lambda x: x.get("ScoreV2") or 0) if items else {}
         risks = [RISK_ORD[x["RiskLevel"]] for x in items if x.get("RiskLevel") in RISK_ORD]
         avg_risk = RISK_REV.get(round(sum(risks) / len(risks))) if risks else None
-        he = SECTOR_EN_TO_HE.get(sec_en, sec_en)
         si = msec.get(he, {})
         ss = si.get("score")
         reco = ("Overweight" if isinstance(ss, (int, float)) and ss >= 66

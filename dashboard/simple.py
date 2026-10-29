@@ -412,7 +412,10 @@ def page_check(ctx):
         if c[0].button("⭐ שמירה במניות שלי", key=f"add_{t}", use_container_width=True):
             v = rep.get("verdict") or {}
             lv = v.get("levels") or {}
-            mywatch.add(t, price=lv.get("price"), score_v2=v.get("quality"),
+            # Baseline = the same daily close "My stocks" compares against later
+            # (a live intraday price here would show a fake change tomorrow).
+            base_price = _n(ctx["rows"].get(t, {}).get("Price")) or lv.get("price")
+            mywatch.add(t, price=base_price, score_v2=v.get("quality"),
                         recommendation=v.get("label"), support=lv.get("support"))
             st.rerun()
     if c[1].button("🔬 לניתוח המקצועי המלא", key=f"pro_{t}", use_container_width=True):

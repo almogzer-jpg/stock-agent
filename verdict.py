@@ -203,6 +203,8 @@ def reliability(f: dict) -> dict:
     """ONE data-reliability number (0-100) for the inputs behind a verdict.
 
     completeness 50 · freshness 25 · critical price fields 15 · source 10.
+    Stock data comes from a single provider (Yahoo) with no per-stock cross
+    check, so the source points are never awarded: the ceiling is 90.
     """
     comp = _n(f.get("completeness"))
     comp = 0 if comp is None else max(0.0, min(100.0, comp))
@@ -229,10 +231,9 @@ def reliability(f: dict) -> dict:
     if crit:
         reasons.append("חסרות רמות מחיר")
     if f.get("fallback"):
-        pts += 5
+        pts -= 5
         reasons.append("חלק מהנתונים מגיבוי יומי")
-    else:
-        pts += 10
+    reasons.append("מקור יחיד (Yahoo), ללא אימות צולב למניות")
     score = int(round(max(0, min(100, pts))))
     label = "גבוהה" if score >= REL_HIGH else "בינונית" if score >= REL_MIN else "נמוכה"
     return {"score": score, "label": label, "reasons": reasons,
