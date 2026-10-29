@@ -59,6 +59,17 @@ CSS = f"""
       background: {ELEV}; color: {TEXT}; padding: 10px 12px; border-radius: 10px; font-size: 13.5px;
       line-height: 1.55; font-weight: 400; z-index: 60; box-shadow: 0 8px 24px rgba(0,0,0,.45);
       white-space: normal; text-align: right; }}
+  /* "details" actions read as a link attached to the card above, not a big box */
+  div[class*="st-key-t_"] button, div[class*="st-key-i_"] button, div[class*="st-key-m_go"] button {{
+      background: transparent !important; border: none !important; color: {PRIMARY} !important;
+      min-height: 34px !important; padding: 0 6px !important; font-size: 14.5px !important;
+      justify-content: flex-start !important; box-shadow: none !important; }}
+  div[class*="st-key-t_"] button *, div[class*="st-key-i_"] button *, div[class*="st-key-m_go"] button * {{
+      color: {PRIMARY} !important; text-align: right !important; }}
+  div[class*="st-key-t_"] .stButton, div[class*="st-key-i_"] .stButton {{ display: flex; justify-content: flex-start; }}
+  div[class*="st-key-t_"] button, div[class*="st-key-i_"] button {{ width: auto !important; }}
+  div[class*="st-key-t_"] button:hover p, div[class*="st-key-i_"] button:hover p {{ text-decoration: underline; }}
+  div[class*="st-key-t_"], div[class*="st-key-i_"] {{ margin-top: -12px; margin-bottom: 6px; }}
   @media (max-width: 640px) {{
     header[data-testid="stHeader"] {{ display: none; }}
     .block-container {{ padding: .4rem .8rem 110px !important; }}

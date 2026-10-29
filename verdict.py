@@ -423,6 +423,20 @@ def verdict_for_row(r: dict, source: str = "daily") -> dict:
     return decide(features_from_row(r, source))
 
 
+_COMPAT_GROUP = {"buy": "positive", "avoid": "avoid"}
+_COMPAT_COLOR = {"positive": "#1b7f3b", "watch": "#b8860b", "avoid": "#b3333b"}
+
+
+def classify_compat(row) -> dict:
+    """The verdict in the shape of ranking_engine.interpret.classify(), so the
+    e-mail/HTML reports speak with the same voice as the app."""
+    r = row.to_dict() if hasattr(row, "to_dict") else dict(row)
+    v = verdict_for_row(r)
+    g = _COMPAT_GROUP.get(v["action"], "watch")
+    return {"group": g, "emoji": v["emoji"], "label": v["short"], "color": _COMPAT_COLOR[g],
+            "summary": v["why"], "detail": " · ".join(v["pros"] + v["cons"]), "verdict": v}
+
+
 def verdict_for_report(rep: dict) -> dict:
     return decide(features_from_report(rep))
 

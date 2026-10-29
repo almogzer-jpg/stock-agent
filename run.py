@@ -37,7 +37,9 @@ from names import get_company_name
 from indicators.technical import compute_indicators
 from scanners.breakout import is_breakout
 from ranking_engine.score import score_stock
-from ranking_engine.interpret import classify
+from ranking_engine.interpret import classify as technical_classify
+import verdict as verdict_engine
+classify = verdict_engine.classify_compat     # reports speak with the app's single verdict
 from ranking_engine.factor_scores import factor_scores
 from ranking_engine.composite import composite_score
 from news.sentiment import score_headlines
@@ -541,7 +543,10 @@ def build_portfolio_payload(sectors=None, regime_label=""):
             "valuation": decision_engine.valuation_score(fund),
             "sector_score": sec_score,
             "confidence": proprietary.confidence(m)["score"],
-            "status_group": classify(m)["group"],
+            "status_group": classify({**m, **fund, "ScoreV2": comp["final"] if comp else None,
+                                      "Completeness": int(comp["completeness"] * 100) if comp else None,
+                                      "RiskLevel": rp["category"] if rp["risk_score"] is not None else fs["risk_level"],
+                                      "Date": datetime.now().strftime("%d/%m/%Y")})["group"],
         })
     # Benchmark: S&P 500 returns.
     b = _returns(mkt_close) if mkt_close is not None else {}
@@ -591,8 +596,9 @@ def main() -> None:
         metrics["Name"] = get_company_name(sym)   # English name (cached)
         metrics["Breakout"] = is_breakout(metrics)
         metrics["Score"] = score_stock(metrics)
-        # Plain-Hebrew status + bottom line (shared engine).
-        info = classify(metrics)
+        # Provisional technical status; replaced by the unified verdict once the
+        # composite score exists (see below, after the Trust Score).
+        info = technical_classify(metrics)
         metrics["Status"] = f"{info['emoji']} {info['label']}"
         metrics["Summary"] = info["summary"]
         if config.ENABLE_FUNDAMENTALS:
@@ -686,6 +692,18 @@ def main() -> None:
         ti = trust_engine.trust_score(r, backtest_map.get(r["Ticker"]))
         ts_s.append(ti["score"]); ts_c.append(ti["category"])
     df["TrustScore"], df["TrustCategory"] = ts_s, ts_c
+
+    # --- Unified verdict (verdict.py) — the same answer the app shows ---
+    st_col, sm_col = [], []
+    for _, r in df.iterrows():
+        rr = r.to_dict()
+        ev = events_map.get(r["Ticker"]) or {}
+        if isinstance(ev.get("days_to_earnings"), (int, float)):
+            rr["DaysToEarnings"] = ev["days_to_earnings"]
+        v = verdict_engine.verdict_for_row(rr)
+        st_col.append(f"{v['emoji']} {v['short']}")
+        sm_col.append(v["why"])
+    df["Status"], df["Summary"] = st_col, sm_col
 
     base_cols = [
         "Ticker", "Name", "Status", "Summary", "Date", "Price", "DailyChange%",

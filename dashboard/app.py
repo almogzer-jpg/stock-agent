@@ -278,6 +278,23 @@ def _is_mobile() -> bool:
     return False
 
 
+# ---- Streamlit Cloud wraps the app in an outer page whose floating badge sits
+# over the bottom-right corner. It lives outside this iframe (CSS cannot hide it),
+# so when we are framed, mark the document and lift the phone nav above it.
+components.html(
+    """<script>
+      try {
+        const appDoc = window.parent.document;
+        if (window.parent.parent !== window.parent) appDoc.body.classList.add('sa-framed');
+      } catch (e) {}
+    </script>""", height=0)
+st.markdown(
+    "<style>body.sa-framed .st-key-snav, body.sa-framed .st-key-mnav {"
+    " padding-bottom: calc(52px + env(safe-area-inset-bottom)) !important; }"
+    "body.sa-framed .block-container { padding-bottom: 170px !important; }</style>",
+    unsafe_allow_html=True)
+
+
 # ---- Per-visitor "my stocks" storage: the visitor's own browser (both modes) ----
 import mywatch as _mywatch
 from dashboard import localstore as _ls
@@ -454,46 +471,6 @@ def fear_greed_gauge(fng: dict):
                 f"{fng.get('label','')}</div>", unsafe_allow_html=True)
 
 
-def opportunity_card(rank, r):
-    info = classify(r)
-    up = fmt(r.get("ExpectedUpside%"), "%")
-    conf = fmt(r.get("Confidence"), "")
-    chg = r.get("DailyChange%", 0)
-    ccol = GREEN if chg >= 0 else RED
-    ex = explain_stock(r, events.get(r["Ticker"]))
-    why_key = {"positive": ("✅ למה כן", ex["why_buy"]),
-               "watch": ("🟡 למה במעקב", ex["why_watch"] or ex["why_buy"]),
-               "avoid": ("🔴 למה להימנע", ex["why_avoid"])}[ex["group"]]
-    why_items = "".join(f"<li>{x}</li>" for x in why_key[1][:3])
-    cats = "".join(f"<li>{x}</li>" for x in ex["catalysts"][:2])
-    rsks = "".join(f"<li>{x}</li>" for x in ex["risks"][:2])
-    st.markdown(
-        f"""<div class="card" style="border-right:5px solid {info['color']}">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="font-size:17px;font-weight:800">#{rank} &nbsp; {r['Ticker']}
-              <span style="color:{MUTED};font-weight:400">· {r['Name']}</span></div>
-            <div style="color:{info['color']};font-weight:700">{info['emoji']} {info['label']}</div>
-          </div>
-          <div style="margin:8px 0;color:{TEXT}">
-            ציון סופי <b>{int(r['ScoreV2'])}</b>/100 <span style="color:{MUTED};font-size:12px">(טכני {int(r['Score'])})</span> ·
-            מחיר ${fmt(r['Price'])} <span style="color:{ccol}">({'+' if chg>=0 else ''}{chg}%)</span> ·
-            פוטנציאל עלייה <b style="color:{GREEN}">{up}</b> ·
-            ביטחון <b>{conf}</b> ({fmt(r.get('ConfidenceLevel'))}) ·
-            סיכון {fmt(r.get('RiskLevel'))}
-          </div>
-          <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:13px">
-            <div><b style="color:{info['color']}">{why_key[0]}</b>
-              <ul style="margin:4px 0;color:{MUTED};padding-right:18px">{why_items}</ul></div>
-            <div><b style="color:{GREEN}">⚡ קטליזטורים</b>
-              <ul style="margin:4px 0;color:{MUTED};padding-right:18px">{cats}</ul></div>
-            <div><b style="color:{RED}">⚠️ סיכונים</b>
-              <ul style="margin:4px 0;color:{MUTED};padding-right:18px">{rsks}</ul></div>
-          </div>
-        </div>""",
-        unsafe_allow_html=True,
-    )
-
-
 # ===========================================================================
 # PAGE: 60-second home (Market Overview + Top Opportunities)
 # ===========================================================================
@@ -551,50 +528,6 @@ def action_card_html(idx, h):
             f"<div class='a-row'><b>השפעת סיכון:</b> {h.get('risk_impact','')}</div>"
             f"<div class='a-row'><b>תועלת צפויה:</b> {benefit}</div>"
             f"<div class='a-row'><b>ביטחון:</b> {h.get('confidence','—')}%</div></div>")
-
-
-def opp_card(rank, r):
-    """Institutional opportunity card: sparkline + score bars + meta + reasons."""
-    info = classify(r)
-    tk = r["Ticker"]
-    chg = r.get("DailyChange%", 0) or 0
-    ccol = POSITIVE if chg >= 0 else NEGATIVE
-    spark = sparkline_svg(chart_series(tk))
-    trust = r.get("TrustScore")
-    risk = r.get("ScoreRisk")
-    risk_health = None if (risk is None or risk != risk) else 100 - risk
-    bars = (score_bar("טכני", r.get("Score")) + score_bar("פונדמנטלי", r.get("ScoreFundamental"))
-            + score_bar("סקטור", _sector_raw(r)) + score_bar("חדשות", r.get("ScoreNews"))
-            + score_bar("ניהול סיכון", risk_health) + score_bar("אמון", trust))
-    ex = explain_stock(r, events.get(tk))
-    why = {"positive": ex["why_buy"], "watch": ex["why_watch"] or ex["why_buy"],
-           "avoid": ex["why_avoid"]}[ex["group"]]
-    whys = "".join(f"<li>{x}</li>" for x in (why or [])[:2]) or "<li>—</li>"
-    rsks = "".join(f"<li>{x}</li>" for x in ex["risks"][:2]) or "<li>—</li>"
-    cats = "".join(f"<li>{x}</li>" for x in ex["catalysts"][:2]) or "<li>—</li>"
-    trust_disp = fmt(int(trust) if isinstance(trust, (int, float)) and trust == trust else None)
-    st.markdown(
-        f"""<div class="opp" style="--ac:{info['color']}">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div><span class="o-tick">#{rank} {tk}</span> <span class="o-co">{r['Name']}</span></div>
-            <div style="text-align:left">{spark}
-              <div class="o-rec" style="color:{info['color']}">{info['emoji']} {info['label']}</div></div>
-          </div>
-          <div class="o-meta">
-            <span>ציון V2 <b>{int(r['ScoreV2'])}</b></span>
-            <span>אמון <b>{trust_disp}</b></span>
-            <span>סיכון <b>{fmt(r.get('RiskLevel'))}</b></span>
-            <span>פוטנציאל <b style="color:{POSITIVE}">{fmt(r.get('ExpectedUpside%'),'%')}</b></span>
-            <span>${fmt(r.get('Price'))} <span style="color:{ccol}">({'+' if chg>=0 else ''}{chg}%)</span></span>
-            <span>{fmt(r.get('Sector'))}</span>
-          </div>
-          <div class="o-cols">
-            <div>{bars}</div>
-            <div><b style="color:{info['color']}">למה מעניין</b><ul>{whys}</ul>
-                 <b style="color:{NEGATIVE}">סיכונים עיקריים</b><ul>{rsks}</ul></div>
-            <div><b style="color:{PRIMARY}">אירועים / קטליזטורים</b><ul>{cats}</ul></div>
-          </div>
-        </div>""", unsafe_allow_html=True)
 
 
 if page.startswith("🏠"):
@@ -2123,7 +2056,7 @@ elif page == "📊 אינטליגנציית שוק":
 
     st.markdown("#### טבלת מניות מדורגת")
     cols = ["Ticker", "Name", "ScoreV2", "Score", "ScoreFundamental", "ScoreRisk",
-            "TrustScore", "RiskLevel", "ExpectedUpside%", "Confidence", "DailyChange%"]
+            "TrustScore", "RiskLevel", "Confidence", "DailyChange%"]
     view = df[[c for c in cols if c in df.columns]].copy().sort_values("ScoreV2", ascending=False)
     view = view.rename(columns={c: L.get(c, c) for c in view.columns})
     pcfg = {L[c]: st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d")

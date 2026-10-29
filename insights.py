@@ -6,7 +6,7 @@ into a readable Hebrew briefing: market summary, best opportunities, biggest
 risks, and sector rotation. Deterministic and transparent — every sentence
 maps to real numbers already shown elsewhere in the app.
 """
-from ranking_engine.interpret import classify
+from verdict import classify_compat as classify
 
 
 def generate_insights(market: dict, df, alert_center: list) -> dict:
@@ -37,15 +37,17 @@ def generate_insights(market: dict, df, alert_center: list) -> dict:
 
     # --- Best opportunities ---
     if positive.empty:
-        opp_txt = "אין היום מניות במומנטום חיובי בולט — שוק זהיר."
+        opp_txt = "אין היום מניות שעוברות את כל התנאים לקנייה — לא חייבים לקנות כל יום."
     else:
         items = []
-        for _, r in positive.head(3).iterrows():
-            info = classify(r)
-            items.append(f"**{r['Ticker']}** ({info['label']}, ציון {int(r['Score'])}, "
-                         f"פוטנציאל {r.get('ExpectedUpside%','?')}%)")
-        opp_txt = (f"{len(positive)} מניות במומנטום חיובי, מתוכן {n_break} מועמדות לפריצה. "
-                   f"הבולטות: " + " · ".join(items) + ".")
+        top = positive.sort_values("ScoreV2", ascending=False) if "ScoreV2" in positive else positive
+        for _, r in top.head(3).iterrows():
+            q = r.get("ScoreV2")
+            items.append(f"**{r['Ticker']}** (ציון איכות {int(q)})" if isinstance(q, (int, float)) and q == q
+                         else f"**{r['Ticker']}**")
+        opp_txt = (f"{len(positive)} מניות בפסק דין 'שווה לשקול קנייה'"
+                   + (f", מתוכן {n_break} בפריצה טכנית" if n_break else "") + ". "
+                   f"המובילות: " + " · ".join(items) + ".")
 
     # --- Biggest risks (genuine risk alerts only — exclude positive breakouts) ---
     risk_alerts = [a for a in (alert_center or [])

@@ -39,6 +39,8 @@ import yfinance as yf
 
 import config
 import technicals as ta
+from ranking_engine.score import score_stock
+from scanners.breakout import is_breakout
 
 HORIZON = 63
 STEP = 21
@@ -83,6 +85,8 @@ def _samples(t, df, spy):
     rsi = _rsi(close)
     hi252 = close.rolling(252).max()
     ret63_back = close / close.shift(63) - 1
+    vol = df["Volume"] if "Volume" in df.columns else None
+    avgvol = vol.rolling(20).mean() if vol is not None else None
     rows = []
     n = len(close)
     for i in range(260, n - HORIZON, STEP):
@@ -101,6 +105,15 @@ def _samples(t, df, spy):
             continue
         fwd = p1 / p0 - 1
         path = close.iloc[i:i + HORIZON + 1]
+        m = {"Price": float(p0), "MA50": float(ma50.iloc[i]), "MA200": float(ma200.iloc[i]),
+             "RSI14": float(rsi.iloc[i]) if rsi.iloc[i] == rsi.iloc[i] else 50.0,
+             "DistFromHigh%": float((hi252.iloc[i] - p0) / hi252.iloc[i] * 100),
+             "VolRatio": (float(vol.iloc[i] / avgvol.iloc[i])
+                          if vol is not None and avgvol.iloc[i] and avgvol.iloc[i] == avgvol.iloc[i] else 1.0)}
+        try:
+            tscore, brk = score_stock(m), bool(is_breakout(m))
+        except Exception:
+            tscore, brk = None, None
         rows.append({
             "t": t, "date": d0.strftime("%Y-%m-%d"),
             "above200": bool(p0 > ma200.iloc[i]), "above50": bool(p0 > ma50.iloc[i]),
@@ -111,6 +124,7 @@ def _samples(t, df, spy):
             "dist_sup": (srl or {}).get("dist_support_pct"),
             "dist_res": (srl or {}).get("dist_resistance_pct"),
             "rr": (srl or {}).get("risk_reward"),
+            "tscore": tscore, "breakout_signal": brk,
             "fwd": fwd * 100, "excess": (fwd - (s1 / s0 - 1)) * 100,
             "dd": float((path.min() / p0 - 1) * 100),
         })
@@ -181,6 +195,12 @@ def build(s, n_tickers):
         "3m momentum top (>= +20%)": s[s.mom3m >= 20],
         "3m momentum <= -15%": s[s.mom3m <= -15],
     }
+    if "tscore" in s.columns:            # model check: the technical score (25% of V2)
+        ts = s[s.tscore.notna()]
+        for lo, hi in ((0, 35), (35, 50), (50, 65), (65, 80), (80, 101)):
+            groups[f"technical score {lo}-{min(hi, 100)}"] = ts[(ts.tscore >= lo) & (ts.tscore < hi)]
+        groups["breakout signal (app definition)"] = s[s.breakout_signal == True]  # noqa: E712
+        groups["no breakout signal"] = s[s.breakout_signal == False]  # noqa: E712
     return {"meta": {"horizon_days": HORIZON, "step_days": STEP, "start": START,
                      "tickers": int(n_tickers), "samples": int(len(s)),
                      "first_date": s.date.min(), "last_date": s.date.max(),
