@@ -5,6 +5,7 @@ Generates Why-Buy / Why-Watch / Why-Avoid bullet lists plus Key Catalysts and
 Key Risks — all rule-based from REAL data (the scan metrics + optional events
 and sector context). Nothing fabricated; reasons map directly to real signals.
 """
+from events import days_phrase
 from ranking_engine.interpret import classify
 
 
@@ -61,7 +62,7 @@ def explain(row, events: dict | None = None, sector: dict | None = None) -> dict
     if vr >= 2:
         catalysts.append(f"📊 זינוק נפח חריג (פי {vr})")
     if events.get("days_to_earnings") is not None and events["days_to_earnings"] <= 14:
-        catalysts.append(f"📅 דוחות כספיים בעוד {events['days_to_earnings']} ימים "
+        catalysts.append(f"📅 דוחות כספיים {days_phrase(events['days_to_earnings'])} "
                          f"({events.get('earnings_date','')})")
     if events.get("rating_action") and "שדרוג" in str(events["rating_action"]):
         catalysts.append(f"⬆️ שדרוג אנליסטים — {events['rating_firm'] or ''} "
@@ -77,7 +78,7 @@ def explain(row, events: dict | None = None, sector: dict | None = None) -> dict
     if risk_level == "גבוה":
         risks.append("⚠️ תנודתיות גבוהה (רמת סיכון גבוהה)")
     if events.get("days_to_earnings") is not None and events["days_to_earnings"] <= 7:
-        risks.append(f"⚠️ דוחות בעוד {events['days_to_earnings']} ימים — סיכון אירוע")
+        risks.append(f"⚠️ דוחות {days_phrase(events['days_to_earnings'])} — סיכון אירוע")
     if events.get("rating_action") and "הורדת" in str(events["rating_action"]):
         risks.append(f"⚠️ הורדת דירוג — {events['rating_firm'] or ''}")
     if sector and sector.get("score", 100) < 35:

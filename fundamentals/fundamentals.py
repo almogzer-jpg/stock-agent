@@ -159,6 +159,9 @@ def get_fundamentals(symbol: str) -> dict:
     if entry and _fresh(entry.get("_date", "")):
         return {k: entry.get(k) for k in FIELDS}
     data = _fetch_raw(symbol)
-    _CACHE[symbol] = {**data, "_date": date.today().isoformat()}
-    _save_cache(_CACHE)
+    # A blocked .info call yields an all-empty profile; caching it would pin the
+    # gap for a whole TTL, so only successful pulls are cached.
+    if any(data.get(k) is not None for k in ("Sector", "MarketCap", "RevenueGrowth", "ForwardPE")):
+        _CACHE[symbol] = {**data, "_date": date.today().isoformat()}
+        _save_cache(_CACHE)
     return data

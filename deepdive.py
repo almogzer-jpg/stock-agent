@@ -29,7 +29,7 @@ from ranking_engine.score import score_stock, score_breakdown
 from ranking_engine.factor_scores import fundamental_score, sentiment_score
 from ranking_engine.composite import composite_score
 from ranking_engine.interpret import classify
-from fundamentals.fundamentals import get_fundamentals
+from fundamentals.fundamentals import get_fundamentals, FIELDS as FUND_FIELDS
 from backtesting.backtester import backtest_signal
 from news.headlines import get_headlines
 from news.sentiment import score_headlines
@@ -217,6 +217,9 @@ def translate_he(text):
 
 def he_overview_line(name, sector_he, industry, country):
     """One factual Hebrew sentence built from REAL structured fields (always works)."""
+    known = [v for v in (sector_he, industry, country) if v and v != NA]
+    if not known:
+        return f"{name} — פרטי הפעילות של החברה אינם זמינים כרגע."
     parts = [f"{name} פועלת"]
     if sector_he and sector_he != NA:
         parts.append(f"בסקטור {sector_he}")
@@ -232,15 +235,51 @@ def he_overview_line(name, sector_he, industry, country):
 # Network fetch + assembly
 # ---------------------------------------------------------------------------
 
+def daily_snapshot(ticker: str) -> dict:
+    """Latest row for `ticker` from the daily scan artifacts (English keys).
+
+    The daily pipeline runs on GitHub Actions, where Yahoo's profile endpoint
+    answers; the hosted app's live `.info` call is often blocked. This row is a
+    real, dated fallback — results.csv (watchlist, full fundamentals) first,
+    then universe.json (500-stock scan, name/sector/market-cap only)."""
+    t = (ticker or "").strip().upper()
+    row = {}
+    try:
+        inv = {v: k for k, v in config.COLUMN_LABELS_HE.items()}
+        df = pd.read_csv(config.RESULTS_CSV, encoding="utf-8-sig").rename(columns=inv)
+        hit = df[df["Ticker"] == t]
+        if len(hit):
+            row = hit.iloc[0].to_dict()
+    except Exception:
+        row = {}
+    if not row:
+        try:
+            import json
+            with open(config.UNIVERSE_JSON, encoding="utf-8") as fh:
+                uni = json.load(fh)
+            row = next((r for r in uni.get("all", []) if r.get("Ticker") == t), {}) or {}
+        except Exception:
+            row = {}
+    return {k: v for k, v in row.items()
+            if v is not None and not (isinstance(v, float) and v != v)}
+
+
 def fetch_bundle(ticker: str) -> dict:
     """Live pull of everything we need for one ticker (caller should cache)."""
     t = ticker.strip().upper()
     tk = yf.Ticker(t)
     out = {"ticker": t}
-    try:
-        out["info"] = tk.info or {}
-    except Exception:
-        out["info"] = {}
+    out["info"] = {}
+    for attempt in range(2):           # Yahoo's profile endpoint blocks intermittently
+        try:
+            out["info"] = tk.info or {}
+        except Exception:
+            out["info"] = {}
+        if out["info"].get("longName") or out["info"].get("sector"):
+            break
+        if attempt == 0:
+            import time
+            time.sleep(1.5)
     out["summary_he"] = translate_he((out["info"] or {}).get("longBusinessSummary"))
     try:
         out["hist"] = tk.history(period="5y", auto_adjust=True)
@@ -299,9 +338,15 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     # ---- Fundamentals / valuation ----
     fund = {}
     try:
-        fund = get_fundamentals(t) or {}
+        fund = dict(get_fundamentals(t) or {})
     except Exception:
         fund = {}
+    snap = daily_snapshot(t)
+    from_daily = []
+    for k in FUND_FIELDS:
+        if fund.get(k) is None and snap.get(k) is not None:
+            fund[k] = snap[k]
+            from_daily.append(k)
     fund_score = fundamental_score(fund)
     val_score = dec.valuation_score(fund)
     rev_growth = _num(fund.get("RevenueGrowth"))
@@ -391,7 +436,8 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
 
     pfcf = (_g(info, "marketCap") / fcf) if (_g(info, "marketCap") and fcf and fcf > 0) else None
     valuation = {
-        "forward_pe": (f"{_g(info,'forwardPE'):.1f}" if _g(info, "forwardPE") is not None else NA),
+        "forward_pe": (f"{_g(info,'forwardPE'):.1f}" if _g(info, "forwardPE") is not None
+                       else f"{fund['ForwardPE']}" if _num(fund.get("ForwardPE")) is not None else NA),
         "trailing_pe": (f"{_g(info,'trailingPE'):.1f}" if _g(info, "trailingPE") is not None else NA),
         "peg": (f"{fund.get('PEG')}" if _num(fund.get("PEG")) is not None else (f"{_g(info,'pegRatio')}" if _g(info, "pegRatio") is not None else NA)),
         "price_sales": (f"{_g(info,'priceToSalesTrailing12Months'):.1f}" if _g(info, "priceToSalesTrailing12Months") is not None else NA),
@@ -417,7 +463,7 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     summary_he = b.get("summary_he")            # translated once at fetch (cached)
     if summary_he is None and bundle is None:    # direct call (no cached bundle) → try now
         summary_he = translate_he(summary_en)
-    name = info.get("longName") or get_company_name(t) or t
+    name = info.get("longName") or snap.get("Name") or get_company_name(t) or t
     overview = {
         "name": name,
         "sector": sector_en or NA, "sector_he": sector_he or NA,
@@ -431,7 +477,7 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
 
     market_data = {
         "price": (f"${ma.get('price'):.2f}" if ma.get("price") is not None else NA),
-        "market_cap": _money(_g(info, "marketCap")),
+        "market_cap": _money(_g(info, "marketCap") or fund.get("MarketCap")),
         "high_52w": (f"${hl['high']}" if hl.get("high") is not None else NA),
         "low_52w": (f"${hl['low']}" if hl.get("low") is not None else NA),
         "daily_change": _pct((close.iloc[-1] / close.iloc[-2] - 1) * 100 if len(close) >= 2 else None),
@@ -478,6 +524,9 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     warnings_q = []
     if hist is None or len(getattr(hist, "index", [])) < 60:
         warnings_q.append("⚠️ נתונים טכניים חלקיים — היסטוריית מחיר קצרה")
+    if from_daily:
+        warnings_q.append(f"ℹ️ חלק מהנתונים העסקיים נלקחו מהסריקה היומית ({snap.get('Date', 'האחרונה')}) "
+                          "— השליפה החיה מ-Yahoo לא הייתה זמינה כרגע")
     if fund_score is None:
         warnings_q.append("⚠️ נתונים פונדמנטליים חסרים — הציון המשוקלל חושב בלעדיהם")
     if not _g(info, "targetMeanPrice"):

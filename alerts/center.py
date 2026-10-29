@@ -5,6 +5,7 @@ Alert types: breakout, volume spike, earnings, analyst upgrade/downgrade,
 sector rotation. Each alert is a dict {type, scope, severity, message}.
 All derived from real scan data, sector intelligence, and events.
 """
+from events import days_phrase
 
 
 def build_alerts(df, sectors: list | None, events_map: dict | None) -> list[dict]:
@@ -32,9 +33,9 @@ def build_alerts(df, sectors: list | None, events_map: dict | None) -> list[dict
         dte = ev.get("days_to_earnings")
         if dte is not None and dte <= 7:
             add("דוחות", t, "בינונית",
-                f"{t} — דוחות כספיים בעוד {dte} ימים ({ev.get('earnings_date','')})")
-        # Analyst actions
-        if ev.get("rating_action"):
+                f"{t} — דוחות כספיים {days_phrase(dte)} ({ev.get('earnings_date','')})")
+        # Analyst actions — a reaffirmed rating is not news, so it is not an alert
+        if ev.get("rating_action") and "אישרור" not in str(ev["rating_action"]):
             sev = "גבוהה" if "הורדת" in str(ev["rating_action"]) else "מידע"
             add("שינוי דירוג", t, sev,
                 f"{t} — {ev['rating_action']} ({ev.get('rating_firm','')})")

@@ -25,6 +25,48 @@ def _days_until(d) -> int | None:
     return None
 
 
+def days_phrase(n) -> str:
+    """Hebrew 'when' phrase for a day count: 0 → היום, 1 → מחר, else בעוד N ימים."""
+    try:
+        n = int(n)
+    except (TypeError, ValueError):
+        return ""
+    if n <= 0:
+        return "היום"
+    if n == 1:
+        return "מחר"
+    return f"בעוד {n} ימים"
+
+
+GRADE_HE = {
+    "strong buy": "קנייה חזקה", "buy": "קנייה", "accumulate": "צבירה",
+    "outperform": "תשואת-יתר", "market outperform": "תשואת-יתר",
+    "sector outperform": "תשואת-יתר", "overweight": "משקל-יתר", "positive": "חיובי",
+    "hold": "החזקה", "neutral": "ניטרלי", "equal-weight": "משקל-שוק",
+    "market perform": "תשואת-שוק", "sector perform": "תשואת-שוק",
+    "peer perform": "תשואת-שוק", "in-line": "בקו השוק", "sector weight": "משקל-שוק",
+    "underperform": "תשואת-חסר", "market underperform": "תשואת-חסר",
+    "underweight": "משקל-חסר", "reduce": "הקטנה", "negative": "שלילי",
+    "sell": "מכירה", "strong sell": "מכירה חזקה",
+}
+ACTION_HE = {"up": "שדרוג", "down": "הורדת דירוג", "init": "כיסוי חדש",
+             "main": "אישרור דירוג", "reit": "אישרור דירוג"}
+
+
+def grade_he(grade) -> str:
+    g = str(grade or "").strip()
+    return GRADE_HE.get(g.lower(), g)
+
+
+def rating_action_he(action, from_grade, to_grade) -> str:
+    """One readable Hebrew line for an analyst rating action (RTL arrow)."""
+    he = ACTION_HE.get(str(action or "").lower(), "עדכון דירוג")
+    frm, to = grade_he(from_grade), grade_he(to_grade)
+    if not frm or frm == to:
+        return f"{he}: {to}" if to else he
+    return f"{he}: {frm} ← {to}"
+
+
 def get_events(symbol: str) -> dict:
     """Return {earnings_date, days_to_earnings, rating_action, rating_firm}.
 
@@ -63,11 +105,8 @@ def get_events(symbol: str) -> dict:
             recent = _days_until(getattr(gdate, "to_pydatetime", lambda: gdate)())
             # Only surface if within the last ~14 days.
             if recent is not None and -14 <= recent <= 0:
-                action = str(last.get("Action", "")).lower()
-                he = {"up": "שדרוג", "down": "הורדת דירוג",
-                      "init": "כיסוי חדש", "main": "אישרור"}.get(action, action or "עדכון")
-                out["rating_action"] = (f"{he}: {last.get('FromGrade','')} → "
-                                        f"{last.get('ToGrade','')}").strip(" :→")
+                out["rating_action"] = rating_action_he(
+                    last.get("Action"), last.get("FromGrade"), last.get("ToGrade"))
                 out["rating_firm"] = str(last.get("Firm", "")) or None
     except Exception:
         pass

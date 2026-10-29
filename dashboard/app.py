@@ -27,6 +27,7 @@ from ranking_engine.score import score_breakdown, COMPONENT_LABELS_HE
 from news.headlines import get_headlines
 from news.sentiment import score_headlines
 from explain import explain as explain_stock
+from events import days_phrase
 import trust as trust_engine
 from dashboard.theme import (DARK_CSS, style_fig, GREEN, AMBER, RED, BLUE, CARD, MUTED, TEXT,
                              SECONDARY, PRIMARY, POSITIVE, WARNING, NEGATIVE, BG, BORDER, ELEV,
@@ -785,13 +786,14 @@ if page.startswith("🏠"):
                   if isinstance(e.get("days_to_earnings"), (int, float)) and 0 <= e["days_to_earnings"] <= 7],
                  key=lambda x: x[1]["days_to_earnings"])
     _wk_html = "".join(f"<div style='display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid {BORDER}'>"
-                       f"<span><b>{t}</b> · דוחות</span><span style='color:{SECONDARY}'>בעוד {int(e['days_to_earnings'])} ימים</span></div>"
+                       f"<span><b>{t}</b> · דוחות</span><span style='color:{SECONDARY}'>{days_phrase(e['days_to_earnings'])}</span></div>"
                        for t, e in _wk) or f"<div class='ic-sub'>אין דוחות השבוע ברשימת המעקב.</div>"
     ev2[0].markdown(f"<div class='ic-card' style='height:100%'><div class='ic-title'>אירועים השבוע</div>{_wk_html}"
                     f"<div class='ic-sub' style='margin-top:8px'>דוחות בלבד — Fed/CPI/דיבידנדים ללא מקור חינמי מובנה.</div></div>",
                     unsafe_allow_html=True)
-    _acts = [(t, e.get("rating_action"), e.get("rating_firm")) for t, e in (events or {}).items()
-             if e.get("rating_action")][:5]
+    _acts = sorted([(t, e.get("rating_action"), e.get("rating_firm")) for t, e in (events or {}).items()
+                    if e.get("rating_action")],
+                   key=lambda x: "אישרור" in str(x[1]) or "reit" in str(x[1]))[:5]
     _news = "".join(f"<div style='padding:7px 2px;border-bottom:1px solid {BORDER}'>"
                     f"<b>{t}</b> · {a} <span style='color:{MUTED};font-size:13.5px'>({f_})</span></div>"
                     for t, a, f_ in _acts) or f"<div class='ic-sub'>אין עדכוני אנליסטים.</div>"
@@ -1969,10 +1971,12 @@ elif page == "🔎 ניתוח חברה":
             pcc = st.columns(2)
             pcc[0].markdown(f"<div class='ic-card' style='border-right:5px solid {POSITIVE}'>"
                             f"<div class='ic-title' style='color:{POSITIVE}'>✅ למה להשקיע</div>"
-                            + "".join(f"<div class='ic-sub'>• {x}</div>" for x in pc["pros"]) + "</div>", unsafe_allow_html=True)
+                            + ("".join(f"<div class='ic-sub'>• {x}</div>" for x in pc["pros"] if x != "—")
+                               or "<div class='ic-sub'>אין כרגע יתרונות בולטים.</div>") + "</div>", unsafe_allow_html=True)
             pcc[1].markdown(f"<div class='ic-card' style='border-right:5px solid {NEGATIVE}'>"
                             f"<div class='ic-title' style='color:{NEGATIVE}'>⚠️ למה לא</div>"
-                            + "".join(f"<div class='ic-sub'>• {x}</div>" for x in pc["cons"]) + "</div>", unsafe_allow_html=True)
+                            + ("".join(f"<div class='ic-sub'>• {x}</div>" for x in pc["cons"] if x != "—")
+                               or "<div class='ic-sub'>לא זוהו חסרונות בולטים.</div>") + "</div>", unsafe_allow_html=True)
 
             # ---- Competitive / Regulation (honest) ----
             cr = st.columns(2)
@@ -1988,7 +1992,10 @@ elif page == "🔎 ניתוח חברה":
             st.markdown(f"<div class='ic-card' style='border-right:6px solid {PRIMARY}'>"
                         f"<div style='font-size:24px;font-weight:800;color:{PRIMARY}'>{op['recommendation']}</div>"
                         f"<div style='margin-top:6px'>{op['attractive']}</div>"
-                        f"<div class='ic-sub' style='margin-top:6px'>טווח הקצאה מוצע: <b style='color:{TEXT}'>{op['allocation_pct']}%</b> · "
+                        f"<div class='ic-sub' style='margin-top:6px'>חשיפה מוצעת בתיק: <b style='color:{TEXT}'>"
+                        + ((f"{dec['position'].get('name', '')} ({dec['position'].get('range', '')})")
+                           if (dec and dec.get("position")) else f"{op['allocation_pct']}%")
+                        + "</b> · "
                         f"פרופיל משקיע: {op['investor_profile']}</div>"
                         f"<div class='ic-sub'>מה ישנה את ההמלצה: {op['what_changes']}</div></div>", unsafe_allow_html=True)
 

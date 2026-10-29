@@ -40,6 +40,17 @@ def test_analyst_alert_from_events():
     assert any(a["type"] == "שינוי דירוג" and a["severity"] == "גבוהה" for a in alerts)
 
 
+def test_earnings_today_reads_as_today_not_zero_days():
+    events = {"AAA": {"days_to_earnings": 0, "earnings_date": "2026-10-29"}}
+    msg = next(a["message"] for a in build_alerts(_df(), SECTORS, events) if a["type"] == "דוחות")
+    assert "היום" in msg and "בעוד 0" not in msg
+
+
+def test_reaffirmed_rating_is_not_an_alert():
+    events = {"AAA": {"rating_action": "אישרור דירוג: קנייה", "rating_firm": "UBS"}}
+    assert not any(a["type"] == "שינוי דירוג" for a in build_alerts(_df(), SECTORS, events))
+
+
 def test_sector_rotation_alerts():
     alerts = build_alerts(_df(), SECTORS, {})
     rot = [a for a in alerts if a["type"] == "רוטציית סקטורים"]

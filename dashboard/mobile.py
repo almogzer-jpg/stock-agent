@@ -67,23 +67,25 @@ MOBILE_CSS = f"""
   div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {{
        background:{PRIMARY}; }}
   div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) * {{ color:#0B1220 !important; }}
-  /* ---- Sticky BOTTOM navigation (real-app feel) ---- */
-  /* Streamlit Cloud floating badge (crown + creator avatar) sits bottom-right with
-     z-index ~999990 and steals taps from the nav. Its class names are hashed, so:
-     (1) hide it via class-fragment selectors, (2) keep the nav's z-index above it
-     as a fallback for future hash/markup changes. */
-  [class*="viewerBadge"], [class*="profileContainer"],
-  a[href*="streamlit.io/cloud"] {{ display:none !important; }}
-  .st-key-mnav {{ position:fixed; bottom:0; left:0; right:0; z-index:1000000;
+  /* ---- Sticky BOTTOM navigation (real-app feel) ----
+     All six tabs must fit a 360px phone: no radio dots, equal-width cells, small
+     label. (The Streamlit Cloud badge lives in the host page outside this iframe,
+     so no CSS here can reach it — the badge-free link is …/~/+/?m=1.) */
+  .st-key-mnav {{ position:fixed; bottom:0; left:0; right:0; z-index:999;
        background:{CARD}; border-top:1px solid {BORDER};
-       padding:6px 6px calc(8px + env(safe-area-inset-bottom)); margin:0; }}
-  .st-key-mnav [role="radiogroup"] {{ display:flex; justify-content:space-around;
-       flex-wrap:nowrap; overflow-x:auto; gap:2px; }}
+       padding:4px 2px calc(6px + env(safe-area-inset-bottom)); margin:0; }}
+  .st-key-mnav [role="radiogroup"] {{ display:flex; justify-content:space-between;
+       flex-wrap:nowrap; overflow:hidden; gap:0; width:100%; }}
   .st-key-mnav [role="radiogroup"] label {{ background:transparent !important; border:none;
-       border-radius:12px; padding:7px 9px; min-height:48px; font-size:13.5px; font-weight:600;
-       display:flex; align-items:center; }}
-  .st-key-mnav [role="radiogroup"] label:has(input:checked) {{ background:{ELEV} !important; }}
-  .st-key-mnav [role="radiogroup"] label:has(input:checked) * {{ color:{PRIMARY} !important; }}
+       border-radius:12px; padding:6px 1px; min-height:48px; font-size:12px; font-weight:600;
+       flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:center;
+       text-align:center; white-space:nowrap; }}
+  .st-key-mnav [role="radiogroup"] label > div:first-child {{ display:none; }}
+  .st-key-mnav [role="radiogroup"] label p {{ text-align:center; font-size:12px; }}
+  .st-key-mnav div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {{
+       background:{ELEV} !important; }}
+  .st-key-mnav div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) * {{
+       color:{PRIMARY} !important; }}
   .scen {{ margin-bottom:10px; }}
 </style>
 """
@@ -141,7 +143,7 @@ def _grid(cards, cols=2):
 def _opp_card(r, lookup, nc, key_prefix="m"):
     info = classify(r)
     tk = r["Ticker"]
-    nm = VW.company_name(tk, lookup, nc)
+    nm = r.get("Name") if isinstance(r.get("Name"), str) and r.get("Name") else VW.company_name(tk, lookup, nc)
     chg = r.get("DailyChange%", 0) or 0
     ccol = POSITIVE if chg >= 0 else NEGATIVE
     sv = _num(r.get("ScoreV2", r.get("Score")))
