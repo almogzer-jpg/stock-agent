@@ -143,6 +143,7 @@ def features_from_row(r: dict, source: str = "daily") -> dict:
         "dist_sup": g("DistSupport%"), "dist_res": g("DistResistance%"), "rr": g("RiskReward"),
         "sr_status": status,
         "quality": g("ScoreV2") if enriched else None, "fundamental": fund,
+        "technical": g("Score"), "news": g("ScoreNews"),
         "valuation": g("Valuation"), "sector_score": g("SectorScore"),
         "risk_level": r.get("RiskLevel"), "volatility": g("Volatility"), "max_dd": g("MaxDrawdown"),
         "beta": g("Beta"),
@@ -180,6 +181,7 @@ def features_from_report(rep: dict) -> dict:
         "dist_sup": _n(srl.get("dist_support_pct")), "dist_res": _n(srl.get("dist_resistance_pct")),
         "rr": _n(srl.get("risk_reward")), "sr_status": srl.get("status") or "normal",
         "quality": sv("final_v2"), "fundamental": sv("fundamental"), "valuation": sv("valuation"),
+        "technical": sv("technical"), "news": sv("news"),
         "sector_score": sv("sector"), "risk_level": rk.get("category"),
         "volatility": _n(rk.get("volatility")), "max_dd": _n(rk.get("max_drawdown")), "beta": _n(rk.get("beta")),
         "rev_growth": _n(rm.get("rev_growth")), "eps_growth": _n(rm.get("eps_growth")),
@@ -309,6 +311,20 @@ def _cons(f, trend):
     return out
 
 
+_DIMS = (("fundamental", "הנתונים העסקיים של החברה"), ("technical", "המצב הטכני של המניה"),
+         ("sector_score", "חוזק הענף שלה"), ("news", "החדשות האחרונות עליה"))
+
+
+def _holding_back(f):
+    """The weakest quality dimension (below 55) — what keeps the score down."""
+    dims = [(f.get(k), label) for k, label in _DIMS if _n(f.get(k)) is not None]
+    dims = [(v, l) for v, l in dims if v < 55]
+    if not dims:
+        return None
+    v, label = min(dims)
+    return f"{label} חלשים יחסית ({int(v)} מתוך 100)" if label.endswith("נתונים העסקיים של החברה")         else f"{label} חלש יחסית ({int(v)} מתוך 100)"
+
+
 def _timing_flags(f, trend):
     """Active, evidence-backed timing problems: [(key, plain reason)]."""
     flags = []
@@ -341,11 +357,13 @@ def decide(f: dict) -> dict:
     elif tier == "poor" or (trend == "down" and tier != "strong") or (very_high_risk and tier != "strong"):
         action = "avoid"
         if tier == "poor":
-            why = "הנתונים הנוכחיים חלשים מכדי להצדיק השקעה."
+            weak = next((c for c in cons if not c.startswith("דוחות")), None)
+            why = "הנתונים הנוכחיים חלשים מכדי להצדיק השקעה" + (f": {weak}." if weak else ".")
         elif trend == "down":
             why = "המניה במגמת ירידה והחברה לא מספיק חזקה כדי לפצות על כך."
         else:
             why = "הסיכון גבוה מאוד ביחס לאיכות שהחברה מציגה כרגע."
+            conditions.append("ירידה בתנודתיות של המניה, או שיפור משמעותי בנתונים העסקיים")
         if trend == "down" and f.get("ma200"):
             conditions.append(f"חזרה מעל {_money(f['ma200'])} (הממוצע של 200 יום) תשפר את התמונה")
         if tier in ("poor", "weak"):
@@ -373,7 +391,9 @@ def decide(f: dict) -> dict:
             why = "חברה חזקה, אבל רמת הסיכון גבוהה מאוד."
             conditions.append("ירידה בתנודתיות, או כניסה בסכום קטן בלבד")
         else:
-            why = "חברה סבירה, אבל לא מספיק משכנעת כרגע."
+            weak = next((c for c in cons if not c.startswith("דוחות")), None) or _holding_back(f)
+            why = (f"חברה סבירה (ציון {int(q)} מתוך 100), אבל עוד לא מספיק חזקה"
+                   + (f": {weak}." if weak else "."))
             conditions.append(f"שיפור בציון האיכות מעל {Q_STRONG}")
             if sup and price and sup < price:
                 conditions.append(f"או ירידה לאזור {_money(sup)} (רמת התמיכה)")

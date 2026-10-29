@@ -165,8 +165,10 @@ def stock_card(v, row, key, show_holder=False):
            if lv.get("target") and lv.get("upside") is not None else "")
     holder = (f"<div class='s-note' style='color:{TONE.get(v['holder_tone'], MUTED)}'>"
               f"אם יש לך את המניה: {v['holder_emoji']} {v['holder_label']}</div>") if show_holder else ""
-    watch_out = (f"<div class='s-note' style='color:{WARNING}'>⚠️ לשים לב: {v['cons'][0]}</div>"
-                 if v["action"] == "buy" and v.get("cons") else "")
+    watch_out = (f"<div class='s-note' style='color:{WARNING}'>⚠️ לשים לב: {gloss(v['cons'][0])}</div>"
+                 if v["action"] == "buy" and v.get("cons") else
+                 f"<div class='s-note'>⏳ מה יכול לשנות: {gloss(v['conditions'][0])}</div>"
+                 if v["action"] in ("wait", "avoid") and v.get("conditions") else "")
     _card(f"<div class='s-row'><div><div class='s-tk'>{v['ticker']}</div>"
           f"<div class='s-nm'>{company_search.display_name(v['ticker'], row.get('Name'))}</div></div>"
           f"<div style='text-align:left'>{pill(v)}</div></div>"
@@ -227,7 +229,7 @@ def page_today(ctx):
 
     import stockdata
     buy = stockdata.ranked(vmap, rows, "buy", limit=3)
-    wait = [v for v in stockdata.ranked(vmap, rows, "wait") if v.get("quality_tier") == "strong"][:3]
+    wait = stockdata.ranked(vmap, rows, "wait", limit=3)
     avoid = sorted([v for v in stockdata.ranked(vmap, rows, "avoid", tiers=("full",))],
                    key=lambda v: v.get("quality") or 0)[:3]
 
@@ -241,12 +243,11 @@ def page_today(ctx):
         _card("<div class='s-why'>היום אין מניות שעוברות את כל התנאים. לא חייבים לקנות כל יום.</div>")
 
     if wait:
-        st.markdown("<div class='s-h'>🟡 חברות טובות — לחכות לרגע הנכון</div>", unsafe_allow_html=True)
+        st.markdown("<div class='s-h'>🟡 שווה לעקוב — עוד לא</div>", unsafe_allow_html=True)
+        st.markdown("<div class='s-note'>חברות שקרובות לפסק דין חיובי, ומה חסר להן כדי להגיע אליו.</div>",
+                    unsafe_allow_html=True)
         for v in wait:
-            cond = (f"<div class='s-note'>מה לחכות לו: {v['conditions'][0]}</div>" if v.get("conditions") else "")
             stock_card(v, rows.get(v["ticker"], {}), f"t_w_{v['ticker']}")
-            if cond:
-                st.markdown(cond, unsafe_allow_html=True)
 
     if avoid:
         st.markdown("<div class='s-h'>🔴 כדאי להיזהר</div>", unsafe_allow_html=True)
@@ -538,12 +539,19 @@ def page_learn(ctx):
     _study_section()
 
 
+# (rule in plain words, test group, its label, comparison group, its label,
+#  the rule is supported when the test group did...)
 STUDY_CHECKS = [
-    ("לחכות כשהמניה 'קנויה-יתר' (RSI 75 ומעלה)", "uptrend · RSI >= 75", "uptrend · RSI 50-70"),
-    ("לחכות כשהמחיר צמוד להתנגדות", "uptrend · <=2% under resistance", "uptrend · >2% under resistance"),
-    ("לחכות כשיחס הסיכוי/סיכון נמוך מ-1", "uptrend · R/R < 1", "uptrend · R/R >= 2"),
-    ("לחכות לירידה לאזור התמיכה", "uptrend · within 3% above support", "uptrend · >8% above support"),
-    ("להימנע ממניות במגמת ירידה", "below MA200", "uptrend (above MA50 & MA200)"),
+    ("לחכות כשהמניה 'קנויה-יתר' (RSI 75 ומעלה)", "uptrend · RSI >= 75", "מניות קנויות-יתר",
+     "uptrend · RSI 50-70", "מניות במצב רגיל", "worse"),
+    ("לחכות כשהמחיר צמוד להתנגדות", "uptrend · <=2% under resistance", "צמודות להתנגדות",
+     "uptrend · >2% under resistance", "רחוקות ממנה", "worse"),
+    ("לחכות כשיחס הסיכוי/סיכון נמוך מ-1", "uptrend · R/R < 1", "יחס נמוך מ-1",
+     "uptrend · R/R >= 2", "יחס 2 ומעלה", "worse"),
+    ("לחכות לירידה לאזור התמיכה", "uptrend · within 3% above support", "קנייה ליד התמיכה",
+     "uptrend · >8% above support", "קנייה רחוק ממנה", "better"),
+    ("להימנע ממניות במגמת ירידה", "below MA200", "במגמת ירידה",
+     "uptrend (above MA50 & MA200)", "במגמת עלייה", "worse"),
 ]
 
 
@@ -553,21 +561,22 @@ def _study_section():
         return
     g = ev["groups"]
     rows = []
-    for label, a, b in STUDY_CHECKS:
+    for label, a, la, b, lb, supported_when in STUDY_CHECKS:
         ga, gb = g.get(a) or {}, g.get(b) or {}
         if ga.get("insufficient") or gb.get("insufficient") or "excess_3m" not in ga or "excess_3m" not in gb:
             continue
         diff = ga["excess_3m"] - gb["excess_3m"]
         se = (ga["excess_se"] ** 2 + gb["excess_se"] ** 2) ** 0.5
         if abs(diff) < 2 * se:
-            verdict_txt, col = "לא נמצא הבדל מובהק", MUTED
-        elif diff > 0:
-            verdict_txt, col = "במצב הזה דווקא היה טוב יותר", POSITIVE
+            verdict_txt, col = "לא נמצא הבדל מובהק — הכלל לא עוזר", MUTED
+        elif (diff < 0) == (supported_when == "worse"):
+            verdict_txt, col = "הכלל נתמך בנתונים", POSITIVE
         else:
-            verdict_txt, col = "במצב הזה היה גרוע יותר", NEGATIVE
+            verdict_txt, col = "התוצאה הפוכה — הכלל מטעה", NEGATIVE
         rows.append(f"<li><b>{label}</b><br><span style='color:{SECONDARY}'>"
-                    f"{ga['excess_3m']:+.1f}% מול {gb['excess_3m']:+.1f}% מעל המדד, בשלושה חודשים "
-                    f"({ga['n']:,} מול {gb['n']:,} מקרים)</span> · <b style='color:{col}'>{verdict_txt}</b></li>")
+                    f"{la}: {ga['excess_3m']:+.1f}% · {lb}: {gb['excess_3m']:+.1f}% "
+                    f"(תשואה מעל המדד בשלושה חודשים, {ga['n'] + gb['n']:,} מקרים)</span><br>"
+                    f"<b style='color:{col}'>{verdict_txt}</b></li>")
     if not rows:
         return
     m = ev["meta"]
