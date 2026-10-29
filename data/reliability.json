@@ -1,5 +1,5 @@
 {
-  "generated": "28/10/2026 10:28",
+  "generated": "29/10/2026 10:48",
   "primary_source": "Yahoo Finance (yfinance)",
   "stale_after_days": 3,
   "artifacts": {
@@ -42,36 +42,16 @@
   "missing_artifacts": [],
   "data_completeness": 100.0,
   "crosscheck": {
-    "status": "disagreement",
+    "status": "ok",
     "secondary_source": "ECB (מט\"ח) + Stooq (מדדים, מיטב-מאמץ)",
     "tolerance_pct": 1.0,
     "fetched": 2,
     "compared": 2,
     "checks": [
       {
-        "symbol": "ILS=X",
-        "name": "דולר/שקל",
-        "yahoo": 3.109,
-        "stooq": 3.0496,
-        "stooq_date": "2026-10-27",
-        "secondary": "ECB",
-        "diff_pct": 1.95,
-        "agree": false
-      },
-      {
         "symbol": "^GSPC",
         "name": "S&P 500",
-        "yahoo": 7722.6,
-        "stooq": null,
-        "stooq_date": null,
-        "secondary": null,
-        "diff_pct": null,
-        "agree": null
-      },
-      {
-        "symbol": "^DJI",
-        "name": "Dow Jones",
-        "yahoo": 52377.57,
+        "yahoo": 7743.98,
         "stooq": null,
         "stooq_date": null,
         "secondary": null,
@@ -81,18 +61,38 @@
       {
         "symbol": "EURUSD=X",
         "name": "אירו/דולר",
-        "yahoo": 1.113,
-        "stooq": 1.115,
-        "stooq_date": "2026-10-27",
+        "yahoo": 1.115,
+        "stooq": 1.1133,
+        "stooq_date": "2026-10-28",
         "secondary": "ECB",
-        "diff_pct": -0.18,
+        "diff_pct": 0.15,
         "agree": true
+      },
+      {
+        "symbol": "ILS=X",
+        "name": "דולר/שקל",
+        "yahoo": 3.112,
+        "stooq": 3.1259,
+        "stooq_date": "2026-10-28",
+        "secondary": "ECB",
+        "diff_pct": -0.44,
+        "agree": true
+      },
+      {
+        "symbol": "^DJI",
+        "name": "Dow Jones",
+        "yahoo": 52475.1,
+        "stooq": null,
+        "stooq_date": null,
+        "secondary": null,
+        "diff_pct": null,
+        "agree": null
       }
     ]
   },
   "reliability": {
-    "score": 74,
-    "label": "נמוכה — מקורות סותרים"
+    "score": 92,
+    "label": "גבוהה"
   },
   "limitations": [
     "מקור ראשי יחיד (Yahoo) — ציון אמינות מוגבל ל-85 ללא אימות-צולב מוצלח",
