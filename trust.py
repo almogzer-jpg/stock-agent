@@ -58,8 +58,12 @@ def trust_score(row, backtest: dict | None = None) -> dict:
     score = int(round(min(100.0, max(0.0, sum(factors.values())))))
 
     strengths, limitations = [], []
-    if occ >= 8 and wr is not None and wr >= 55:
+    # A per-ticker success rate is only quoted on a sample large enough to mean
+    # something (PRODUCT_IDENTITY rule 18); below that we say so instead.
+    if occ >= 30 and wr is not None and wr >= 55:
         strengths.append(f"אומת היסטורית: {wr:.0f}% הצלחה על {occ} מופעים")
+    elif 8 <= occ < 30:
+        limitations.append(f"אות הפריצה הופיע רק {occ} פעמים — מדגם קטן מכדי לקבוע אחוז הצלחה")
     elif 0 < occ < 4:
         limitations.append(f"מדגם היסטורי קטן ({occ} מופעים)")
     elif occ == 0:

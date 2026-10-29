@@ -2073,6 +2073,24 @@ elif page == "📊 אינטליגנציית שוק":
         st.dataframe(backtest, use_container_width=True, hide_index=True)
         st.caption("אחוז הצלחה = שיעור האיתותים שהניבו תשואה חיובית (כולל אימות Out-of-Sample).")
 
+    st.markdown("#### מחקר היסטורי — בדיקת כללי ההחלטה")
+    import verdict as _vmod
+    _ev = _vmod._load_evidence()
+    if not _ev:
+        st.caption("תוצאות המחקר לא נמצאו (research/timing_study_results.json).")
+    else:
+        _m = _ev["meta"]
+        _rows = [{"קבוצה": k, "מקרים": v.get("n"),
+                  "תשואה עודפת 3ח׳ %": v.get("excess_3m"), "± שגיאת תקן": v.get("excess_se"),
+                  "שיעור הצלחה מול המדד %": v.get("hit_rate"), "ירידה ממוצעת בדרך %": v.get("avg_drawdown"),
+                  "אחוזון 10 %": v.get("p10_return"), "חציון %": v.get("median_return")}
+                 for k, v in _ev["groups"].items() if not v.get("insufficient")]
+        st.dataframe(pd.DataFrame(_rows), use_container_width=True, hide_index=True)
+        st.caption(f"{_m['tickers']} מניות S&P 500 · {_m['first_date']} עד {_m['last_date']} · {_m['samples']:,} דגימות "
+                   f"(כל 21 ימי מסחר) · אופק {_m['horizon_days']} ימי מסחר · סטטיסטיקה ממוצעת לפי תאריך. "
+                   f"הטיית שרידות: רק חברי המדד הנוכחיים, ולכן משווים קבוצות ולא רמות מוחלטות. "
+                   f"שחזור: python research/timing_study.py")
+
 elif page == "⚙️ הגדרות":
     st.markdown("### הגדרות")
     st.markdown(f"<div class='ic-card'><div class='ic-title'>📅 מצב הנתונים</div>"
