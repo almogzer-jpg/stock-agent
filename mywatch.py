@@ -4,7 +4,8 @@
 Star a company at analysis time → we snapshot the thesis (price, score,
 recommendation, support). Every visit answers: WHAT CHANGED since you saved it,
 and what deserves attention — computed from real artifacts, no new data source.
-Local JSON persistence (git-ignored), same pattern as rec_history. Never raises.
+Storage is pluggable: a local JSON file by default (CLI / local runs), and the
+visitor's own browser storage inside the hosted app (see use_backend). Never raises.
 """
 import json
 import os
@@ -16,7 +17,7 @@ WATCHLIST_PATH = os.path.join(config.DATA_DIR, "my_watchlist.json")
 ATTENTION_SCORE_DELTA = 8          # |ΔScore V2| that warrants attention
 
 
-def _load() -> dict:
+def _file_load() -> dict:
     try:
         with open(WATCHLIST_PATH, encoding="utf-8") as fh:
             return json.load(fh)
@@ -24,11 +25,34 @@ def _load() -> dict:
         return {}
 
 
-def _save(d: dict) -> bool:
+def _file_save(d: dict) -> bool:
     try:
         with open(WATCHLIST_PATH, "w", encoding="utf-8") as fh:
             json.dump(d, fh, ensure_ascii=False, indent=1)
         return True
+    except Exception:
+        return False
+
+
+_BACKEND = {"load": _file_load, "save": _file_save}
+
+
+def use_backend(load_fn, save_fn) -> None:
+    """Swap persistence (e.g. per-visitor browser storage in the hosted app)."""
+    _BACKEND["load"], _BACKEND["save"] = load_fn, save_fn
+
+
+def _load() -> dict:
+    try:
+        d = _BACKEND["load"]()
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save(d: dict) -> bool:
+    try:
+        return bool(_BACKEND["save"](d))
     except Exception:
         return False
 
@@ -41,12 +65,23 @@ def is_watched(ticker) -> bool:
     return ticker in _load()
 
 
-def add(ticker, price=None, score_v2=None, recommendation=None, support=None, note="") -> bool:
-    """Snapshot the thesis at save time — the baseline for 'what changed'."""
+def add(ticker, price=None, score_v2=None, recommendation=None, support=None, note="",
+        owned=False) -> bool:
+    """Snapshot the thesis at save time — the baseline for 'what changed'.
+    `owned` marks a stock the user holds (holder guidance applies)."""
     d = _load()
     d[ticker] = {"added": datetime.now().strftime("%d/%m/%Y"),
                  "price": price, "score_v2": score_v2,
-                 "recommendation": recommendation, "support": support, "note": note}
+                 "recommendation": recommendation, "support": support, "note": note,
+                 "owned": bool(owned)}
+    return _save(d)
+
+
+def set_owned(ticker, owned: bool) -> bool:
+    d = _load()
+    if ticker not in d:
+        return False
+    d[ticker]["owned"] = bool(owned)
     return _save(d)
 
 

@@ -22,7 +22,9 @@ except ImportError:
 from config import FUNDAMENTALS_CACHE, FUNDAMENTALS_TTL_DAYS
 
 FIELDS = ["Sector", "MarketCap", "RevenueGrowth", "EPSGrowth", "FCFGrowth",
-          "OperatingMargin", "DebtToEquity", "ROIC", "PEG", "ForwardPE"]
+          "OperatingMargin", "DebtToEquity", "ROIC", "PEG", "ForwardPE",
+          # analyst consensus (real Yahoo fields; None when not covered)
+          "TargetMean", "TargetHigh", "TargetLow", "AnalystCount"]
 
 
 def _num(v):
@@ -117,6 +119,12 @@ def _fetch_raw(symbol: str) -> dict:
     out["PEG"] = round(peg, 2) if peg is not None else None
     fpe = _num(info.get("forwardPE"))
     out["ForwardPE"] = round(fpe, 1) if fpe is not None else None
+    for key, src in (("TargetMean", "targetMeanPrice"), ("TargetHigh", "targetHighPrice"),
+                     ("TargetLow", "targetLowPrice")):
+        v = _num(info.get(src))
+        out[key] = round(v, 2) if v is not None and v > 0 else None
+    n = _num(info.get("numberOfAnalystOpinions"))
+    out["AnalystCount"] = int(n) if n else None
     out["FCFGrowth"] = _fcf_growth(tk)
     out["ROIC"] = _roic(tk)
     return out

@@ -140,9 +140,22 @@ def _grid(cards, cols=2):
     return f"<div class='kpi-grid' style='grid-template-columns:repeat({cols},1fr)'>{''.join(cards)}</div>"
 
 
+_VMAP = {}
+_TONE_COL = {"positive": POSITIVE, "warning": WARNING, "negative": NEGATIVE}
+
+
+def _verdict_info(tk):
+    """Unified verdict (verdict.py) in the shape the cards expect."""
+    v = _VMAP.get(tk)
+    if not v:
+        return {"color": MUTED, "emoji": "⚪", "label": "אין מספיק מידע", "summary": "אין מספיק נתונים אמינים."}
+    return {"color": _TONE_COL.get(v["tone"], MUTED), "emoji": v["emoji"], "label": v["short"],
+            "summary": v["why"]}
+
+
 def _opp_card(r, lookup, nc, key_prefix="m"):
-    info = classify(r)
     tk = r["Ticker"]
+    info = _verdict_info(tk)
     nm = r.get("Name") if isinstance(r.get("Name"), str) and r.get("Name") else VW.company_name(tk, lookup, nc)
     chg = r.get("DailyChange%", 0) or 0
     ccol = POSITIVE if chg >= 0 else NEGATIVE
@@ -171,14 +184,17 @@ def _opp_card(r, lookup, nc, key_prefix="m"):
 
 # ---------------------------------------------------------------------------
 
-def render(df, mkt):
+def render(df, mkt, vmap=None):
     """Entry point: the mobile app experience (bottom-nav driven)."""
+    _VMAP.clear()
+    _VMAP.update(vmap or {})
     st.markdown(MOBILE_CSS, unsafe_allow_html=True)
     alerts = _load(config.ALERTS_CENTER_JSON, [])
     uni = _load(config.UNIVERSE_JSON, {})
     sysh = _load(config.SYSTEM_HEALTH_JSON, {})
     df = df.copy()
-    df["_g"] = [classify(r)["group"] for _, r in df.iterrows()]
+    _grp = {"buy": "positive", "avoid": "avoid"}
+    df["_g"] = [_grp.get((_VMAP.get(t) or {}).get("action"), "watch") for t in df["Ticker"]]
     regime = mkt.get("regime", {})
     fng = mkt.get("fear_greed", {})
     sectors = sorted(mkt.get("sectors", []), key=lambda s: -s.get("score", 0))
@@ -291,7 +307,7 @@ def _home(df, ranked, sectors, alerts, regime, fng, lookup, nc):
         st.markdown(f"<div class='mcard' style='border-right:4px solid {PRIMARY}'>"
                     f"<div class='mco'>קיצור דרך</div>"
                     f"<div style='font-size:18px;font-weight:700'>החלטת השקעה מלאה ל-{top_tk}</div>"
-                    f"<div class='mco'>המלצה, איכות כניסה, יעד, רמות ויחס סיכון/סיכוי.</div></div>",
+                    f"<div class='mco'>פסק הדין, מחיר יעד, תמיכה והתנגדות, וההסבר.</div></div>",
                     unsafe_allow_html=True)
         _goto("🔎 ניתוח", top_tk, key="h_dec", label=f"🔎 פתח החלטת השקעה · {top_tk}")
 
@@ -359,6 +375,11 @@ def _alerts(alerts):
 
 def _settings(df, mkt, sysh):
     st.markdown("#### הגדרות ועוד")
+    if st.button("🌱 מעבר למצב פשוט", key="m_to_simple", use_container_width=True):
+        st.session_state["mode"] = "simple"
+        if "mode" in st.query_params:
+            del st.query_params["mode"]
+        st.rerun()
     st.markdown(_grid([
         _mkpi("🔢", sysh.get("scanned", "—"), "נסרקו", "מניות", PRIMARY),
         _mkpi("🛡️", _fmt(sysh.get("avg_trust")), "אמון ממוצע", "מערכת", score_color(sysh.get("avg_trust"))),
@@ -421,17 +442,20 @@ def _analysis(mkt, lookup, nc):
     # --- Investment Decision card (the one open section) ---
     if dec:
         ent = dec["entry"]
-        ent_c = {"excellent": POSITIVE, "good": POSITIVE, "wait": WARNING,
-                 "extended": "#fb923c", "avoid": NEGATIVE}.get(ent["band"], MUTED)
-        conf = dec.get("confidence")
+        ent_c = {"extended": WARNING, "avoid": NEGATIVE}.get(ent["band"], SECONDARY)
+        conf = ((dec.get("verdict") or {}).get("reliability") or {}).get("score")
+        _vd = dec.get("verdict") or {}
+        _vc = _TONE_COL.get(_vd.get("tone"), MUTED)
         rr_c = {"מצוין": POSITIVE, "טוב": POSITIVE, "סביר": WARNING, "חלש": NEGATIVE}.get(dec.get("rr_interpretation"), MUTED)
         st.markdown(
             f"<div class='mcard' style='border-right:4px solid {PRIMARY}'>"
             f"<div style='font-size:20px;font-weight:700;margin-bottom:8px'>החלטת השקעה</div>"
-            f"<div class='mstats'>איכות כניסה: <b style='color:{ent_c}'>{ent['emoji']} {ent['label']}</b></div>"
+            f"<div style='font-size:19px;font-weight:800;color:{_vc}'>{_vd.get('emoji', '⚪')} {_vd.get('label', 'אין מספיק מידע')}</div>"
+            f"<div class='mwhy' style='margin:4px 0 8px'>{_vd.get('why', '')}</div>"
+            f"<div class='mstats'>מיקום המחיר: <b style='color:{ent_c}'>{ent['emoji']} {ent['label']}</b></div>"
             f"<div class='mco'>{' · '.join(ent['reasons'][:2])}</div>"
-            f"<div class='mstats' style='margin-top:8px'>ביטחון <b style='color:{score_color(conf)}'>"
-            f"{int(conf) if isinstance(conf, (int, float)) else '—'}%</b> · אופק <b>{dec['horizon']}</b></div>"
+            f"<div class='mstats' style='margin-top:8px'>אמינות הנתונים <b style='color:{score_color(conf)}'>"
+            f"{int(conf) if isinstance(conf, (int, float)) else '—'}/100</b> · אופק <b>{dec['horizon']}</b></div>"
             + _grid([
                 _mkpi("🎯", dec.get("target", "—"), "מחיר יעד", "קונצנזוס אנליסטים", PRIMARY),
                 _mkpi("⚖️", dec.get("rr") if dec.get("rr") is not None else "—", "סיכון/סיכוי",
@@ -537,7 +561,7 @@ def _analysis(mkt, lookup, nc):
             pill = (f"<span style='color:{POSITIVE if up >= 0 else NEGATIVE};font-weight:700'>"
                     f"{'+' if up >= 0 else ''}{up}%</span>") if up is not None else ""
             st.markdown(f"<div class='mcard' style='border-right:4px solid {ac}'>"
-                        f"<b style='color:{ac};font-size:17px'>{s['emoji']} {s['title']}</b> · סבירות {s['prob']}%<br>"
+                        f"<b style='color:{ac};font-size:17px'>{s['emoji']} {s['title']}</b><br>"
                         f"<span class='mco'>יעד {s['target']['price']} {pill}</span>"
                         f"<div class='mwhy' style='margin-top:6px'>{s['summary']}</div></div>",
                         unsafe_allow_html=True)

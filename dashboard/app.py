@@ -234,6 +234,30 @@ closes = load_closes()
 events = load_events()
 
 
+@st.cache_data(ttl=120, show_spinner=False)
+def load_verdicts():
+    """Canonical rows + the ONE verdict per ticker (stockdata/verdict)."""
+    import stockdata
+    rows = stockdata.load_rows(load_results(), load_universe(), load_events())
+    return rows, stockdata.verdicts(rows)
+
+
+ROWS, VMAP = load_verdicts()
+_GROUP_OF = {"buy": "positive", "avoid": "avoid"}
+if len(df):
+    df["_group"] = [_GROUP_OF.get((VMAP.get(t) or {}).get("action"), "watch") for t in df["Ticker"]]
+
+
+def vbadge(ticker, size=14):
+    """Verdict pill HTML for a ticker (same wording on every page)."""
+    v = VMAP.get(ticker)
+    if not v:
+        return f"<span style='color:{MUTED}'>—</span>"
+    col = {"positive": POSITIVE, "warning": WARNING, "negative": NEGATIVE}.get(v["tone"], MUTED)
+    return (f"<span style='color:{col};font-weight:700;font-size:{size}px;white-space:nowrap'>"
+            f"{v['emoji']} {v['short']}</span>")
+
+
 def _is_mobile() -> bool:
     """True on a narrow screen (?m=1) — auto-detected via a tiny JS probe.
 
@@ -254,10 +278,62 @@ def _is_mobile() -> bool:
     return False
 
 
+# ---- Per-visitor "my stocks" storage: the visitor's own browser (both modes) ----
+import mywatch as _mywatch
+from dashboard import localstore as _ls
+_ls.sync("watch", default={})
+_mywatch.use_backend(lambda: dict(st.session_state.get("_ls_cache", {}).get("watch") or {}),
+                     lambda d: (_ls.put("watch", d), True)[1])
+
+
+# ---- Simple by Default, Professional on Demand ----
+def _mode() -> str:
+    if "mode" not in st.session_state:
+        st.session_state["mode"] = "pro" if st.query_params.get("mode") == "pro" else "simple"
+    return st.session_state["mode"]
+
+
+def set_mode(mode: str, ticker: str | None = None):
+    st.session_state["mode"] = mode
+    if mode == "pro":
+        st.query_params["mode"] = "pro"
+    elif "mode" in st.query_params:
+        del st.query_params["mode"]
+    if ticker:
+        st.session_state["dd_ticker"] = ticker
+        st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
+        st.session_state["_m_pending"] = "🔎 ניתוח"
+    st.rerun()
+
+
+@st.cache_data(ttl=1800, show_spinner=False)
+def simple_analyze(ticker: str) -> dict:
+    import deepdive
+    b = deepdive_fetch(ticker)
+    rep = deepdive.analyze(ticker, sectors=load_market().get("sectors"), bundle=b)
+    rep["_hist"] = b.get("hist")
+    return rep
+
+
+if _mode() == "simple":
+    from dashboard import simple as simple_ui
+
+    def _an(t):
+        with st.spinner(f"מנתח את {t} — כמה שניות…"):
+            try:
+                return simple_analyze(t)
+            except Exception as exc:
+                return {"error": str(exc)}
+
+    simple_ui.render({"mkt": mkt, "rows": ROWS, "vmap": VMAP, "events": events,
+                      "analyze": _an, "to_pro": lambda t: set_mode("pro", t)},
+                     mobile=_is_mobile())
+    st.stop()
+
 # Phase 16: branch to the dedicated mobile experience on narrow screens.
 if _is_mobile():
     from dashboard import mobile as mobile_ui
-    mobile_ui.render(df, mkt)
+    mobile_ui.render(df, mkt, VMAP)
     st.stop()
 
 positive = df[df["_group"] == "positive"]
@@ -328,6 +404,8 @@ page = st.sidebar.radio(
 )
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
 st.sidebar.divider()
+if st.sidebar.button("🌱 מעבר למצב פשוט", use_container_width=True, key="to_simple"):
+    set_mode("simple")
 if st.sidebar.button("📱 תצוגת מובייל", use_container_width=True):
     st.query_params["m"] = "1"
     st.rerun()
@@ -662,18 +740,17 @@ if page.startswith("🏠"):
         st.markdown("#### מה השתנה מאז הסריקה הקודמת")
         _fb = ""
         for it in _dd["items"][:7]:
-            act = _delta.action_for(it["score_now"], it.get("group"), it.get("d_score"))
             _fb += (f"<tr><td><div style='font-weight:700;font-size:16px'>{it['ticker']}</div>"
                     f"<div style='color:{MUTED};font-size:12.5px'>{it.get('name','')}</div></td>"
                     f"<td style='color:{SECONDARY}'>{'<br>'.join(it['changes'][:2])}</td>"
                     f"<td style='color:{MUTED};font-size:13.5px'>{' · '.join(it['causes'][:2])}</td>"
-                    f"<td style='white-space:nowrap'><b>{act['icon']} {act['verb']}</b></td></tr>")
+                    f"<td>{vbadge(it['ticker'])}</td></tr>")
         for tk in _dd["new"][:3]:
             _fb += (f"<tr><td><b style='font-size:16px'>{tk}</b></td>"
                     f"<td style='color:{POSITIVE}'>חדשה בסריקה</td>"
                     f"<td style='color:{MUTED};font-size:13.5px'>נכנסה לרשימת המעקב של המערכת</td>"
                     f"<td><b>🔍 לחקור היום</b></td></tr>")
-        _fh = "".join(f"<th>{h}</th>" for h in ["חברה", "מה השתנה", "למה (מדיד)", "פעולה"])
+        _fh = "".join(f"<th>{h}</th>" for h in ["חברה", "מה השתנה", "למה (מדיד)", "פסק דין"])
         st.markdown(f"<table class='sectbl'><thead><tr>{_fh}</tr></thead><tbody>{_fb}</tbody></table>",
                     unsafe_allow_html=True)
         _dl_ctx = {it["ticker"]: f"הופיעה בשינויי-הלילה: {it['changes'][0]} · סיבה מדידה: {it['causes'][0]}"
@@ -690,74 +767,51 @@ if page.startswith("🏠"):
                 st.rerun()
         st.caption(f"השוואה: {_dd.get('prev_date')} ← {_dd.get('cur_date')} · מוצגים שינויים בלבד, עם הסיבה מפירוק הציון.")
 
-    st.markdown("### ההזדמנויות בעלות האמונה הגבוהה ביותר היום")
-    ranked = (positive if not positive.empty else df).sort_values("ScoreV2", ascending=False).head(8)
+    st.markdown("### ההזדמנויות המובילות היום")
+    import stockdata as _sd
+    _top = (_sd.ranked(VMAP, ROWS, "buy") + _sd.ranked(VMAP, ROWS, "wait"))[:8]
 
-    def _why_row(r):
-        """Decision-language reason — derived only from real fields (priority chain)."""
-        ev = (events or {}).get(r["Ticker"], {})
-        act = str(ev.get("rating_action") or "")
-        n = lambda k: r.get(k) if isinstance(r.get(k), (int, float)) else None
-        if bool(r.get("Breakout")):
-            return "פריצה טכנית פעילה"
-        if (n("EPSGrowth") or 0) >= 20 and str(r.get("RiskLevel")) == "נמוך":
-            return "האצת רווחים באיכות גבוהה"
-        if (n("EPSGrowth") or 0) >= 20:
-            return "האצת רווחים"
-        if "שדרוג" in act:
-            return "שדרוג אנליסטים טרי"
-        if (n("RSI14") or 50) <= 35 and abs(n("DistSupport%") or 99) <= 4:
-            return "מכירת-יתר צמוד לתמיכה"
-        if (n("DistFromHigh%") or 99) <= 3:
-            return "מומנטום — נושקת לשיא 52 שבועות"
-        if n("PEG") is not None and 0 < r["PEG"] <= 1.2:
-            return "תמחור אטרקטיבי ביחס לצמיחה"
-        if (n("ScoreFundamental") or 0) >= 70:
-            return "איכות פונדמנטלית גבוהה"
-        return "ציון משוקלל מוביל"
+    def _lvl(v, key, sub=None, color=None):
+        x = (v.get("levels") or {}).get(key)
+        if x is None:
+            return "<div style='color:%s'>—</div>" % MUTED
+        main = f"${x:,.2f}"
+        s2 = (v.get("levels") or {}).get(sub) if sub else None
+        tail = (f"<div style='color:{color or MUTED};font-size:12.5px'>{s2:+.1f}%</div>"
+                if isinstance(s2, (int, float)) else "")
+        return f"<div style='font-weight:600'>{main}</div>{tail}"
 
     _body = ""
-    for _, r in ranked.iterrows():
-        n = lambda k: r.get(k) if isinstance(r.get(k), (int, float)) else None
-        sv = int(r["ScoreV2"]) if n("ScoreV2") is not None else None
-        chg = n("DailyChange%")
+    for v in _top:
+        r = ROWS.get(v["ticker"], {})
+        chg = r.get("DailyChange%")
         chc = POSITIVE if (chg or 0) >= 0 else NEGATIVE
-        up = n("ExpectedUpside%")
-        tgt = round(r["Price"] * (1 + up / 100), 2) if (n("Price") and up is not None) else None
-        sup, res = n("Support"), n("Resistance")
-        dsup, dres = n("DistSupport%"), n("DistResistance%")
-        rr = n("RiskReward")
-        rrc = POSITIVE if (rr or 0) >= 2 else WARNING if (rr or 0) >= 1 else NEGATIVE
+        qv = int(v["quality"]) if v.get("quality") is not None else None
         _body += (
-            f"<tr>"
-            f"<td><div style='font-weight:700;font-size:16px'>{r['Ticker']}</div>"
-            f"<div style='color:{MUTED};font-size:13px'>{r.get('Name','')}</div></td>"
-            f"<td><div style='font-weight:700;font-size:19px'>${fmt(n('Price'))}</div>"
-            f"<div style='color:{chc};font-size:13.5px;font-weight:600'>"
-            f"{f'{chg:+.1f}% היום' if chg is not None else '—'}</div></td>"
-            f"<td><div style='display:flex;align-items:center;gap:8px'>"
-            f"<div class='miniprog' style='min-width:64px'><div style='width:{sv or 0}%;background:{score_color(sv)}'></div></div>"
-            f"<b style='color:{score_color(sv)}'>{sv if sv is not None else '—'}</b></div></td>"
-            f"<td><div style='font-weight:600'>{f'${tgt:,.2f}' if tgt else '—'}</div>"
-            f"<div style='color:{POSITIVE if (up or 0)>=0 else NEGATIVE};font-size:13px'>"
-            f"{f'{up:+.1f}%' if up is not None else ''}</div></td>"
-            f"<td><div>{f'${sup}' if sup else '—'}</div>"
-            f"<div style='color:{MUTED};font-size:12.5px'>{f'{dsup}%' if dsup is not None else ''}</div></td>"
-            f"<td><div>{f'${res}' if res else '—'}</div>"
-            f"<div style='color:{MUTED};font-size:12.5px'>{f'+{dres}%' if dres is not None else ''}</div></td>"
-            f"<td><b style='color:{rrc};font-size:16px'>{rr if rr is not None else '—'}</b></td>"
-            f"<td style='color:{SECONDARY};font-size:13.5px'>{_why_row(r)}</td></tr>")
+            f"<tr><td><div style='font-weight:700;font-size:16px'>{v['ticker']}</div>"
+            f"<div style='color:{MUTED};font-size:13px'>{r.get('Name') or ''}</div></td>"
+            f"<td><div style='font-weight:700;font-size:18px'>${fmt(r.get('Price'))}</div>"
+            f"<div style='color:{chc};font-size:13px'>{f'{chg:+.1f}% היום' if isinstance(chg, (int, float)) else ''}</div></td>"
+            f"<td>{vbadge(v['ticker'], 15)}</td>"
+            f"<td><b style='color:{score_color(qv)}'>{qv if qv is not None else '—'}</b></td>"
+            f"<td>{_lvl(v, 'target', 'upside', POSITIVE)}</td>"
+            f"<td>{_lvl(v, 'support', 'downside')}</td>"
+            f"<td style='color:{SECONDARY};font-size:13.5px;max-width:330px'>{v['why']}</td></tr>")
     _head = "".join(f"<th>{h}</th>" for h in
-                    ["חברה", "מחיר נוכחי", "ציון V2", "יעד (מחושב)", "תמיכה", "התנגדות",
-                     "סיכון/סיכוי", "למה עכשיו?"])
-    st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
-                unsafe_allow_html=True)
-    st.caption("יעד = מחיר × פוטנציאל מחושב (מדד קנייני) · תמיכה/התנגדות מרמות מחיר אמיתיות · לחיצה על 🔎 פותחת ניתוח מלא.")
-    _bc = st.columns(max(len(ranked), 1))
-    for j, (_, r) in enumerate(ranked.iterrows()):
-        if _bc[j].button(f"🔎 {r['Ticker']}", key=f"hg_{r['Ticker']}", use_container_width=True):
-            st.session_state["dd_ticker"] = r["Ticker"]
-            st.session_state["dd_context"] = f"מובילה בהזדמנויות הבוקר — {_why_row(r)}"
+                    ["חברה", "מחיר", "פסק דין", "ציון איכות", "יעד אנליסטים", "תמיכה", "למה"])
+    if _top:
+        st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
+                    unsafe_allow_html=True)
+    else:
+        st.markdown(f"<div class='ic-sub'>אין היום מניות שעוברות את כל התנאים — זה מידע בפני עצמו: לא חייבים לקנות כל יום.</div>",
+                    unsafe_allow_html=True)
+    st.caption("פסק דין אחד לכל מניה, זהה בכל העמודים · יעד = ממוצע תחזיות האנליסטים (Yahoo), לא תחזית של המערכת · "
+               "תמיכה = השפל הקרוב, והאחוז = המרחק אליו · לחיצה על 🔎 פותחת ניתוח מלא.")
+    _bc = st.columns(max(len(_top), 1))
+    for j, v in enumerate(_top):
+        if _bc[j].button(f"🔎 {v['ticker']}", key=f"hg_{v['ticker']}", use_container_width=True):
+            st.session_state["dd_ticker"] = v["ticker"]
+            st.session_state["dd_context"] = f"מהזדמנויות הבוקר — {v['emoji']} {v['label']}: {v['why']}"
             st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
             st.rerun()
 
@@ -813,9 +867,9 @@ if page.startswith("🏠"):
     st.markdown("#### תור המחקר שלך להיום")
     _queue = []
     for it in (_dd.get("items") or [])[:6]:
-        _act = _delta.action_for(it["score_now"], it.get("group"), it.get("d_score"))
-        if _act["icon"] in ("🔍", "⚠️", "📈"):
-            _queue.append((it["ticker"], f"{_act['icon']} {_act['verb']} — {it['changes'][0]}"))
+        _v = VMAP.get(it["ticker"])
+        if _v and _v["action"] in ("buy", "avoid") or abs(it.get("d_score") or 0) >= 8:
+            _queue.append((it["ticker"], f"{(_v or {}).get('emoji', '🔍')} {(_v or {}).get('short', 'לבדוק')} — {it['changes'][0]}"))
     for _tk in (_dd.get("new") or [])[:3]:
         _queue.append((_tk, "🔍 לחקור — חדשה בסריקה"))
     for w in _wlatt[:2]:
@@ -1394,16 +1448,15 @@ elif page == "🔎 ניתוח חברה":
             def _hm(lbl, val, color=TEXT):
                 return (f"<div style='min-width:104px'><div style='color:{MUTED};font-size:13px'>{lbl}</div>"
                         f"<div style='font-size:19px;font-weight:600;color:{color};margin-top:3px'>{val}</div></div>")
-            reco_pill = (f"<span class='tbadge' style='color:{PRIMARY};font-size:15px;padding:7px 18px'>"
-                         f"{'🟢' if 'Buy' in str(reco_he_txt) or 'קנייה' in reco_he_txt else '🟡' if reco_he_txt in ('מעקב', 'החזקה') else '🔴'} "
-                         f"{reco_he_txt}</span>")
-            # Reliability badge (Phase 0.5) — data confidence of THIS analysis.
-            _dc = rep.get("data_confidence") or {}
-            _dc_c = (POSITIVE if _dc.get("score", 0) >= 80 else
-                     WARNING if _dc.get("score", 0) >= 65 else NEGATIVE)
-            reco_pill += (f" <span class='tbadge' style='color:{_dc_c};font-size:14px;padding:6px 14px'>"
-                          f"{'🟢' if _dc.get('score', 0) >= 80 else '🟡' if _dc.get('score', 0) >= 65 else '🔴'} "
-                          f"{_dc.get('label_he', 'אמינות לא חושבה')} {_dc.get('score', '—')}/100</span>")
+            _V = rep.get("verdict") or {}
+            _vtone = {"positive": POSITIVE, "warning": WARNING, "negative": NEGATIVE}.get(_V.get("tone"), MUTED)
+            reco_pill = (f"<span class='tbadge' style='color:{_vtone};font-size:15px;padding:7px 18px'>"
+                         f"{_V.get('emoji', '⚪')} {_V.get('label', 'אין מספיק מידע')}</span>")
+            # ONE reliability number (verdict.reliability) — the same one simple mode shows.
+            _rl = _V.get("reliability") or {}
+            _rl_c = POSITIVE if _rl.get("label") == "גבוהה" else WARNING if _rl.get("label") == "בינונית" else NEGATIVE
+            reco_pill += (f" <span class='tbadge' style='color:{_rl_c};font-size:14px;padding:6px 14px'>"
+                          f"אמינות הנתונים: {_rl.get('label', '—')} {_rl.get('score', '—')}/100</span>")
             st.markdown(
                 f"<div class='ic-card' style='padding:28px 30px'>"
                 f"<div style='display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap'>"
@@ -1424,7 +1477,6 @@ elif page == "🔎 ניתוח חברה":
                 + _hm("איכות", int(qual) if isinstance(qual, (int, float)) else "—",
                       score_color(qual if isinstance(qual, (int, float)) else None))
                 + _hm("ציון v2", v2, score_color(v2))
-                + _hm("אמון", sc["trust"]["value"], score_color(sc["trust"]["value"]))
                 + "</div></div>", unsafe_allow_html=True)
 
             # ---- Data-quality warnings + full source transparency (Phase 0.5) ----
@@ -1474,14 +1526,13 @@ elif page == "🔎 ניתוח חברה":
                         return "—"
                     s = f"{v:+.1f}" if plus else f"{v:,.1f}".rstrip("0").rstrip(".")
                     return f"{s}{suf}"
-                reco = dec["recommendation"]
-                reco_he = reco.split("·")[-1].strip() if isinstance(reco, str) else NEA
-                reco_c = (POSITIVE if any(k in reco for k in ("Buy",)) else
-                          NEGATIVE if any(k in reco for k in ("Avoid", "Reduce")) else WARNING)
-                conf = dec.get("confidence")
+                _V = rep.get("verdict") or {}
+                reco_he = f"{_V.get('emoji', '⚪')} {_V.get('label', NEA)}"
+                reco_c = {"positive": POSITIVE, "warning": WARNING, "negative": NEGATIVE}.get(_V.get("tone"), MUTED)
+                conf = (_V.get("reliability") or {}).get("score")
                 ent = dec["entry"]
-                ent_c = {"excellent": POSITIVE, "good": POSITIVE, "wait": WARNING,
-                         "extended": "#fb923c", "avoid": NEGATIVE}.get(ent["band"], MUTED)
+                ent_c = {"excellent": SECONDARY, "good": SECONDARY, "wait": SECONDARY,
+                         "extended": WARNING, "avoid": NEGATIVE}.get(ent["band"], MUTED)
                 rr_c = {"מצוין": POSITIVE, "טוב": POSITIVE, "סביר": WARNING, "חלש": NEGATIVE}.get(dec.get("rr_interpretation"), MUTED)
 
                 def _kv(lbl, val, color=TEXT, sub=""):
@@ -1492,19 +1543,24 @@ elif page == "🔎 ניתוח חברה":
                 c3[0].markdown(
                     f"<div class='ic-card' style='height:100%;background:{ELEV}'>"
                     f"<div style='color:{MUTED};font-size:12.5px'>המלצה</div>"
-                    f"<div style='font-size:30px;font-weight:700;color:{reco_c};line-height:1.15'>{reco_he}</div>"
-                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>ביטחון (ציון אמון)</div>"
+                    f"<div style='font-size:26px;font-weight:700;color:{reco_c};line-height:1.2'>{reco_he}</div>"
+                    f"<div style='color:{SECONDARY};font-size:13.5px;line-height:1.6;margin-top:6px'>{_V.get('why', '')}</div>"
+                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:6px'>אם יש לך את המניה: "
+                    f"<b style='color:{TEXT}'>{_V.get('holder_emoji', '')} {_V.get('holder_label', '')}</b></div>"
+                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>אמינות הנתונים</div>"
                     f"<div class='sbar-t' style='margin-top:4px'><div class='sbar-f' style='width:{conf if isinstance(conf,(int,float)) else 0}%;background:{score_color(conf)}'></div></div>"
-                    f"<div style='font-size:14px;font-weight:600;color:{score_color(conf)}'>{int(conf) if isinstance(conf,(int,float)) else NEA}%</div>"
-                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>ביטחון בתזה (הסכמת אותות · נפרד מאמינות הנתונים)</div>"
+                    f"<div style='font-size:14px;font-weight:600;color:{score_color(conf)}'>{int(conf) if isinstance(conf,(int,float)) else NEA}/100</div>"
+                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>הסכמה בין האותות (טכני, עסקי, סקטור)</div>"
                     f"<div style='font-size:16px;font-weight:700;color:{score_color((dec.get('thesis_confidence') or {}).get('score'))}'>"
                     f"{(dec.get('thesis_confidence') or {}).get('score', '—')}/100 · {(dec.get('thesis_confidence') or {}).get('label', '')}</div>"
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>אופק השקעה</div>"
                     f"<div style='font-size:15px;font-weight:600'>{dec['horizon']}</div>"
-                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>איכות כניסה</div>"
+                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>מיקום המחיר</div>"
                     f"<div style='font-size:16px;font-weight:700;color:{ent_c}'>{ent['emoji']} {ent['label']}</div>"
                     f"<div style='color:{SECONDARY};font-size:12.5px;line-height:1.6;margin-top:4px'>"
-                    + " · ".join(ent["reasons"][:3]) + "</div></div>", unsafe_allow_html=True)
+                    + " · ".join(ent["reasons"][:3]) + "</div>"
+                    f"<div style='color:{MUTED};font-size:11.5px;line-height:1.55;margin-top:6px'>{deepdive.ENTRY_NOTE}</div>"
+                    "</div>", unsafe_allow_html=True)
                 c3[1].markdown(
                     f"<div class='ic-card' style='height:100%'>"
                     f"<div style='display:flex;gap:22px;flex-wrap:wrap'>"
@@ -1948,21 +2004,19 @@ elif page == "🔎 ניתוח חברה":
                 col.markdown(
                     f"<div class='scen' style='--ac:{ac};--bg:{scn_bg}'>"
                     f"<div class='s-ti'>{scn['emoji']} {scn['title']}</div>"
-                    f"<div class='s-lbl'>סבירות (הערכת מודל)</div>"
-                    f"<div class='s-prob'>{scn['prob']}%</div>"
                     f"<div class='s-lbl'>מחיר יעד (אנליסטים)</div>"
                     f"<div class='s-tgt'>{tgt['price']}</div>{pill}"
                     f"<div class='s-sum'>{scn['summary']}</div>"
                     f"<div class='s-lbl'>גורמים מרכזיים</div><ul>{drivers}</ul></div>",
                     unsafe_allow_html=True)
-            st.caption("מחירי יעד = קונצנזוס אנליסטים (Yahoo, גבוה/ממוצע/נמוך). הסבירות היא הערכת מודל "
-                       "דטרמיניסטית לפי Score V2 — אינדיקציה בלבד, לא הסתברות שוק.")
+            st.caption("מחירי יעד = קונצנזוס אנליסטים (Yahoo, גבוה/ממוצע/נמוך). לא מוצגת סבירות לכל תרחיש: "
+                       "למודל אין כיול היסטורי שמצדיק אחוזים, ולכן התרחישים הם תיאור בלבד.")
             conf = rep.get("confidence", {})
             cs = conf.get("score")
             if isinstance(cs, (int, float)):
                 ccol = score_color(cs)
                 st.markdown(
-                    f"<div class='confmeter'><div class='ct'><span>🎯 רמת ביטחון בניתוח</span>"
+                    f"<div class='confmeter'><div class='ct'><span>🎯 ציון אמון (שלמות נתונים ואימות אות הפריצה)</span>"
                     f"<b style='color:{ccol}'>{conf.get('category', '')} · {int(cs)}/100</b></div>"
                     f"<div class='conftrack'><div class='conffill' style='width:{max(0, min(100, cs))}%;"
                     f"background:{ccol}'></div></div></div>", unsafe_allow_html=True)

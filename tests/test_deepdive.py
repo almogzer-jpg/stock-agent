@@ -158,9 +158,12 @@ def test_engine_v2_thesis_confidence_and_position():
     assert tc["score"] >= 60
     pos = d["position"]
     assert pos["name"] and pos["range"]
-    # negative recommendation → no position
-    d2 = dd.investment_decision(_rep(opinion={"recommendation": "Avoid · להימנע"}))
-    assert d2["position"]["range"] == "0%"
+    # position size follows the unified verdict: only 'buy' opens a position
+    for action in ("avoid", "wait"):
+        d2 = dd.investment_decision(_rep(verdict={"action": action, "quality": 76}))
+        assert d2["position"]["range"] == "0%"
+    d3 = dd.investment_decision(_rep(verdict={"action": "buy", "quality": 76}), regime_score=80)
+    assert d3["position"]["range"] not in ("0%", "—")
 
 
 def test_engine_v2_invalidators_catalysts_summary():

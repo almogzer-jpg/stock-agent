@@ -391,8 +391,11 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     probs = scenario_probs(score_v2)
     price_now = ma.get("price")
 
+    _fund_key = {"targetHighPrice": "TargetHigh", "targetMeanPrice": "TargetMean",
+                 "targetLowPrice": "TargetLow"}
+
     def _tgt(key):
-        tp = _g(info, key)
+        tp = _g(info, key) or _num(fund.get(_fund_key.get(key)))
         if tp is None or not price_now:
             return {"price": NA, "price_num": None, "upside": None}
         return {"price": f"${tp:.0f}", "price_num": round(tp, 2),
@@ -447,10 +450,10 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     }
 
     # ---- Growth / analyst (often NA on free data) ----
-    target = _g(info, "targetMeanPrice")
+    target = _g(info, "targetMeanPrice") or _num(fund.get("TargetMean"))
     growth = {
         "analyst_target": (_money(target) if target is not None else NA),
-        "analyst_count": (info.get("numberOfAnalystOpinions") or NA),
+        "analyst_count": (info.get("numberOfAnalystOpinions") or fund.get("AnalystCount") or NA),
         "analyst_reco": (info.get("recommendationKey") or NA),
         "rev_estimate": NA, "eps_estimate": NA,   # not reliably free
         "earnings_date": _earnings_date(info),
@@ -529,7 +532,7 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
                           "— השליפה החיה מ-Yahoo לא הייתה זמינה כרגע")
     if fund_score is None:
         warnings_q.append("⚠️ נתונים פונדמנטליים חסרים — הציון המשוקלל חושב בלעדיהם")
-    if not _g(info, "targetMeanPrice"):
+    if not target:
         warnings_q.append("⚠️ יעד אנליסטים לא זמין")
     warnings_q.append("⚠️ מקור נתונים ראשי יחיד (Yahoo) — אימות-צולב זמין למט\"ח/מדדים בלבד")
     gate = _rel.quality_gate(dconf["score"], fresh=True,
@@ -537,21 +540,7 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
                                                [("מחיר", ma.get("price")), ("היסטוריית מחיר", hist is not None)]
                                                if not v],
                              cross_status="ok" if _cross_ok else "not_completed")
-    try:  # audit trail + recommendation history — never blocks the analysis
-        _rel.record_decision_audit({
-            "ticker": t, "recommendation": rec, "confidence": trust["score"],
-            "score_v2": score_v2, "data_confidence": dconf["score"],
-            "sources": ["Yahoo Finance (yfinance)"], "fallbacks": [],
-            "models": ["composite_v2", "risk_engine", "technicals", "trust", "decision_v0"],
-            "missing": (comp.get("missing") if comp else []) or [],
-            "weights": (comp.get("weights") if comp else {}) or {},
-            "gate_pass": gate["pass"]})
-        _rel.record_recommendation(t, rec, trust["score"], score_v2,
-                                   _g(info, "targetMeanPrice"), risk_cat)
-    except Exception:
-        pass
-
-    return {
+    out = {
         "ticker": t, "disclaimer": DISCLAIMER,
         "raw_metrics": raw_metrics,
         "data_confidence": dconf, "quality_warnings": warnings_q, "quality_gate": gate,
@@ -585,6 +574,29 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
                  "facts": "נמשך מ-Yahoo Finance", "calc": "מחושב במנועי המערכת",
                  "opinion_note": "תזה/דעה — מבוססת כללים על נתונים אמיתיים, לא ייעוץ"},
     }
+    # ONE verdict for the whole app (verdict.py) — the score-scale rating stays
+    # available to the professional view under its own name.
+    import verdict as _vd
+    vd = _vd.verdict_for_report(out)
+    out["verdict"] = vd
+    out["opinion"]["score_scale"] = rec
+    rec = f"{vd['emoji']} {vd['label']}"
+    out["opinion"]["recommendation"] = rec
+    try:  # audit trail + recommendation history — never blocks the analysis
+        _rel.record_decision_audit({
+            "ticker": t, "recommendation": rec, "confidence": trust["score"],
+            "score_v2": score_v2, "data_confidence": dconf["score"],
+            "sources": ["Yahoo Finance (yfinance)"], "fallbacks": [],
+            "models": ["composite_v2", "risk_engine", "technicals", "verdict_v1"],
+            "missing": (comp.get("missing") if comp else []) or [],
+            "weights": (comp.get("weights") if comp else {}) or {},
+            "gate_pass": gate["pass"]})
+        _rel.record_recommendation(t, rec, trust["score"], score_v2, target, risk_cat)
+    except Exception:
+        pass
+
+    out["history"] = _rel.recommendation_history(t)
+    return out
 
 
 def _earnings_date(info):
@@ -656,30 +668,33 @@ def _rr_interpretation(rr):
     return ("מצוין" if rr >= 2.5 else "טוב" if rr >= 1.5 else "סביר" if rr >= 1.0 else "חלש")
 
 
+ENTRY_NOTE = ("מידע על מיקום המחיר בלבד. במחקר ההיסטורי של המערכת (S&P 500, 2015–2026) "
+              "המתנה לפי מדדים אלו לא שיפרה את התשואה, ולכן הם לא משנים את פסק הדין.")
+
+
 def _entry_quality(trend, rsi, dist_sup, dist_res, rr, val_score):
-    """Rule-based entry quality: (emoji, label, band, reasons[]). All from real metrics."""
+    """Where the price sits relative to its levels: (emoji, label, band, reasons[]).
+    DESCRIPTIVE ONLY — research/timing_study.py found no return benefit from
+    waiting on these readings, so they never override the verdict."""
     reasons = []
     if dist_sup is not None:
         reasons.append(f"המחיר {abs(dist_sup):.1f}% מעל התמיכה")
     if dist_res is not None:
         reasons.append(f"{dist_res:.1f}% עד ההתנגדות")
     if rr is not None:
-        reasons.append(f"יחס סיכון/סיכוי {rr}")
+        reasons.append(f"יחס סיכוי/סיכון לרמות {rr}")
     if isinstance(val_score, (int, float)):
         reasons.append("התמחור אטרקטיבי" if val_score >= 65 else
                        "התמחור סביר" if val_score >= 40 else "התמחור יקר יחסית")
     if trend in ("מגמת ירידה", "מגמת ירידה חזקה"):
-        return "🔴", "להימנע מרדיפה", "avoid", [f"מגמה טכנית שלילית ({trend})"] + reasons[:2]
+        return "🔴", "מגמת ירידה — סיכון לירידות עמוקות יותר", "avoid", [f"מגמה טכנית שלילית ({trend})"] + reasons[:2]
     if (isinstance(rsi, (int, float)) and rsi >= 75) or (dist_res is not None and dist_res <= 2):
-        return "🟠", "מתוח — התרחק מרמות אלו", "extended", \
-            ([f"RSI {rsi:.0f} — קנוי-יתר"] if isinstance(rsi, (int, float)) and rsi >= 75 else []) + reasons[:3]
+        return "🟡", "מחיר מתוח — צפויות תנודות חדות", "extended",             ([f"RSI {rsi:.0f} — עלייה מהירה"] if isinstance(rsi, (int, float)) and rsi >= 75 else []) + reasons[:3]
     if dist_sup is not None and abs(dist_sup) <= 3 and (rr or 0) >= 2:
-        return "🟢", "נקודת כניסה מצוינת", "excellent", reasons[:4]
+        return "⚪", "קרוב לתמיכה", "excellent", reasons[:4]
     if dist_sup is not None and abs(dist_sup) <= 6 and (rr or 0) >= 1.2:
-        return "🟢", "כניסה טובה", "good", reasons[:4]
-    if rr is not None and rr < 1:
-        return "🟡", "עדיף להמתין לתיקון", "wait", reasons[:4]
-    return "🟡", "ניטרלי — אין יתרון כניסה מובהק", "wait", (reasons[:4] or [NOT_ENOUGH])
+        return "⚪", "קרוב יחסית לתמיכה", "good", reasons[:4]
+    return "⚪", "באמצע הטווח", "wait", (reasons[:4] or [NOT_ENOUGH])
 
 
 def _check(value, good, neutral, higher_better=True):
@@ -855,9 +870,11 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
     }
     # ---- Decision Engine V2: the intelligence layer ----
     out["thesis_confidence"] = thesis_confidence(rep, regime_score)
+    _vd = rep.get("verdict") or {}
+    out["verdict"] = _vd
     out["position"] = position_suggestion(out["thesis_confidence"]["score"], risk_cat,
                                           (rep.get("risk") or {}).get("volatility"),
-                                          out["recommendation"])
+                                          _vd.get("action"), _vd.get("quality"))
     out["invalidators"] = thesis_invalidators(rep)
     out["catalysts"] = catalysts_timeline(rep)
     out["rating_change"] = explain_rating_change(rep.get("history") or [])
@@ -930,21 +947,23 @@ def thesis_confidence(rep: dict, regime_score=None) -> dict:
                       "התאמה למשטר השוק": round(regime_part), "עומק ראיות": round(depth_part)}}
 
 
-def position_suggestion(thesis_conf, risk_cat, volatility, recommendation) -> dict:
-    """Suggested portfolio exposure band — from conviction, risk and volatility."""
-    rec = str(recommendation or "")
-    if any(k in rec for k in ("Avoid", "Reduce")):
-        return {"name": "להימנע", "range": "0%", "why": "ההמלצה שלילית"}
-    if "Watch" in rec or "Hold" in rec:
-        return {"name": "המתנה — ללא פוזיציה חדשה", "range": "0%", "why": "ההמלצה היא מעקב/החזקה"}
+def position_suggestion(thesis_conf, risk_cat, volatility, action, quality=None) -> dict:
+    """Suggested exposure band for a NEW position — only when the verdict is
+    'buy'; every other verdict means no new position (one rule, app-wide)."""
+    if action == "avoid":
+        return {"name": "ללא פוזיציה", "range": "0%", "why": "פסק הדין: לא עכשיו"}
+    if action == "wait":
+        return {"name": "המתנה — ללא פוזיציה חדשה", "range": "0%", "why": "פסק הדין: להמתין להזדמנות"}
+    if action != "buy":
+        return {"name": "אין המלצה", "range": "—", "why": "אין מספיק מידע אמין"}
     tc = thesis_conf if isinstance(thesis_conf, (int, float)) else 50
     vol_hi = isinstance(volatility, (int, float)) and volatility >= 45
     risky = risk_cat in ("גבוה", "גבוה מאוד")
-    if tc >= 80 and not risky and not vol_hi and "Strong" in rec:
-        return {"name": "אמונה גבוהה", "range": "8-10%", "why": "ביטחון-תזה גבוה, סיכון נמוך, המלצה חזקה"}
+    if tc >= 80 and not risky and not vol_hi and (quality or 0) >= 78:
+        return {"name": "אמונה גבוהה", "range": "8-10%", "why": "ביטחון-תזה גבוה, סיכון נמוך, ציון איכות גבוה"}
     if tc >= 70 and not risky:
         return {"name": "פוזיציית ליבה", "range": "5-8%", "why": "ביטחון-תזה טוב וסיכון סביר"}
-    if tc >= 55:
+    if tc >= 55 and not vol_hi:
         return {"name": "פוזיציה בינונית", "range": "3-5%", "why": "תזה סבירה — חשיפה מדודה"}
     return {"name": "פוזיציה התחלתית", "range": "1-2%", "why": "ביטחון-תזה/סיכון מצדיקים כניסה זהירה בלבד"}
 

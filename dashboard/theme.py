@@ -367,7 +367,7 @@ def style_fig(fig, height: int = 300):
         paper_bgcolor=BG,
         plot_bgcolor=BG,
         font=dict(family="Inter, Segoe UI, Arial", color=TEXT, size=13),
-        title=dict(font=dict(color=TEXT, size=15)),
+        title=dict(text=(fig.layout.title.text or ""), font=dict(color=TEXT, size=15)),
         margin=dict(l=14, r=14, t=42, b=14),
         height=height,
         hoverlabel=dict(bgcolor=CARD, bordercolor=BORDER, font=dict(color=TEXT, size=12.5)),

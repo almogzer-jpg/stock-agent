@@ -142,4 +142,8 @@ COLUMN_LABELS_HE = {
     "ROIC": "ROIC %",
     "PEG": "PEG",
     "ForwardPE": "מכפיל עתידי",
+    "TargetMean": "מחיר יעד ממוצע (אנליסטים)",
+    "TargetHigh": "מחיר יעד גבוה",
+    "TargetLow": "מחיר יעד נמוך",
+    "AnalystCount": "מספר אנליסטים",
 }
