@@ -1,5 +1,17 @@
 [
   {
+    "type": "פריצה",
+    "scope": "LLY",
+    "severity": "גבוהה",
+    "message": "LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.84"
+  },
+  {
+    "type": "פריצה",
+    "scope": "MSFT",
+    "severity": "גבוהה",
+    "message": "MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.86"
+  },
+  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
@@ -18,40 +30,28 @@
     "message": "NFLX — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)"
   },
   {
-    "type": "דוחות",
-    "scope": "LLY",
+    "type": "זינוק נפח",
+    "scope": "AMZN",
     "severity": "בינונית",
-    "message": "LLY — דוחות כספיים בעוד 0 ימים (2026-10-29)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "MA",
-    "severity": "בינונית",
-    "message": "MA — דוחות כספיים בעוד 0 ימים (2026-10-29)"
+    "message": "AMZN — נפח מסחר פי 2.2 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "AAPL",
     "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 4 ימים (2026-11-02)"
-  },
-  {
-    "type": "דוחות",
-    "scope": "AMZN",
-    "severity": "בינונית",
-    "message": "AMZN — דוחות כספיים בעוד 0 ימים (2026-10-29)"
+    "message": "AAPL — דוחות כספיים בעוד 3 ימים (2026-11-02)"
   },
   {
     "type": "דוחות",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 5 ימים (2026-11-03)"
+    "message": "AMD — דוחות כספיים בעוד 4 ימים (2026-11-03)"
   },
   {
     "type": "זינוק נפח",
     "scope": "GOOGL",
     "severity": "בינונית",
-    "message": "GOOGL — נפח מסחר פי 2.37 מהממוצע"
+    "message": "GOOGL — נפח מסחר פי 4.5 מהממוצע"
   },
   {
     "type": "שינוי דירוג",
@@ -63,7 +63,7 @@
     "type": "שינוי דירוג",
     "scope": "V",
     "severity": "מידע",
-    "message": "V — אישרור: Overweight → Overweight (JP Morgan)"
+    "message": "V — אישרור: Outperform → Outperform (Macquarie)"
   },
   {
     "type": "שינוי דירוג",
@@ -73,21 +73,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — reit: Overweight → Overweight (Piper Sandler)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "PG",
     "severity": "מידע",
     "message": "PG — אישרור: Equal-Weight → Equal-Weight (Barclays)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — אישרור: Neutral → Neutral (DA Davidson)"
   },
   {
     "type": "שינוי דירוג",
@@ -97,21 +85,15 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "AAPL",
-    "severity": "מידע",
-    "message": "AAPL — אישרור: Neutral → Neutral (MoffettNathanson)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "JPM",
-    "severity": "מידע",
-    "message": "JPM — אישרור: Neutral → Neutral (Citigroup)"
-  },
-  {
-    "type": "שינוי דירוג",
     "scope": "UNH",
     "severity": "מידע",
     "message": "UNH — אישרור: Overweight → Overweight (Wells Fargo)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "MSFT",
+    "severity": "מידע",
+    "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
   },
   {
     "type": "שינוי דירוג",
@@ -121,15 +103,9 @@
   },
   {
     "type": "שינוי דירוג",
-    "scope": "NVDA",
+    "scope": "AAPL",
     "severity": "מידע",
-    "message": "NVDA — reit: Buy → Buy (Needham)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — אישרור: Buy → Buy (Rosenblatt)"
+    "message": "AAPL — אישרור: Neutral → Neutral (MoffettNathanson)"
   },
   {
     "type": "שינוי דירוג",
@@ -139,15 +115,27 @@
   },
   {
     "type": "שינוי דירוג",
+    "scope": "NVDA",
+    "severity": "מידע",
+    "message": "NVDA — reit: Buy → Buy (Needham)"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "CRM",
+    "severity": "מידע",
+    "message": "CRM — אישרור: Neutral → Neutral (DA Davidson)"
+  },
+  {
+    "type": "שינוי דירוג",
     "scope": "AMD",
     "severity": "מידע",
     "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
   },
   {
     "type": "שינוי דירוג",
-    "scope": "GOOGL",
+    "scope": "AVGO",
     "severity": "מידע",
-    "message": "GOOGL — אישרור: Market Outperform → Market Outperform (Citizens)"
+    "message": "AVGO — אישרור: Buy → Buy (Rosenblatt)"
   },
   {
     "type": "שינוי דירוג",
@@ -162,15 +150,21 @@
     "message": "TSLA — שדרוג: Equal-Weight → Overweight (Barclays)"
   },
   {
+    "type": "שינוי דירוג",
+    "scope": "GOOGL",
+    "severity": "מידע",
+    "message": "GOOGL — אישרור: Market Perform → Market Perform (Bernstein)"
+  },
+  {
     "type": "רוטציית סקטורים",
     "scope": "אנרגיה",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.27%)"
+    "message": "כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.82%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 3, חוזק יחסי -8.43%)"
+    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 2, חוזק יחסי -9.69%)"
   }
 ]
