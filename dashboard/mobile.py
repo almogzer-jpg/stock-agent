@@ -17,6 +17,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 import config
+import globalmkt
 import market
 import technicals as ta
 from ranking_engine.interpret import classify
@@ -218,8 +219,11 @@ def render(df, mkt, vmap=None):
     ranked = pos if not pos.empty else df.sort_values("ScoreV2", ascending=False)
 
     if page == "🏠 בית":
-        gm = _load(config.GLOBAL_JSON, {})
-        if gm.get("strip"):
+        gm = globalmkt.check(_load(config.GLOBAL_JSON, {}))
+        if gm.get("message"):
+            st.markdown(f"<div class='chiprow'><span class='chip'>{gm['message']}</span></div>",
+                        unsafe_allow_html=True)
+        elif gm.get("strip"):
             chips = []
             for r in gm["strip"]:
                 p, d1 = r.get("price"), r.get("d1")
@@ -231,7 +235,9 @@ def render(df, mkt, vmap=None):
                       else "שינוי: דורש אימות" if r.get("suspect") else "")
                 chips.append(f"<span class='chip'>{r['name']} <b>{pv}</b> "
                              f"<span style='color:{col}'>{dv}</span></span>")
-            st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>"
+                        f"<div style='color:{MUTED};font-size:12.5px'>עודכן {gm.get('updated', '—')}</div>",
+                        unsafe_allow_html=True)
         _home(df, ranked, sectors, alerts, regime, fng, lookup, nc)
     elif page == "🔎 ניתוח":
         _analysis(mkt, lookup, nc)
@@ -254,7 +260,7 @@ def _home(df, ranked, sectors, alerts, regime, fng, lookup, nc):
     # --- Morning brief (lite): environment + the single most material change ---
     try:
         import delta as dl
-        _gm = _load(config.GLOBAL_JSON, {})
+        _gm = globalmkt.check(_load(config.GLOBAL_JSON, {}))
         _vix = next((r for grp in (_gm.get("groups") or {}).values() for r in grp
                      if r.get("symbol") == "^VIX"), None)
         _env = dl.classify_environment(regime, _vix, {}, sectors)

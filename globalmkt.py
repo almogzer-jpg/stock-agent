@@ -5,6 +5,7 @@ Real yfinance data only (batched download, cached to data/global_markets.json by
 run.py). Deterministic interpretations from calculated changes — never invented.
 Missing data → None (UI shows "אין נתון זמין").
 """
+import copy
 from datetime import datetime
 
 import yfinance as yf
@@ -43,6 +44,14 @@ SPIKE = {"fx": 1.5, "rates": 8.0, "equity": 6.0, "commodity": 8.0, "crypto": 15.
 HARD_D1 = {"fx": 4.0, "rates": 15.0, "equity": 12.0, "commodity": 20.0, "crypto": 30.0}
 # Per-symbol overrides: the VIX routinely moves 10–30% a day.
 SYMBOL_LIMITS = {"^VIX": {"spike": 35.0, "hard": 80.0}}
+
+# Read-time gate (check): a snapshot is shown only when it was produced by the
+# validating build (SCHEMA), is recent, and every row still passes the checks.
+# The file in git can be days old after a server restart, so age is judged when it
+# is READ, not when it was written.
+SCHEMA = 2
+MAX_AGE_DAYS = 4        # the bot runs every weekday morning: Friday → Monday is 3 days
+ROW_LAG_DAYS = 5        # a row whose last close lags the snapshot this much stopped updating
 
 
 def validate(sym, grp, closes, price):
@@ -142,5 +151,67 @@ def build() -> dict:
                               "d1": None, "d7": None, "d30": None,
                               "trend": "הפוך ⚠️" if t10 - t2 < 0 else "תקין",
                               "interp": "עקום הפוך — היסטורית איתות האטה" if t10 - t2 < 0 else ""})
-    return {"updated": datetime.now().strftime("%d/%m/%Y %H:%M"), "groups": rows,
+    return {"schema": SCHEMA, "updated": datetime.now().strftime("%d/%m/%Y %H:%M"), "groups": rows,
             "strip": [by_sym[s] for s in STRIP if s in by_sym]}
+
+
+def _parse(s):
+    for fmt in ("%d/%m/%Y %H:%M", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(str(s), fmt)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _hide(row, reason):
+    row.update(price=None, d1=None, d7=None, d30=None, trend="—", interp="",
+               suspect=True, suspect_reason=reason)
+
+
+def check(g: dict, now: datetime | None = None) -> dict:
+    """The only way the app reads global market data. Returns a copy with
+    status ok / stale / unverified / missing, a Hebrew message, and every value that
+    cannot be trusted hidden (price None, suspect=True) so no screen can show it."""
+    now = now or datetime.now()
+    out = copy.deepcopy(g or {})
+    groups = out.get("groups") or {}
+    if not groups:
+        out.update(status="missing", message="נתוני השווקים הגלובליים אינם זמינים כרגע.", groups={}, strip=[])
+        return out
+    upd = _parse(out.get("updated"))
+    if out.get("schema") != SCHEMA:
+        status = "unverified"
+        message = ("נתוני השווקים הגלובליים בקובץ הנוכחי לא עברו בדיקת תקינות, ולכן הם מוסתרים. "
+                   "הם יוצגו אחרי העדכון הבא של המערכת.")
+    elif upd is None or (now - upd).total_seconds() > MAX_AGE_DAYS * 86400:
+        status = "stale"
+        message = (f"נתוני השווקים הגלובליים לא עודכנו מאז {upd:%d/%m/%Y}, ולכן הם מוסתרים עד העדכון הבא."
+                   if upd else "לא ידוע מתי עודכנו נתוני השווקים הגלובליים, ולכן הם מוסתרים.")
+    else:
+        status, message = "ok", ""
+    by_sym = {}
+    for grp, rows in groups.items():
+        kept = []
+        for r in rows:
+            if r.get("symbol") == "CURVE":
+                kept.append(r)
+                continue
+            if status != "ok":
+                _hide(r, "הנתונים לא עדכניים או לא אומתו")
+            else:
+                p, lo_hi = r.get("price"), RANGES.get(r.get("symbol"))
+                as_of = _parse(r.get("as_of"))
+                if isinstance(p, (int, float)) and lo_hi and not (lo_hi[0] <= p <= lo_hi[1]):
+                    _hide(r, "ערך מחוץ לטווח סביר — ייתכן קנה מידה שגוי במקור")
+                elif as_of and upd and (upd - as_of).days > ROW_LAG_DAYS:
+                    _hide(r, f"הנתון לא התעדכן מאז {as_of:%d/%m/%Y}")
+            kept.append(r)
+            by_sym[r.get("symbol")] = r
+        groups[grp] = kept
+    t10, t2 = by_sym.get("^TNX", {}), by_sym.get("2YY=F", {})
+    if status != "ok" or t10.get("suspect") or t2.get("suspect") or t10.get("price") is None or t2.get("price") is None:
+        groups["rates"] = [r for r in groups.get("rates", []) if r.get("symbol") != "CURVE"]
+    out.update(groups=groups, strip=[by_sym[s] for s in STRIP if s in by_sym],
+               status=status, message=message)
+    return out

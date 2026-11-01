@@ -19,6 +19,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 import config
+import globalmkt
 import market
 from config import COLUMN_LABELS_HE as L
 from ranking_engine.interpret import classify
@@ -131,7 +132,8 @@ def load_system_health() -> dict:
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_global() -> dict:
-    return _read_json(config.GLOBAL_JSON, {})
+    # Validated on every read: an old or unverified file never shows as current data.
+    return globalmkt.check(_read_json(config.GLOBAL_JSON, {}))
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -157,6 +159,10 @@ def provenance_line() -> str:
 
 def global_strip_html(g: dict) -> str:
     """Compact green/red market chips from the global artifact."""
+    if g.get("status") in ("stale", "unverified", "missing"):
+        return (f"<div class='chiprow'><div class='chip' style='max-width:none'>"
+                f"<div class='cl'>שווקים גלובליים</div><div class='cv' style='font-size:15px'>"
+                f"{g.get('message', '')}</div></div></div>")
     chips = []
     for r in g.get("strip", []):
         p, d1 = r.get("price"), r.get("d1")
@@ -167,7 +173,10 @@ def global_strip_html(g: dict) -> str:
               else "שינוי יומי: דורש אימות" if r.get("suspect") else "")
         chips.append(f"<div class='chip'><div class='cl'>{r['name']}</div>"
                      f"<div class='cv'>{pv} <span style='color:{col};font-size:14px'>{dv}</span></div></div>")
-    return f"<div class='chiprow'>{''.join(chips)}</div>" if chips else ""
+    if not chips:
+        return ""
+    return (f"<div class='chiprow'>{''.join(chips)}</div>"
+            f"<div style='color:{MUTED};font-size:13px;margin-top:2px'>שווקים גלובליים · עודכן {g.get('updated', '—')}</div>")
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
@@ -592,11 +601,14 @@ if page.startswith("🏠"):
             continue
         p, d1 = r.get("price"), r.get("d1")
         col = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
-        pv = "—" if p is None else (f"${p:,.0f}" if sym.endswith("-USD") else f"{p:,.2f}")
+        pv = (("דורש אימות" if r.get("suspect") else "—") if p is None
+              else (f"${p:,.0f}" if sym.endswith("-USD") else f"{p:,.2f}"))
         chips.append(f"<div class='chip'><div class='cl'>{r['name']} {r.get('trend','')[-1] if r.get('trend') else ''}</div>"
                      f"<div class='cv'>{pv} <span style='color:{col};font-size:14px'>"
                      f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></div></div>")
-    if chips:
+    if g.get("message"):
+        st.markdown(global_strip_html(g), unsafe_allow_html=True)       # stale / unverified: message only
+    elif chips:
         st.markdown(f"<div class='chiprow'>{''.join(chips)}</div>", unsafe_allow_html=True)
         st.caption(f"שווקים גלובליים · עודכן {g.get('updated','—')}")
 
@@ -655,7 +667,7 @@ if page.startswith("🏠"):
         cc2 = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
         _mrows += (f"<div style='display:flex;justify-content:space-between;gap:10px;padding:8px 2px;"
                    f"border-bottom:1px solid {BORDER}'><span style='color:{SECONDARY}'>{nm}</span>"
-                   f"<span><b>{fmt(r.get('price'))}</b> <span style='color:{cc2}'>"
+                   f"<span><b>{'דורש אימות' if r.get('suspect') and r.get('price') is None else fmt(r.get('price'))}</b> <span style='color:{cc2}'>"
                    f"{f'{d1:+.1f}%' if isinstance(d1,(int,float)) else ''}</span></span>"
                    f"<span style='color:{MUTED};font-size:13.5px'>{r.get('interp','')}</span></div>")
     mb[0].markdown(f"<div class='ic-card'><div class='ic-title'>תמונת מאקרו</div>{_mrows}"
@@ -2042,6 +2054,8 @@ elif page == "📊 אינטליגנציית שוק":
     if g.get("groups"):
         st.markdown("#### שווקים גלובליים")
         st.caption(f"עודכן {g.get('updated', '—')} · נתונים אמיתיים (Yahoo) · פרשנות דטרמיניסטית מהשינויים המחושבים בלבד.")
+        if g.get("message"):
+            st.warning(g["message"])
         _gtabs = st.tabs(["מדדים", "קריפטו", "מט\"ח", "סחורות", "אג\"ח וריביות"])
         for tab, key in zip(_gtabs, ["equity", "crypto", "fx", "commodity", "rates"]):
             with tab:
