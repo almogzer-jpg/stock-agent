@@ -164,7 +164,9 @@ _CACHE = _load_cache()
 def get_fundamentals(symbol: str) -> dict:
     """Cached fundamentals for `symbol` (refetched weekly). Clean dict (no _date)."""
     entry = _CACHE.get(symbol)
-    if entry and _fresh(entry.get("_date", "")):
+    # An entry written before a field was added (e.g. the analyst targets) is
+    # incomplete, not fresh: refetch it instead of serving the gap for a week.
+    if entry and _fresh(entry.get("_date", "")) and all(k in entry for k in FIELDS):
         return {k: entry.get(k) for k in FIELDS}
     data = _fetch_raw(symbol)
     # A blocked .info call yields an all-empty profile; caching it would pin the

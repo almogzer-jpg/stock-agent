@@ -102,3 +102,14 @@ def test_the_file_in_the_repository_right_now_never_shows_a_wrong_yield():
         g = G.check(json.load(fh))
     tnx = next((r for r in g["strip"] if r["symbol"] == "^TNX"), None)
     assert tnx is None or tnx["price"] is None or 1.0 <= tnx["price"] <= 20.0
+
+
+def test_fundamentals_cache_entry_missing_new_fields_is_refetched(monkeypatch):
+    from datetime import date
+    from fundamentals import fundamentals as F
+    old = {k: 1.0 for k in F.FIELDS if not k.startswith("Target") and k != "AnalystCount"}
+    monkeypatch.setitem(F._CACHE, "ZZZ", {**old, "_date": date.today().isoformat()})
+    fetched = {k: 2.0 for k in F.FIELDS}
+    monkeypatch.setattr(F, "_fetch_raw", lambda s: dict(fetched))
+    monkeypatch.setattr(F, "_save_cache", lambda c: None)
+    assert F.get_fundamentals("ZZZ")["TargetMean"] == 2.0
