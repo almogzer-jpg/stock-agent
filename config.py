@@ -85,7 +85,7 @@ EMAIL_CONFIG_FILE = os.path.join(BASE_DIR, "email_config.json")
 # --- Feature flags --------------------------------------------------------
 # Simple view (dashboard/simple.py) as the default experience. Off in the
 # reliability release (data and decision fixes only), on in the V4 line.
-SIMPLE_MODE_ENABLED = os.environ.get("STOCK_AGENT_SIMPLE_MODE", "1") == "1"
+SIMPLE_MODE_ENABLED = os.environ.get("STOCK_AGENT_SIMPLE_MODE", "0") == "1"
 
 # --- Hebrew display labels -----------------------------------------------
 # Internal metric keys stay English (used across modules); these Hebrew labels
