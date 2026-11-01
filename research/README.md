@@ -153,3 +153,15 @@ analyst targets and price fetched from Yahoo on 01/11/2026). Nothing in the live
   buy / wait / avoid 19 / 35 / 3 against 40 / 10 / 7 live. 37 of 57 verdicts change.
 
 Owner-facing recommendation and decision table: `DECISION_ENGINE_PROPOSAL.md`.
+
+## shadow_eval.py — outcomes of the four-dimension engine vs the live engine
+
+Approved by the owner on 01/11/2026 (version A, see `DECISION_ENGINE_PROPOSAL.md`). `verdict4.py`
+runs in shadow mode after every scan (`shadow.py`) and logs both engines' decisions with the
+day's price to `data/shadow_log.jsonl`. This script measures excess return after 21 and 63
+trading days (vs the equal-weight average of logged stocks that day and vs SPY), hit rate and
+the worst drop inside the window, per engine and action, plus the disagreement cohorts.
+Standard errors are clustered by day. Overlapping windows mean neighbouring days are not
+independent, so even day-clustered errors overstate precision. No conclusion is printed for a
+group with fewer than 20 decision days. Fewer buys is not a quality measure: the test is whether
+the new engine's buys beat its own waits and avoids and the live buys, with shallower drawdowns.

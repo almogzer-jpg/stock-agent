@@ -206,6 +206,7 @@ def scan_universe(name=None, limit=None, top_enrich=None) -> dict:
         "rankings": rankings, "sector_distribution": dict(sorted(sec_dist.items(),
                                                           key=lambda kv: -kv[1])),
         "elapsed_sec": round(time.time() - t0, 1),
+        "sector_scores": {x.get("sector"): x.get("score") for x in sectors or []},
     }
     return payload
 
@@ -231,3 +232,10 @@ if __name__ == "__main__":
     payload = scan_universe(uni, limit=lim)
     save_universe(payload)
     _report(payload)
+    # Four-dimension engine in shadow mode: logged for outcome measurement, never displayed.
+    # A failure here must never affect the live scan.
+    try:
+        import shadow
+        shadow.run(sector_scores=payload.get("sector_scores"))
+    except Exception as exc:
+        print(f"  ! מנוע הצל לא רץ: {exc}")

@@ -64,6 +64,15 @@ RSI_MAX = 75.0            # healthy-momentum RSI band, upper bound
 ENABLE_FUNDAMENTALS = True
 FUNDAMENTALS_CACHE = os.path.join(DATA_DIR, "fundamentals_cache.json")
 FUNDAMENTALS_TTL_DAYS = 7
+# Company profiles for the WHOLE universe (four-dimension engine, shadow mode).
+# Rolling refresh: each run refetches the stalest PROFILES_PER_RUN tickers, so the
+# full universe turns over about once a week without a burst of Yahoo calls.
+PROFILES_JSON = os.path.join(DATA_DIR, "profiles.json")
+PROFILES_TTL_DAYS = 7
+PROFILES_PER_RUN = 110
+# Shadow run of the four-dimension engine: computed and logged, never displayed.
+SHADOW_JSON = os.path.join(DATA_DIR, "shadow_verdicts.json")    # latest snapshot
+SHADOW_LOG = os.path.join(DATA_DIR, "shadow_log.jsonl")         # one line per stock per day
 # News is fetched only for breakout candidates (few calls), so it's cheap.
 ENABLE_NEWS = True
 NEWS_LIMIT = 5
