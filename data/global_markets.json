@@ -1,0 +1,402 @@
+{
+  "updated": "30/10/2026 09:00",
+  "groups": {
+    "equity": [
+      {
+        "symbol": "^GSPC",
+        "name": "S&P 500",
+        "price": 7720.39,
+        "d1": -0.3,
+        "d7": 0.74,
+        "d30": 0.9,
+        "trend": "יציבה →",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^IXIC",
+        "name": "Nasdaq",
+        "price": 26184.72,
+        "d1": -1.38,
+        "d7": 0.68,
+        "d30": -2.52,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^DJI",
+        "name": "Dow Jones",
+        "price": 52342.56,
+        "d1": -0.25,
+        "d7": -0.99,
+        "d30": 2.82,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^RUT",
+        "name": "Russell 2000",
+        "price": 2859.22,
+        "d1": 1.01,
+        "d7": 2.7,
+        "d30": 2.23,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^VIX",
+        "name": "VIX",
+        "price": 17.2,
+        "d1": 1.71,
+        "d7": -9.62,
+        "d30": 5.26,
+        "trend": "עולה ↑",
+        "interp": "תנודתיות יציבה",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^N225",
+        "name": "Nikkei",
+        "price": 63290.11,
+        "d1": -2.12,
+        "d7": 0.95,
+        "d30": -5.19,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^GDAXI",
+        "name": "DAX",
+        "price": 26039.68,
+        "d1": 1.31,
+        "d7": 2.63,
+        "d30": 3.34,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^FTSE",
+        "name": "FTSE",
+        "price": 10722.1,
+        "d1": 0.26,
+        "d7": -0.03,
+        "d30": 1.09,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "^HSI",
+        "name": "Hang Seng",
+        "price": 23331.28,
+        "d1": 1.62,
+        "d7": 1.03,
+        "d30": -4.86,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      }
+    ],
+    "crypto": [
+      {
+        "symbol": "BTC-USD",
+        "name": "ביטקוין",
+        "price": 78450.71,
+        "d1": -3.47,
+        "d7": -2.9,
+        "d30": -3.95,
+        "trend": "יורדת ↓",
+        "interp": "קריפטו מדשדש",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "ETH-USD",
+        "name": "את'ריום",
+        "price": 2249.03,
+        "d1": -4.61,
+        "d7": -4.54,
+        "d30": -9.02,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "SOL-USD",
+        "name": "סולאנה",
+        "price": 98.05,
+        "d1": -4.16,
+        "d7": -4.13,
+        "d30": -10.41,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "XRP-USD",
+        "name": "XRP",
+        "price": 1.26,
+        "d1": -4.48,
+        "d7": -2.58,
+        "d30": -8.27,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      }
+    ],
+    "fx": [
+      {
+        "symbol": "ILS=X",
+        "name": "דולר/שקל",
+        "price": 3.114,
+        "d1": -0.28,
+        "d7": 0.04,
+        "d30": 1.33,
+        "trend": "עולה ↑",
+        "interp": "שער הדולר יציב",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "EURILS=X",
+        "name": "אירו/שקל",
+        "price": 3.471,
+        "d1": -0.2,
+        "d7": -0.39,
+        "d30": -0.53,
+        "trend": "יציבה →",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "GBPILS=X",
+        "name": "ליש\"ט/שקל",
+        "price": 4.173,
+        "d1": 0.47,
+        "d7": 0.32,
+        "d30": 2.23,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "EURUSD=X",
+        "name": "אירו/דולר",
+        "price": 1.118,
+        "d1": 0.26,
+        "d7": -0.33,
+        "d30": -1.26,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      }
+    ],
+    "commodity": [
+      {
+        "symbol": "GC=F",
+        "name": "זהב",
+        "price": 3994.0,
+        "d1": -0.93,
+        "d7": -0.35,
+        "d30": -4.96,
+        "trend": "יורדת ↓",
+        "interp": "זהב יציב",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "SI=F",
+        "name": "כסף",
+        "price": 50.94,
+        "d1": -2.39,
+        "d7": -5.15,
+        "d30": -16.11,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "CL=F",
+        "name": "נפט WTI",
+        "price": 102.93,
+        "d1": 0.91,
+        "d7": -0.33,
+        "d30": 10.83,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "BZ=F",
+        "name": "ברנט",
+        "price": 111.99,
+        "d1": -2.52,
+        "d7": -4.05,
+        "d30": 9.46,
+        "trend": "עולה ↑",
+        "interp": "",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "NG=F",
+        "name": "גז טבעי",
+        "price": 2.9,
+        "d1": -1.86,
+        "d7": 9.73,
+        "d30": -2.36,
+        "trend": "יורדת ↓",
+        "interp": "",
+        "source": "Yahoo"
+      }
+    ],
+    "rates": [
+      {
+        "symbol": "^TNX",
+        "name": "תשואת אג\"ח 10 שנים",
+        "price": 0.5,
+        "d1": -1.11,
+        "d7": 0.73,
+        "d30": -5.74,
+        "trend": "יורדת ↓",
+        "interp": "ירידת תשואות — רוח גבית לנכסי סיכון",
+        "source": "Yahoo"
+      },
+      {
+        "symbol": "2YY=F",
+        "name": "תשואת אג\"ח שנתיים",
+        "price": null,
+        "d1": null,
+        "d7": null,
+        "d30": null,
+        "trend": "—",
+        "interp": "",
+        "source": null
+      },
+      {
+        "symbol": "DX-Y.NYB",
+        "name": "מדד הדולר DXY",
+        "price": 101.86,
+        "d1": -0.18,
+        "d7": 0.04,
+        "d30": -0.24,
+        "trend": "יציבה →",
+        "interp": "",
+        "source": "Yahoo"
+      }
+    ]
+  },
+  "strip": [
+    {
+      "symbol": "^GSPC",
+      "name": "S&P 500",
+      "price": 7720.39,
+      "d1": -0.3,
+      "d7": 0.74,
+      "d30": 0.9,
+      "trend": "יציבה →",
+      "interp": "",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "^IXIC",
+      "name": "Nasdaq",
+      "price": 26184.72,
+      "d1": -1.38,
+      "d7": 0.68,
+      "d30": -2.52,
+      "trend": "יורדת ↓",
+      "interp": "",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "^VIX",
+      "name": "VIX",
+      "price": 17.2,
+      "d1": 1.71,
+      "d7": -9.62,
+      "d30": 5.26,
+      "trend": "עולה ↑",
+      "interp": "תנודתיות יציבה",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "BTC-USD",
+      "name": "ביטקוין",
+      "price": 78450.71,
+      "d1": -3.47,
+      "d7": -2.9,
+      "d30": -3.95,
+      "trend": "יורדת ↓",
+      "interp": "קריפטו מדשדש",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "ETH-USD",
+      "name": "את'ריום",
+      "price": 2249.03,
+      "d1": -4.61,
+      "d7": -4.54,
+      "d30": -9.02,
+      "trend": "יורדת ↓",
+      "interp": "",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "GC=F",
+      "name": "זהב",
+      "price": 3994.0,
+      "d1": -0.93,
+      "d7": -0.35,
+      "d30": -4.96,
+      "trend": "יורדת ↓",
+      "interp": "זהב יציב",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "CL=F",
+      "name": "נפט WTI",
+      "price": 102.93,
+      "d1": 0.91,
+      "d7": -0.33,
+      "d30": 10.83,
+      "trend": "עולה ↑",
+      "interp": "",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "ILS=X",
+      "name": "דולר/שקל",
+      "price": 3.114,
+      "d1": -0.28,
+      "d7": 0.04,
+      "d30": 1.33,
+      "trend": "עולה ↑",
+      "interp": "שער הדולר יציב",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "DX-Y.NYB",
+      "name": "מדד הדולר DXY",
+      "price": 101.86,
+      "d1": -0.18,
+      "d7": 0.04,
+      "d30": -0.24,
+      "trend": "יציבה →",
+      "interp": "",
+      "source": "Yahoo"
+    },
+    {
+      "symbol": "^TNX",
+      "name": "תשואת אג\"ח 10 שנים",
+      "price": 0.5,
+      "d1": -1.11,
+      "d7": 0.73,
+      "d30": -5.74,
+      "trend": "יורדת ↓",
+      "interp": "ירידת תשואות — רוח גבית לנכסי סיכון",
+      "source": "Yahoo"
+    }
+  ]
+}
