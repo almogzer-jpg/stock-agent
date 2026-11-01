@@ -135,3 +135,33 @@ positive predictive power", not "proven negative".
 **Not changed.** Score V2 weights stay as they are. A weight change would need a test of the whole
 V2 score, which requires point-in-time fundamentals that free sources do not provide. Options
 for the owner are listed in the V4 approval notes.
+
+## decision_structure_study.py — five dimensions instead of one mixed score (01/11/2026)
+
+Shadow comparison on the 57 stocks with full fundamentals. Inputs: the canonical rows
+(technicals from the 29/10/2026 close) and `decision_structure_inputs.json` (fundamentals,
+analyst targets and price fetched from Yahoo on 01/11/2026). Nothing in the live engine changes.
+
+- What orders Score V2 (rank correlation): fundamental −0.05, technical 0.58, sector 0.55,
+  risk −0.45. A business-only quality score (fundamental_score without PEG / forward P/E)
+  correlates 0.03 with Score V2, and only 4 of the top 10 overlap.
+- Lowering the technical weight alone barely changes the ranking (10%: ρ 0.97, 0%: ρ 0.86),
+  because sector momentum and price-derived risk still dominate.
+- Price never enters the live verdict: 8 of the 40 live "buy" verdicts are above the analyst
+  consensus target (AMGN, AWK, BDX, CHD, EXPD, LLY, MO, REGN).
+- Proposed structure (quality from business data, price, timing, risk, one decision table):
+  buy / wait / avoid 19 / 35 / 3 against 40 / 10 / 7 live. 37 of 57 verdicts change.
+
+Owner-facing recommendation and decision table: `DECISION_ENGINE_PROPOSAL.md`.
+
+## shadow_eval.py — outcomes of the four-dimension engine vs the live engine
+
+Approved by the owner on 01/11/2026 (version A, see `DECISION_ENGINE_PROPOSAL.md`). `verdict4.py`
+runs in shadow mode after every scan (`shadow.py`) and logs both engines' decisions with the
+day's price to `data/shadow_log.jsonl`. This script measures excess return after 21 and 63
+trading days (vs the equal-weight average of logged stocks that day and vs SPY), hit rate and
+the worst drop inside the window, per engine and action, plus the disagreement cohorts.
+Standard errors are clustered by day. Overlapping windows mean neighbouring days are not
+independent, so even day-clustered errors overstate precision. No conclusion is printed for a
+group with fewer than 20 decision days. Fewer buys is not a quality measure: the test is whether
+the new engine's buys beat its own waits and avoids and the live buys, with shallower drawdowns.
