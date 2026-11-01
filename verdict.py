@@ -480,7 +480,7 @@ def facets(f: dict, v: dict) -> dict:
         "quality": {"label": q[0], "tone": q[1],
                     "basis": f"ציון איכות {int(v['quality'])} מתוך 100" if v.get("quality") is not None else ""},
         "price": {"label": p[0], "tone": p[1], "basis": basis},
-        "now": {"label": v["label"], "tone": v["tone"], "basis": "פסק הדין: איכות, מגמה וסיכון יחד"},
+        "now": {"label": v["label"], "tone": v["tone"], "basis": "הערכת ההשקעה: איכות, מגמה וסיכון יחד"},
     }
 
 

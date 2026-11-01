@@ -315,7 +315,7 @@ def _home(df, ranked, sectors, alerts, regime, fng, lookup, nc):
         st.markdown(f"<div class='mcard' style='border-right:4px solid {PRIMARY}'>"
                     f"<div class='mco'>קיצור דרך</div>"
                     f"<div style='font-size:18px;font-weight:700'>החלטת השקעה מלאה ל-{top_tk}</div>"
-                    f"<div class='mco'>פסק הדין, מחיר יעד, תמיכה והתנגדות, וההסבר.</div></div>",
+                    f"<div class='mco'>הערכת ההשקעה, מחיר יעד, תמיכה והתנגדות, וההסבר.</div></div>",
                     unsafe_allow_html=True)
         _goto("🔎 ניתוח", top_tk, key="h_dec", label=f"🔎 פתח החלטת השקעה · {top_tk}")
 
@@ -466,7 +466,7 @@ def _analysis(mkt, lookup, nc):
             f"{int(conf) if isinstance(conf, (int, float)) else '—'}/100</b> · אופק <b>{dec['horizon']}</b></div>"
             + _grid([
                 _mkpi("🎯", dec.get("target", "—"), "מחיר יעד", "קונצנזוס אנליסטים", PRIMARY),
-                _mkpi("⚖️", dec.get("rr") if dec.get("rr") is not None else "—", "יחס סיכוי לסיכון (יעד אנליסטים מול תמיכה)",
+                _mkpi("⚖️", dec.get("rr") if dec.get("rr") is not None else "—", dec.get("rr_label") or "יחס סיכוי לסיכון",
                       dec.get("rr_interpretation") or "", rr_c),
                 _mkpi("🟢", f"${_fmt(dec.get('support'))}" if dec.get("support") else "—", "תמיכה",
                       _fmt(dec.get("downside"), "%"), POSITIVE),

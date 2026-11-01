@@ -426,12 +426,13 @@ if st.query_params.get("diag") == "1":
 if st.session_state.get("_pending_nav"):
     st.session_state["nav"] = st.session_state.pop("_pending_nav")
 
-page = st.sidebar.radio(
-    "תצוגה",
-    ["🏠 ראשי", "🔎 ניתוח חברה", "⭐ המעקב שלי", "💎 הזדמנויות", "🗺️ סקטורים", "🚨 התראות",
-     "📊 אינטליגנציית שוק", "⚙️ הגדרות"],
-    key="nav",
-)
+_NAV = ["🏠 ראשי", "🔎 ניתוח חברה", "⭐ המעקב שלי", "💎 הזדמנויות", "🗺️ סקטורים", "🚨 התראות",
+        "📊 אינטליגנציית שוק", "⚙️ הגדרות"]
+if not config.PERSONAL_LISTS_ENABLED:
+    _NAV.remove("⭐ המעקב שלי")
+    if st.session_state.get("nav") not in _NAV:
+        st.session_state.pop("nav", None)
+page = st.sidebar.radio("תצוגה", _NAV, key="nav")
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
 st.sidebar.divider()
 if config.SIMPLE_MODE_ENABLED and st.sidebar.button("🌱 מעבר למצב פשוט", use_container_width=True,
@@ -700,7 +701,7 @@ if page.startswith("🏠"):
                     f"<td style='color:{POSITIVE}'>חדשה בסריקה</td>"
                     f"<td style='color:{MUTED};font-size:13.5px'>נכנסה לרשימת המעקב של המערכת</td>"
                     f"<td><b>🔍 לחקור היום</b></td></tr>")
-        _fh = "".join(f"<th>{h}</th>" for h in ["חברה", "מה השתנה", "למה (מדיד)", "פסק דין"])
+        _fh = "".join(f"<th>{h}</th>" for h in ["חברה", "מה השתנה", "למה (מדיד)", "הערכת השקעה"])
         st.markdown(f"<table class='sectbl'><thead><tr>{_fh}</tr></thead><tbody>{_fb}</tbody></table>",
                     unsafe_allow_html=True)
         _dl_ctx = {it["ticker"]: f"הופיעה בשינויי-הלילה: {it['changes'][0]} · סיבה מדידה: {it['causes'][0]}"
@@ -748,14 +749,14 @@ if page.startswith("🏠"):
             f"<td>{_lvl(v, 'support', 'downside')}</td>"
             f"<td style='color:{SECONDARY};font-size:13.5px;max-width:330px'>{v['why']}</td></tr>")
     _head = "".join(f"<th>{h}</th>" for h in
-                    ["חברה", "מחיר", "פסק דין", "ציון איכות", "יעד אנליסטים", "תמיכה", "למה"])
+                    ["חברה", "מחיר", "הערכת השקעה", "ציון איכות", "יעד אנליסטים", "תמיכה", "למה"])
     if _top:
         st.markdown(f"<table class='sectbl'><thead><tr>{_head}</tr></thead><tbody>{_body}</tbody></table>",
                     unsafe_allow_html=True)
     else:
         st.markdown(f"<div class='ic-sub'>אין היום מניות שעוברות את כל התנאים — זה מידע בפני עצמו: לא חייבים לקנות כל יום.</div>",
                     unsafe_allow_html=True)
-    st.caption("פסק דין אחד לכל מניה, זהה בכל העמודים · יעד = ממוצע תחזיות האנליסטים (Yahoo), לא תחזית של המערכת · "
+    st.caption("הערכת השקעה אחת לכל מניה, זהה בכל העמודים · יעד = ממוצע תחזיות האנליסטים (Yahoo), לא תחזית של המערכת · "
                "תמיכה = השפל הקרוב, והאחוז = המרחק אליו · לחיצה על 🔎 פותחת ניתוח מלא.")
     _bc = st.columns(max(len(_top), 1))
     for j, v in enumerate(_top):
@@ -768,7 +769,8 @@ if page.startswith("🏠"):
 
     # ---- Watchlist changes (answer: מה השתנה ברשימה שלי?) ----
     import mywatch as _mw
-    _wlrows = _mw.enrich(uni_h, df.to_dict("records") if not df.empty else [])
+    _wlrows = (_mw.enrich(uni_h, df.to_dict("records") if not df.empty else [])
+               if config.PERSONAL_LISTS_ENABLED else [])
     _wlatt = [w for w in _wlrows if w["attention"]] if _wlrows else []
     if _wlrows:
         st.markdown("#### מה השתנה ברשימת המעקב שלך")
@@ -1146,7 +1148,7 @@ elif page == "💎 הזדמנויות":
                     rows.append({
                         "דירוג": rank, "סימול": r["Ticker"],
                         "חברה": VW.company_name(r["Ticker"], lookup, nc),
-                        "פסק דין": f"{_v.get('emoji', '⚪')} {_v.get('short', 'אין מספיק מידע')}",
+                        "הערכת השקעה": f"{_v.get('emoji', '⚪')} {_v.get('short', 'אין מספיק מידע')}",
                         "סקטור": market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector") or "—"),
                         "Score V2": int(_q) if _num(_q) is not None else None,
                         "מומנטום 3ח׳": round(r["Ret3m"], 1) if _num(r.get("Ret3m")) is not None else None,
@@ -1269,7 +1271,7 @@ elif page == "🗺️ סקטורים":
                           f"<td><span class='tbadge' style='color:{rbx[3]}'>{rbx[0]} {rbx[1]}</span></td>"
                           f"<td style='color:{POSITIVE if isinstance(m3x,(int,float)) and m3x>=0 else NEGATIVE}'>"
                           f"{f'{m3x:+.0f}%' if isinstance(m3x,(int,float)) else '—'}</td></tr>")
-            st.markdown(f"<table class='sectbl'><thead><tr><th>חברה</th><th>ציון V2</th><th>פסק דין</th>"
+            st.markdown(f"<table class='sectbl'><thead><tr><th>חברה</th><th>ציון V2</th><th>הערכת השקעה</th>"
                         f"<th>סיכון</th><th>מומנטום 3ח׳</th></tr></thead><tbody>{dbody}</tbody></table>",
                         unsafe_allow_html=True)
             dcols = st.columns(len(pool))
@@ -1560,7 +1562,7 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='font-size:26px;font-weight:700;color:{POSITIVE if (dec.get('upside') or 0)>=0 else NEGATIVE}'>{_n2(dec.get('upside'), '%', plus=True)}</div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>דאונסייד (לתמיכה)</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{NEGATIVE}'>{_n2(dec.get('downside'), '%', plus=True)}</div>"
-                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>יחס סיכוי לסיכון (יעד אנליסטים מול תמיכה)</div>"
+                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>{dec.get('rr_label') or 'יחס סיכוי לסיכון'}</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{rr_c}'>{dec.get('rr') if dec.get('rr') is not None else '—'}"
                     f" <span style='font-size:14px'>{dec.get('rr_interpretation') or ''}</span></div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>מתאים ל</div>"
@@ -2020,7 +2022,7 @@ elif page == "🔎 ניתוח חברה":
             import mywatch as _mw
             _wcols2 = st.columns([1, 1, 3])
             _watched = _mw.is_watched(tkin)
-            if _wcols2[0].button("★ ברשימת המעקב — הסר" if _watched else "⭐ הוסף למעקב",
+            if config.PERSONAL_LISTS_ENABLED and _wcols2[0].button("★ ברשימת המעקב — הסר" if _watched else "⭐ הוסף למעקב",
                                  key=f"star_{tkin}", use_container_width=True):
                 if _watched:
                     _mw.remove(tkin)
@@ -2031,7 +2033,7 @@ elif page == "🔎 ניתוח חברה":
                             recommendation=rep.get("opinion", {}).get("recommendation"),
                             support=_srl0.get("support"))
                 st.rerun()
-            if _watched:
+            if _watched and config.PERSONAL_LISTS_ENABLED:
                 _wcols2[1].caption("נשמרה תמונת-מצב · מעקב בעמוד ⭐")
             st.download_button("📥 הורד דוח HTML", data=to_html(rep),
                                file_name=f"deepdive_{tkin}.html", mime="text/html")
@@ -2085,7 +2087,10 @@ elif page == "📊 אינטליגנציית שוק":
     cols = ["Ticker", "Name", "ScoreV2", "Score", "ScoreFundamental", "ScoreRisk",
             "TrustScore", "RiskLevel", "Confidence", "DailyChange%"]
     view = df[[c for c in cols if c in df.columns]].copy().sort_values("ScoreV2", ascending=False)
-    view = view.rename(columns={c: L.get(c, c) for c in view.columns})
+    # "Confidence" is proprietary.confidence(): a 0-100 heuristic (technical factors, signal
+    # agreement, data availability, backtest hit rate), not a calibrated probability.
+    view = view.rename(columns={c: ("ציון אות פנימי (0-100, לא הסתברות)" if c == "Confidence" else L.get(c, c))
+                                for c in view.columns})
     pcfg = {L[c]: st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d")
             for c in ("ScoreV2", "Score", "ScoreFundamental", "TrustScore")
             if c in df.columns and L.get(c) in view.columns}
@@ -2154,11 +2159,11 @@ elif page == "⚙️ הגדרות":
         f"<div class='ic-sub'><b>ציון V2</b> = שקלול דטרמיניסטי: "
         + " · ".join(f"{_wl_he.get(k, k)} {v:.0%}" for k, v in _W.items())
         + " (ממדים חסרים → המשקלים מנורמלים מחדש; הפירוק המלא מוצג בכל ניתוח).</div>"
-        f"<div class='ic-sub'><b>פסק הדין (מנוע אחד לכל המערכת):</b> 🟢 שווה לשקול קנייה = ציון 68+ ומגמה תקינה · "
+        f"<div class='ic-sub'><b>הערכת ההשקעה (מנוע אחד לכל המערכת):</b> 🟢 שווה לשקול קנייה = ציון 68+ ומגמה תקינה · "
         f"🟡 להמתין = ציון 45–67, או חברה חזקה במגמת ירידה · 🔴 לא עכשיו = ציון מתחת ל-45, או מגמת ירידה בלי חברה חזקה, "
         f"או סיכון גבוה מאוד · ⚪ אין מספיק מידע = נתונים חסרים או אמינות מתחת ל-55.</div>"
         f"<div class='ic-sub'><b>כללי תזמון:</b> נבדקו היסטורית (S&P 500, 2015–2026, 66,625 מקרים). "
-        f"קנוי-יתר, יחס סיכוי/סיכון, קרבה להתנגדות והמתנה לתמיכה לא שיפרו תשואה, ולכן לא משנים את פסק הדין "
+        f"קנוי-יתר, יחס סיכוי/סיכון, קרבה להתנגדות והמתנה לתמיכה לא שיפרו תשואה, ולכן לא משנים את הערכת ההשקעה "
         f"(research/timing_study.py).</div>"
         f"<div class='ic-sub'><b>אמינות הנתונים:</b> שלמות 50 · טריות 25 · רמות מחיר 15 · מקור 10. "
         f"מקור יחיד (Yahoo) ללא אימות צולב למניות → תקרה 90. מתחת ל-55 → אין המלצה.</div>"

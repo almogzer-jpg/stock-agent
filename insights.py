@@ -45,7 +45,7 @@ def generate_insights(market: dict, df, alert_center: list) -> dict:
             q = r.get("ScoreV2")
             items.append(f"**{r['Ticker']}** (ציון איכות {int(q)})" if isinstance(q, (int, float)) and q == q
                          else f"**{r['Ticker']}**")
-        opp_txt = (f"{len(positive)} מניות בפסק דין 'שווה לשקול קנייה'. "
+        opp_txt = (f"{len(positive)} מניות בהערכה 'שווה לשקול קנייה'. "
                    f"המובילות: " + " · ".join(items) + ".")
 
     # --- Biggest risks (genuine risk alerts only — exclude positive breakouts) ---

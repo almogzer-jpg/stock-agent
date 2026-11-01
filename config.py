@@ -63,6 +63,9 @@ RSI_MAX = 75.0            # healthy-momentum RSI band, upper bound
 # Cached weekly (they change quarterly) so daily runs stay fast.
 ENABLE_FUNDAMENTALS = True
 FUNDAMENTALS_CACHE = os.path.join(DATA_DIR, "fundamentals_cache.json")
+# Personal watchlists ("המעקב שלי" / "המניות שלי") stay hidden from the public site until
+# visitors can sign in (owner decision 01/11/2026). Stored lists are kept, not deleted.
+PERSONAL_LISTS_ENABLED = os.environ.get("STOCK_AGENT_PERSONAL_LISTS", "0") == "1"
 # One day: a weekly cache let a run in the days after an earnings report reuse the
 # figures from before it, with nothing on screen saying so (found 01/11/2026).
 # The daily bot starts from a clean checkout, so this changes only runs that keep
@@ -112,6 +115,8 @@ COLUMN_LABELS_HE = {
     "Summary": "שורה תחתונה",
     "Date": "תאריך",
     "FundDate": "תאריך נתונים עסקיים",
+    "LastQuarter": "רבעון אחרון בנתונים",
+    "LastReport": "דוח אחרון פורסם",
     "Price": "מחיר",
     "MA20": "ממוצע 20",
     "MA50": "ממוצע 50",

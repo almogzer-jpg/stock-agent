@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 import company_search
+import config
 import glossary
 import market
 import mywatch
@@ -24,6 +25,8 @@ from dashboard.theme import (BG, CARD, ELEV, BORDER, PRIMARY, POSITIVE, WARNING,
 
 PAGES = [("today", "🏠", "היום"), ("check", "🔎", "בדיקת מניה"), ("ideas", "💡", "רעיונות"),
          ("mine", "⭐", "המניות שלי"), ("learn", "📖", "מילון")]
+if not config.PERSONAL_LISTS_ENABLED:                 # no personal lists until sign-in exists
+    PAGES = [p for p in PAGES if p[0] != "mine"]
 TONE = {"positive": POSITIVE, "warning": WARNING, "negative": NEGATIVE, "muted": MUTED}
 POPULAR = [("AAPL", "אפל"), ("MSFT", "מיקרוסופט"), ("NVDA", "אנבידיה"), ("AMZN", "אמזון"),
            ("GOOGL", "גוגל"), ("TEVA", "טבע"), ("JPM", "ג'יי פי מורגן"), ("KO", "קוקה קולה")]
@@ -233,7 +236,7 @@ def page_today(ctx):
           f"<div class='s-why'>{' '.join(lines)}</div>")
 
     # My stocks first, when something needs attention
-    mine = mywatch.items()
+    mine = mywatch.items() if config.PERSONAL_LISTS_ENABLED else {}
     attn = []
     for tk, base in mine.items():
         v = vmap.get(tk)
@@ -261,7 +264,7 @@ def page_today(ctx):
 
     if wait:
         st.markdown("<div class='s-h'>🟡 שווה לעקוב — עוד לא</div>", unsafe_allow_html=True)
-        st.markdown("<div class='s-note'>חברות שקרובות לפסק דין חיובי, ומה חסר להן כדי להגיע אליו.</div>",
+        st.markdown("<div class='s-note'>חברות שקרובות להערכה חיובית, ומה חסר להן כדי להגיע אליה.</div>",
                     unsafe_allow_html=True)
         for v in wait:
             stock_card(v, rows.get(v["ticker"], {}), f"t_w_{v['ticker']}")
@@ -330,7 +333,7 @@ def _analysis_block(t, rep, daily_v):
         f"{int(v['quality']) if v.get('quality') is not None else '—'}</b> מתוך 100</span></div></div>",
         unsafe_allow_html=True)
     if daily_v and daily_v["action"] != v["action"]:
-        st.markdown(f"<div class='s-note'>בסריקת הבוקר פסק הדין היה {daily_v['emoji']} {daily_v['label']}. "
+        st.markdown(f"<div class='s-note'>בסריקת הבוקר הערכת ההשקעה הייתה {daily_v['emoji']} {daily_v['label']}. "
                     f"הניתוח כאן מבוסס על המחיר והנתונים העדכניים ביותר.</div>", unsafe_allow_html=True)
 
     # Key numbers
@@ -434,7 +437,9 @@ def page_check(ctx):
 
     mine = mywatch.items()
     c = st.columns(2)
-    if t in mine:
+    if not config.PERSONAL_LISTS_ENABLED:
+        pass
+    elif t in mine:
         if c[0].button("★ במניות שלי — הסרה", key=f"rm_{t}", use_container_width=True):
             mywatch.remove(t)
             st.rerun()
@@ -455,7 +460,7 @@ def page_check(ctx):
 def page_ideas(ctx):
     rows, vmap = ctx["rows"], ctx["vmap"]
     st.markdown("<div class='s-hero'>רעיונות להשקעה</div>"
-                "<div class='s-sub'>מניות שהמערכת ניתחה לעומק היום, מסודרות לפי פסק הדין</div>",
+                "<div class='s-sub'>מניות שהמערכת ניתחה לעומק היום, מסודרות לפי הערכת ההשקעה</div>",
                 unsafe_allow_html=True)
     import stockdata
     pool = stockdata.ranked(vmap, rows, None)
@@ -478,7 +483,7 @@ def page_ideas(ctx):
         if sec != "כל הענפים" and market.SECTOR_EN_TO_HE.get(r.get("Sector"), r.get("Sector")) != sec:
             continue
         out.append(v)
-    st.markdown(f"<div class='s-note'>{len(out)} מניות · פסק הדין זהה לזה שבתצוגה המקצועית</div>",
+    st.markdown(f"<div class='s-note'>{len(out)} מניות · הערכת ההשקעה זהה לזו שבתצוגה המקצועית</div>",
                 unsafe_allow_html=True)
     if not out:
         _card("<div class='s-why'>אין מניות שמתאימות לסינון הזה. נסו להרחיב את רמת הסיכון או את הענף.</div>")
@@ -552,8 +557,8 @@ def page_learn(ctx):
           "<li>1. <b>האם החברה טובה?</b> ציון איכות 0–100 שמשקלל נתונים עסקיים, מגמה, ענף, חדשות וסיכון.</li>"
           "<li>2. <b>האם זה רגע טוב?</b> בודקים מגמה וכללי תזמון שנבדקו על נתוני עבר אמיתיים.</li>"
           "<li>3. <b>כמה אפשר לסמוך על הנתונים?</b> כשהנתונים לא מספיקים, המערכת לא נותנת המלצה.</li>"
-          "</ul><div class='s-note'>מכאן יוצא פסק דין אחד: 🟢 שווה לשקול קנייה · 🟡 להמתין להזדמנות · "
-          "🔴 לא עכשיו · ⚪ אין מספיק מידע. אותו פסק דין מופיע בכל מקום במערכת.</div>")
+          "</ul><div class='s-note'>מכאן נגזרת הערכת השקעה אחת: 🟢 שווה לשקול קנייה · 🟡 להמתין להזדמנות · "
+          "🔴 לא עכשיו · ⚪ אין מספיק מידע. אותה הערכה מופיעה בכל מקום במערכת.</div>")
     _study_section()
 
 
@@ -599,10 +604,10 @@ def _study_section():
         return
     m = ev["meta"]
     st.markdown("<div class='s-h'>מה בדקנו בנתוני העבר</div>", unsafe_allow_html=True)
-    _card(f"<div class='s-why' style='margin-top:0'>לפני שכלל משפיע על פסק הדין, בודקים אותו על נתוני עבר אמיתיים: "
+    _card(f"<div class='s-why' style='margin-top:0'>לפני שכלל משפיע על הערכת ההשקעה, בודקים אותו על נתוני עבר אמיתיים: "
           f"{m['tickers']} מניות S&P 500, {m['first_date'][:4]}–{m['last_date'][:4]}, {m['samples']:,} מקרים.</div>"
           f"<ul class='s-list'>{''.join(rows)}</ul>"
-          f"<div class='s-note'>כללים שלא הוכיחו את עצמם לא משנים את פסק הדין, גם אם הם נשמעים הגיוניים. "
+          f"<div class='s-note'>כללים שלא הוכיחו את עצמם לא משנים את הערכת ההשקעה, גם אם הם נשמעים הגיוניים. "
           f"מגמת ירידה כן נלקחת בחשבון, אבל כשיקול סיכון: בעבר היו בה ירידות עמוקות יותר בדרך. "
           f"הבדיקה כוללת רק מניות שנמצאות היום במדד, ולכן משווים קבוצות זו לזו ולא מסתכלים על המספר עצמו.</div>")
 
@@ -640,7 +645,7 @@ def render(ctx, mobile: bool):
 
     st.divider()
     c = st.columns([3, 2])
-    c[0].markdown(f"<div class='s-note'>Stock Agent מציג מידע ופסקי דין מבוססי נתונים. "
+    c[0].markdown(f"<div class='s-note'>Stock Agent מציג מידע והערכות השקעה מבוססי נתונים. "
                   f"זה לא ייעוץ השקעות אישי, וההחלטה הסופית שלכם.</div>", unsafe_allow_html=True)
     if mobile and c[1].button("🔬 לתצוגה המקצועית", key="to_pro_foot", use_container_width=True):
         ctx["to_pro"](None)

@@ -12,7 +12,7 @@ stay fast (fundamentals only change quarterly).
 """
 import json
 import os
-from datetime import date
+from datetime import date, datetime, timezone
 
 try:
     import yfinance as yf
@@ -24,7 +24,32 @@ from config import FUNDAMENTALS_CACHE, FUNDAMENTALS_TTL_DAYS
 FIELDS = ["Sector", "MarketCap", "RevenueGrowth", "EPSGrowth", "FCFGrowth",
           "OperatingMargin", "DebtToEquity", "ROIC", "PEG", "ForwardPE",
           # analyst consensus (real Yahoo fields; None when not covered)
-          "TargetMean", "TargetHigh", "TargetLow", "AnalystCount"]
+          "TargetMean", "TargetHigh", "TargetLow", "AnalystCount",
+          # which period the figures describe, and the latest report date (DD/MM/YYYY)
+          "LastQuarter", "LastReport"]
+
+
+def _dmy_from_ts(ts):
+    try:
+        return datetime.fromtimestamp(float(ts), tz=timezone.utc).strftime("%d/%m/%Y") if ts else None
+    except (TypeError, ValueError, OverflowError, OSError):
+        return None
+
+
+def _last_report(tk, info) -> str | None:
+    """Date of the most recent earnings report already published (DD/MM/YYYY), or None."""
+    now = datetime.now(timezone.utc)
+    try:
+        ed = tk.get_earnings_dates(limit=8)
+        past = [d for d in (ed.index if ed is not None else []) if d.to_pydatetime() <= now]
+        if past:
+            return max(past).strftime("%d/%m/%Y")
+    except Exception:
+        pass
+    ts = _num(info.get("earningsTimestamp"))
+    if ts and datetime.fromtimestamp(ts, tz=timezone.utc) <= now:
+        return _dmy_from_ts(ts)
+    return None
 
 
 def _num(v):
@@ -125,6 +150,9 @@ def _fetch_raw(symbol: str) -> dict:
         out[key] = round(v, 2) if v is not None and v > 0 else None
     n = _num(info.get("numberOfAnalystOpinions"))
     out["AnalystCount"] = int(n) if n else None
+    mrq = _num(info.get("mostRecentQuarter"))
+    out["LastQuarter"] = _dmy_from_ts(mrq)
+    out["LastReport"] = _last_report(tk, info)
     out["FCFGrowth"] = _fcf_growth(tk)
     out["ROIC"] = _roic(tk)
     return out

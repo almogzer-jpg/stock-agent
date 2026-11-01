@@ -146,7 +146,8 @@ def scan_universe(name=None, limit=None, top_enrich=None) -> dict:
         m["ScoreFundamental"] = fundamental_score(fund)
         m["Valuation"] = decision_engine.valuation_score(fund)
         for k in ("TargetMean", "TargetHigh", "TargetLow", "AnalystCount",
-                  "RevenueGrowth", "EPSGrowth", "OperatingMargin", "ForwardPE", "PEG"):
+                  "RevenueGrowth", "EPSGrowth", "OperatingMargin", "ForwardPE", "PEG",
+                  "LastQuarter", "LastReport"):
             m[k] = fund.get(k)
         m["SectorScore"] = market.sector_score_for(m["Sector"], sectors)
         comp = composite_score(technical=m["Score"], fundamental=m["ScoreFundamental"],

@@ -182,7 +182,7 @@ def render_report_html(df: pd.DataFrame, closes_map: dict, embed: str = "cid"):
     <div style="background:#1f3b57;color:#fff;padding:14px 16px;border-radius:8px">
       <div style="font-size:17px;font-weight:bold;margin-bottom:6px">השורה התחתונה להיום</div>
       <div style="line-height:1.8">
-        🟢 {len(positive)} מניות בפסק דין "לשקול קנייה" ·
+        🟢 {len(positive)} מניות בהערכה "לשקול קנייה" ·
         🟡 {len(watch)} למעקב · 🔴 {len(avoid)} להימנעות.<br>
         הבולטת היום: <b>{standout['Ticker']}</b> ({standout['Name']}) — ציון טכני {standout['Score']} מתוך 100.
       </div>
@@ -220,7 +220,7 @@ def build_report_email(df: pd.DataFrame, closes_map: dict):
     positive, watch, avoid = (grp[grp["_g"] == g] for g in ("positive", "watch", "avoid"))
     n_break = int(df["Breakout"].sum())
     subject = (f"📈 דוח מניות {today} — "
-               f"{len(positive)} בפסק דין לשקול קנייה")
+               f"{len(positive)} בהערכה "לשקול קנייה")
 
     # Plain-text fallback.
     lines = [f"סוכן מניות — דוח יומי {today}", ""]

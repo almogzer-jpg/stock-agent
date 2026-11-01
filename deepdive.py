@@ -662,6 +662,10 @@ def _explain(key):
 NOT_ENOUGH = "אין מספיק נתונים"
 
 
+RR_LABEL = {"target": "יחס סיכוי לסיכון (יעד אנליסטים מול תמיכה)",
+            "resistance": "יחס סיכוי לסיכון (התנגדות מול תמיכה, כי היעד אינו מעל המחיר)"}
+
+
 def _rr_interpretation(rr):
     if rr is None:
         return None
@@ -669,7 +673,7 @@ def _rr_interpretation(rr):
 
 
 ENTRY_NOTE = ("מידע על מיקום המחיר בלבד. במחקר ההיסטורי של המערכת (S&P 500, 2015–2026) "
-              "המתנה לפי מדדים אלו לא שיפרה את התשואה, ולכן הם לא משנים את פסק הדין.")
+              "המתנה לפי מדדים אלו לא שיפרה את התשואה, ולכן הם לא משנים את הערכת ההשקעה.")
 
 
 def _entry_quality(trend, rsi, dist_sup, dist_res, rr, val_score):
@@ -739,6 +743,10 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
     rr = (round(upside / abs(downside), 2)
           if (isinstance(upside, (int, float)) and isinstance(downside, (int, float))
               and upside > 0 and abs(downside) > 0.05) else srl.get("risk_reward"))
+    # Which formula produced rr, so the label never names the wrong one: when the analyst
+    # target is not above the price, rr falls back to the resistance/support ratio.
+    rr_basis = ("target" if (isinstance(upside, (int, float)) and isinstance(downside, (int, float))
+                             and upside > 0 and abs(downside) > 0.05) else "resistance")
 
     trend = tech.get("trend")
     entry = _entry_quality(trend, rm.get("rsi"), downside, srl.get("dist_resistance_pct"),
@@ -859,7 +867,8 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
         "price": price, "target": base_t.get("price", NA), "target_num": fair,
         "fair_value": base_t.get("price", NA), "margin_of_safety": mos,
         "support": srl.get("support"), "resistance": srl.get("resistance"),
-        "upside": upside, "downside": downside, "rr": rr,
+        "upside": upside, "downside": downside, "rr": rr, "rr_basis": rr_basis,
+        "rr_label": RR_LABEL[rr_basis],
         "rr_interpretation": _rr_interpretation(rr),
         "risk_level": risk_cat or NOT_ENOUGH, "score_v2": v2,
         "entry": {"emoji": entry[0], "label": entry[1], "band": entry[2], "reasons": entry[3]},
@@ -951,9 +960,9 @@ def position_suggestion(thesis_conf, risk_cat, volatility, action, quality=None)
     """Suggested exposure band for a NEW position — only when the verdict is
     'buy'; every other verdict means no new position (one rule, app-wide)."""
     if action == "avoid":
-        return {"name": "ללא פוזיציה", "range": "0%", "why": "פסק הדין: לא עכשיו"}
+        return {"name": "ללא פוזיציה", "range": "0%", "why": "הערכת ההשקעה: לא עכשיו"}
     if action == "wait":
-        return {"name": "המתנה — ללא פוזיציה חדשה", "range": "0%", "why": "פסק הדין: להמתין להזדמנות"}
+        return {"name": "המתנה — ללא פוזיציה חדשה", "range": "0%", "why": "הערכת ההשקעה: להמתין להזדמנות"}
     if action != "buy":
         return {"name": "אין המלצה", "range": "—", "why": "אין מספיק מידע אמין"}
     tc = thesis_conf if isinstance(thesis_conf, (int, float)) else 50
