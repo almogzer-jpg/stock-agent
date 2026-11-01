@@ -1,0 +1,422 @@
+{
+ "meta": {
+  "samples": 65130,
+  "tickers": 499,
+  "first_date": "2015-01-14",
+  "last_date": "2026-05-01",
+  "horizons": [
+   21,
+   63,
+   126
+  ],
+  "step": 21,
+  "generated": "2026-11-01",
+  "breakout_events": 1800,
+  "caveat": "Survivorship: today's S&P 500 members only. Cross-sectional (equal-weight) tests are primary because they remove most of the level bias."
+ },
+ "results": {
+  "technical_score": {
+   "21d": {
+    "vs_equal_weight": {
+     "ic": {
+      "mean": -0.0138,
+      "se": 0.013,
+      "t": -1.06,
+      "share_positive": 47.1,
+      "dates": 136
+     },
+     "top_minus_bottom_pct": {
+      "mean": -0.4502,
+      "se": 0.2663,
+      "t": -1.69,
+      "share_positive": 44.1,
+      "dates": 136
+     }
+    },
+    "vs_sector_etf": {
+     "ic": {
+      "mean": -0.0065,
+      "se": 0.0108,
+      "t": -0.61,
+      "share_positive": 47.8,
+      "dates": 136
+     },
+     "top_minus_bottom_pct": {
+      "mean": -0.2706,
+      "se": 0.2034,
+      "t": -1.33,
+      "share_positive": 44.9,
+      "dates": 136
+     }
+    },
+    "sub_periods": {
+     "2015-2018": {
+      "mean": -0.0088,
+      "se": 0.0213,
+      "t": -0.41,
+      "share_positive": 54.2,
+      "dates": 48
+     },
+     "2019-2022": {
+      "mean": -0.0399,
+      "se": 0.0236,
+      "t": -1.69,
+      "share_positive": 39.6,
+      "dates": 48
+     },
+     "2023-2026": {
+      "mean": 0.0115,
+      "se": 0.0195,
+      "t": 0.59,
+      "share_positive": 47.5,
+      "dates": 40
+     }
+    },
+    "regimes": {
+     "spy_above_200d": {
+      "mean": -0.0032,
+      "se": 0.0127,
+      "t": -0.25,
+      "share_positive": 50.5,
+      "dates": 111
+     },
+     "spy_below_200d": {
+      "mean": -0.0612,
+      "se": 0.0381,
+      "t": -1.6,
+      "share_positive": 32.0,
+      "dates": 25
+     }
+    }
+   },
+   "63d": {
+    "vs_equal_weight": {
+     "ic": {
+      "mean": -0.0189,
+      "se": 0.0139,
+      "t": -1.36,
+      "share_positive": 52.2,
+      "dates": 136
+     },
+     "top_minus_bottom_pct": {
+      "mean": -0.9869,
+      "se": 0.5104,
+      "t": -1.93,
+      "share_positive": 43.4,
+      "dates": 136
+     }
+    },
+    "vs_sector_etf": {
+     "ic": {
+      "mean": -0.0087,
+      "se": 0.0125,
+      "t": -0.7,
+      "share_positive": 50.7,
+      "dates": 136
+     },
+     "top_minus_bottom_pct": {
+      "mean": -0.4515,
+      "se": 0.4371,
+      "t": -1.03,
+      "share_positive": 47.1,
+      "dates": 136
+     }
+    },
+    "sub_periods": {
+     "2015-2018": {
+      "mean": -0.008,
+      "se": 0.0246,
+      "t": -0.32,
+      "share_positive": 56.2,
+      "dates": 48
+     },
+     "2019-2022": {
+      "mean": -0.0516,
+      "se": 0.0247,
+      "t": -2.09,
+      "share_positive": 43.8,
+      "dates": 48
+     },
+     "2023-2026": {
+      "mean": 0.0072,
+      "se": 0.017,
+      "t": 0.43,
+      "share_positive": 57.5,
+      "dates": 40
+     }
+    },
+    "regimes": {
+     "spy_above_200d": {
+      "mean": -0.0021,
+      "se": 0.015,
+      "t": -0.14,
+      "share_positive": 56.8,
+      "dates": 111
+     },
+     "spy_below_200d": {
+      "mean": -0.0937,
+      "se": 0.0355,
+      "t": -2.64,
+      "share_positive": 32.0,
+      "dates": 25
+     }
+    }
+   },
+   "126d": {
+    "vs_equal_weight": {
+     "ic": {
+      "mean": -0.0146,
+      "se": 0.0172,
+      "t": -0.85,
+      "share_positive": 50.7,
+      "dates": 136
+     },
+     "top_minus_bottom_pct": {
+      "mean": -1.3247,
+      "se": 0.9321,
+      "t": -1.42,
+      "share_positive": 49.3,
+      "dates": 136
+     }
+    },
+    "vs_sector_etf": {
+     "ic": {
+      "mean": -0.0075,
+      "se": 0.0148,
+      "t": -0.51,
+      "share_positive": 50.0,
+      "dates": 136
+     },
+     "top_minus_bottom_pct": {
+      "mean": -0.6936,
+      "se": 0.7676,
+      "t": -0.9,
+      "share_positive": 46.3,
+      "dates": 136
+     }
+    },
+    "sub_periods": {
+     "2015-2018": {
+      "mean": -0.009,
+      "se": 0.0306,
+      "t": -0.29,
+      "share_positive": 50.0,
+      "dates": 48
+     },
+     "2019-2022": {
+      "mean": -0.0679,
+      "se": 0.0234,
+      "t": -2.9,
+      "share_positive": 29.2,
+      "dates": 48
+     },
+     "2023-2026": {
+      "mean": 0.0425,
+      "se": 0.0172,
+      "t": 2.48,
+      "share_positive": 77.5,
+      "dates": 40
+     }
+    },
+    "regimes": {
+     "spy_above_200d": {
+      "mean": -0.0027,
+      "se": 0.0184,
+      "t": -0.15,
+      "share_positive": 55.9,
+      "dates": 111
+     },
+     "spy_below_200d": {
+      "mean": -0.0674,
+      "se": 0.0172,
+      "t": -3.91,
+      "share_positive": 28.0,
+      "dates": 25
+     }
+    }
+   }
+  },
+  "breakout": {
+   "21d": {
+    "vs_all_same_date": {
+     "mean": -0.4087,
+     "se": 0.3047,
+     "t": -1.34,
+     "share_positive": 45.5,
+     "dates": 134,
+     "events": 1800
+    },
+    "vs_matched_no_volume_spike": {
+     "mean": -0.1269,
+     "se": 0.2907,
+     "t": -0.44,
+     "share_positive": 45.9,
+     "dates": 133,
+     "events": 1800
+    },
+    "vs_sector_etf_mean": {
+     "mean": 0.1615,
+     "se": 0.1538,
+     "t": 1.05,
+     "share_positive": 50.5,
+     "dates": 1766
+    },
+    "sub_periods": {
+     "2015-2018": {
+      "mean": -0.5055,
+      "se": 0.4315,
+      "t": -1.17,
+      "share_positive": 41.7,
+      "dates": 48,
+      "events": 709
+     },
+     "2019-2022": {
+      "mean": -0.371,
+      "se": 0.5274,
+      "t": -0.7,
+      "share_positive": 42.2,
+      "dates": 45,
+      "events": 584
+     },
+     "2023-2026": {
+      "mean": 0.6019,
+      "se": 0.5308,
+      "t": 1.13,
+      "share_positive": 55.0,
+      "dates": 40,
+      "events": 507
+     }
+    }
+   },
+   "63d": {
+    "vs_all_same_date": {
+     "mean": -1.2217,
+     "se": 0.4953,
+     "t": -2.47,
+     "share_positive": 43.3,
+     "dates": 134,
+     "events": 1800
+    },
+    "vs_matched_no_volume_spike": {
+     "mean": -0.5455,
+     "se": 0.5186,
+     "t": -1.05,
+     "share_positive": 48.9,
+     "dates": 133,
+     "events": 1800
+    },
+    "vs_sector_etf_mean": {
+     "mean": 0.4685,
+     "se": 0.2903,
+     "t": 1.61,
+     "share_positive": 52.6,
+     "dates": 1766
+    },
+    "sub_periods": {
+     "2015-2018": {
+      "mean": -0.2315,
+      "se": 0.6172,
+      "t": -0.38,
+      "share_positive": 54.2,
+      "dates": 48,
+      "events": 709
+     },
+     "2019-2022": {
+      "mean": -0.6643,
+      "se": 0.8028,
+      "t": -0.83,
+      "share_positive": 40.0,
+      "dates": 45,
+      "events": 584
+     },
+     "2023-2026": {
+      "mean": -0.7885,
+      "se": 1.2649,
+      "t": -0.62,
+      "share_positive": 52.5,
+      "dates": 40,
+      "events": 507
+     }
+    }
+   },
+   "126d": {
+    "vs_all_same_date": {
+     "mean": -1.6591,
+     "se": 0.8695,
+     "t": -1.91,
+     "share_positive": 41.0,
+     "dates": 134,
+     "events": 1800
+    },
+    "vs_matched_no_volume_spike": {
+     "mean": -0.4051,
+     "se": 0.732,
+     "t": -0.55,
+     "share_positive": 49.6,
+     "dates": 133,
+     "events": 1800
+    },
+    "vs_sector_etf_mean": {
+     "mean": 0.9197,
+     "se": 0.4674,
+     "t": 1.97,
+     "share_positive": 49.9,
+     "dates": 1766
+    },
+    "sub_periods": {
+     "2015-2018": {
+      "mean": 0.9374,
+      "se": 0.6204,
+      "t": 1.51,
+      "share_positive": 60.4,
+      "dates": 48,
+      "events": 709
+     },
+     "2019-2022": {
+      "mean": -1.042,
+      "se": 0.8437,
+      "t": -1.24,
+      "share_positive": 37.8,
+      "dates": 45,
+      "events": 584
+     },
+     "2023-2026": {
+      "mean": -1.2997,
+      "se": 1.9768,
+      "t": -0.66,
+      "share_positive": 50.0,
+      "dates": 40,
+      "events": 507
+     }
+    }
+   }
+  },
+  "risk_by_score": {
+   "Q1 (נמוך)": {
+    "avg_drawdown_63d": -9.69,
+    "p10_fwd63": -13.97,
+    "n": 13026
+   },
+   "Q2": {
+    "avg_drawdown_63d": -9.0,
+    "p10_fwd63": -13.48,
+    "n": 13026
+   },
+   "Q3": {
+    "avg_drawdown_63d": -8.56,
+    "p10_fwd63": -13.09,
+    "n": 13026
+   },
+   "Q4": {
+    "avg_drawdown_63d": -8.18,
+    "p10_fwd63": -12.69,
+    "n": 13026
+   },
+   "Q5 (גבוה)": {
+    "avg_drawdown_63d": -8.2,
+    "p10_fwd63": -13.04,
+    "n": 13026
+   }
+  }
+ }
+}

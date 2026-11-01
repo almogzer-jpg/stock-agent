@@ -182,7 +182,7 @@ def render_report_html(df: pd.DataFrame, closes_map: dict, embed: str = "cid"):
     <div style="background:#1f3b57;color:#fff;padding:14px 16px;border-radius:8px">
       <div style="font-size:17px;font-weight:bold;margin-bottom:6px">השורה התחתונה להיום</div>
       <div style="line-height:1.8">
-        🟢 {len(positive)} מניות במומנטום חיובי (מתוכן {n_break} מועמדות לפריצה) ·
+        🟢 {len(positive)} מניות בפסק דין "לשקול קנייה" ·
         🟡 {len(watch)} למעקב · 🔴 {len(avoid)} להימנעות.<br>
         הבולטת היום: <b>{standout['Ticker']}</b> ({standout['Name']}) — ציון {standout['Score']}/100.
       </div>
@@ -220,7 +220,7 @@ def build_report_email(df: pd.DataFrame, closes_map: dict):
     positive, watch, avoid = (grp[grp["_g"] == g] for g in ("positive", "watch", "avoid"))
     n_break = int(df["Breakout"].sum())
     subject = (f"📈 דוח מניות {today} — "
-               f"{len(positive)} חיוביות, {n_break} מועמדות לפריצה")
+               f"{len(positive)} בפסק דין לשקול קנייה")
 
     # Plain-text fallback.
     lines = [f"סוכן מניות — דוח יומי {today}", ""]
@@ -260,9 +260,9 @@ def hebrew_summary(df: pd.DataFrame) -> None:
 
     # Breakout candidates
     breakouts = df[df["Breakout"] == True]  # noqa: E712
-    print(f"\n🚀 מועמדים לפריצה ({len(breakouts)}):")
+    print(f"\nפריצות טכניות — מידע בלבד, לא המלצת קנייה ({len(breakouts)}):")
     if breakouts.empty:
-        print("  אין מועמדים לפריצה היום.")
+        print("  אין פריצות טכניות היום.")
     else:
         for _, r in breakouts.iterrows():
             print(
@@ -317,8 +317,8 @@ def build_static_dashboard_html(df: pd.DataFrame, closes_map: dict,
                 f"<div style='color:#9fb3d1;font-size:13px'>{label}</div></div>")
 
     kpis = "".join([
-        chip("מניות מומלצות", len(positive), "#36d399"),
-        chip("מועמדות לפריצה", n_break, "#36d399"),
+        chip("לשקול קנייה", len(positive), "#36d399"),
+        chip("פריצות טכניות (מידע)", n_break, "#9fb3d1"),
         chip("למעקב", len(watch), "#fbbd23"),
         chip("להימנעות", len(avoid), "#f87272"),
         chip("התראות", n_break, "#60a5fa"),
@@ -725,8 +725,8 @@ def main() -> None:
     breakouts = df[df["Breakout"] == True]  # noqa: E712
     if len(breakouts):
         notifier.send(
-            f"{len(breakouts)} מועמדים לפריצה: " + ", ".join(breakouts["Ticker"]),
-            level="התראה",
+            f"{len(breakouts)} פריצות טכניות (מידע בלבד): " + ", ".join(breakouts["Ticker"]),
+            level="מידע",
         )
         # Attach a recent headline per candidate (cheap — few tickers).
         if config.ENABLE_NEWS:

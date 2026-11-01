@@ -21,10 +21,11 @@ def build_alerts(df, sectors: list | None, events_map: dict | None) -> list[dict
         t = r["Ticker"]
         ev = events_map.get(t, {})
 
-        # Breakouts
+        # Breakouts are technical information only: research/signal_study.py found
+        # no evidence they work as a buy signal (owner decision, 01/11/2026).
         if r.get("Breakout"):
-            add("פריצה", t, "גבוהה",
-                f"{t} פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי {r.get('VolRatio')}")
+            add("פריצה טכנית", t, "מידע",
+                f"{t} — פריצה טכנית בנפח גבוה (מידע בלבד, לא המלצת קנייה)")
         # Volume spikes
         if r.get("VolRatio", 0) >= 2:
             add("זינוק נפח", t, "בינונית",

@@ -24,9 +24,11 @@ def test_weak_has_avoid_reasons(weak):
     assert ex["why_avoid"] and "אין" not in ex["why_avoid"][0]
 
 
-def test_breakout_is_a_catalyst(strong):
+def test_breakout_is_information_not_a_catalyst(strong):
+    # research/signal_study.py: no evidence the breakout signal predicts returns
     ex = explain(strong)            # strong fixture is a breakout
-    assert any("פריצה" in c for c in ex["catalysts"])
+    assert not any("פריצה" in c for c in ex["catalysts"])
+    assert any("פריצה" in w and "מידע" in w for w in ex["why_watch"])
 
 
 def test_earnings_event_becomes_catalyst_and_risk():

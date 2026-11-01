@@ -18,9 +18,11 @@ def _df():
     ])
 
 
-def test_breakout_alert():
+def test_breakout_is_information_not_a_buy_alert():
     alerts = build_alerts(_df(), SECTORS, {})
-    assert any(a["type"] == "פריצה" and a["scope"] == "AAA" for a in alerts)
+    brk = [a for a in alerts if a["scope"] == "AAA" and "פריצה" in a["type"]]
+    assert brk and all(a["severity"] == "מידע" for a in brk)
+    assert all("לא המלצת קנייה" in a["message"] for a in brk)
 
 
 def test_volume_spike_alert():

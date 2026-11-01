@@ -11,7 +11,7 @@ import yfinance as yf
 
 import config
 
-# (symbol, Hebrew name, group). ^TNX quotes the 10Y yield ×10.
+# (symbol, Hebrew name, group). Yields (^TNX, 2YY=F) are quoted in percent.
 ASSETS = [
     ("^GSPC", "S&P 500", "equity"), ("^IXIC", "Nasdaq", "equity"),
     ("^DJI", "Dow Jones", "equity"), ("^RUT", "Russell 2000", "equity"),
@@ -28,6 +28,40 @@ ASSETS = [
     ("DX-Y.NYB", "מדד הדולר DXY", "rates"),
 ]
 STRIP = ["^GSPC", "^IXIC", "^VIX", "BTC-USD", "ETH-USD", "GC=F", "CL=F", "ILS=X", "DX-Y.NYB", "^TNX"]
+
+
+# Plausibility checks — a value that fails is published with suspect=True and a
+# reason, and the UI shows "דורש אימות" instead of the number. Ranges are wide on
+# purpose: they catch scale and feed errors, not market moves.
+# Yields below 1% did happen (2020) but are rare enough to verify by hand, and a
+# ×10 scale slip lands exactly there.
+RANGES = {"^TNX": (1.0, 20.0), "2YY=F": (0.3, 20.0), "^VIX": (5.0, 100.0),
+          "ILS=X": (2.0, 6.0), "EURILS=X": (2.0, 7.0), "GBPILS=X": (2.5, 8.0), "EURUSD=X": (0.7, 1.8)}
+# |daily move| beyond which a one-bar spike-and-reversal marks the prior close bad,
+# and a hard cap above which any daily move is treated as suspect.
+SPIKE = {"fx": 1.5, "rates": 8.0, "equity": 6.0, "commodity": 8.0, "crypto": 15.0}
+HARD_D1 = {"fx": 4.0, "rates": 15.0, "equity": 12.0, "commodity": 20.0, "crypto": 30.0}
+# Per-symbol overrides: the VIX routinely moves 10–30% a day.
+SYMBOL_LIMITS = {"^VIX": {"spike": 35.0, "hard": 80.0}}
+
+
+def validate(sym, grp, closes, price):
+    """(suspect_price, suspect_change, reason) for one asset's recent closes."""
+    lo_hi = RANGES.get(sym)
+    if price is None or price <= 0 or (lo_hi and not (lo_hi[0] <= price <= lo_hi[1])):
+        return True, True, "ערך מחוץ לטווח סביר — ייתכן קנה מידה שגוי במקור"
+    vals = [float(x) for x in list(closes)[-3:]]
+    if len(vals) == 3:
+        a = (vals[1] / vals[0] - 1) * 100
+        b = (vals[2] / vals[1] - 1) * 100
+        lim = SYMBOL_LIMITS.get(sym, {}).get("spike", SPIKE.get(grp, 8.0))
+        if abs(a) > lim and abs(b) > lim and (a > 0) != (b > 0):
+            return False, True, "קפיצה חד-יומית שחזרה מיד — שער הסגירה הקודם במקור חשוד"
+    if len(vals) >= 2:
+        d1 = (vals[-1] / vals[-2] - 1) * 100
+        if abs(d1) > SYMBOL_LIMITS.get(sym, {}).get("hard", HARD_D1.get(grp, 15.0)):
+            return False, True, "שינוי יומי חריג — דורש אימות מול מקור נוסף"
+    return False, False, ""
 
 
 def _ret(c, days):
@@ -86,17 +120,23 @@ def build() -> dict:
             except Exception:
                 pass
         else:
-            scale = 0.1 if sym == "^TNX" else 1.0
             d1, d7, d30 = _ret(c, 1), _ret(c, 5), _ret(c, 21)
+            price = round(float(c.iloc[-1]), 3 if "ILS" in sym or sym == "EURUSD=X" else 2)
+            bad_price, bad_change, why = validate(sym, grp, c.tail(3), price)
             row = {"symbol": sym, "name": name,
-                   "price": round(float(c.iloc[-1]) * scale, 3 if "ILS" in sym or sym == "EURUSD=X" else 2),
-                   "d1": d1, "d7": d7, "d30": d30,
-                   "trend": trend_of(d30), "interp": interpret(sym, d1, d30),
-                   "source": "Yahoo"}
+                   "price": None if bad_price else price,
+                   "d1": None if bad_change else d1, "d7": None if bad_price else d7,
+                   "d30": None if bad_price else d30,
+                   "trend": "—" if bad_price else trend_of(d30),
+                   "interp": "" if (bad_price or bad_change) else interpret(sym, d1, d30),
+                   "source": "Yahoo", "as_of": c.index[-1].strftime("%d/%m/%Y"),
+                   "suspect": bool(bad_price or bad_change), "suspect_reason": why or None}
         rows.setdefault(grp, []).append(row)
         by_sym[sym] = row
     # Yield curve 10Y-2Y (only from real values).
     t10, t2 = by_sym.get("^TNX", {}).get("price"), by_sym.get("2YY=F", {}).get("price")
+    if by_sym.get("^TNX", {}).get("suspect") or by_sym.get("2YY=F", {}).get("suspect"):
+        t10 = t2 = None
     if isinstance(t10, (int, float)) and isinstance(t2, (int, float)):
         rows["rates"].append({"symbol": "CURVE", "name": "עקום 10ש-2ש", "price": round(t10 - t2, 2),
                               "d1": None, "d7": None, "d30": None,

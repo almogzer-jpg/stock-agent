@@ -161,8 +161,10 @@ def global_strip_html(g: dict) -> str:
     for r in g.get("strip", []):
         p, d1 = r.get("price"), r.get("d1")
         col = MUTED if not isinstance(d1, (int, float)) else (POSITIVE if d1 >= 0 else NEGATIVE)
-        pv = "—" if p is None else (f"${p:,.0f}" if r["symbol"].endswith("-USD") else f"{p:,.2f}")
-        dv = f"{d1:+.1f}%" if isinstance(d1, (int, float)) else ""
+        pv = ("דורש אימות" if r.get("suspect") and p is None else "—" if p is None
+              else (f"${p:,.0f}" if r["symbol"].endswith("-USD") else f"{p:,.2f}"))
+        dv = (f"{d1:+.1f}%" if isinstance(d1, (int, float))
+              else "שינוי יומי: דורש אימות" if r.get("suspect") else "")
         chips.append(f"<div class='chip'><div class='cl'>{r['name']}</div>"
                      f"<div class='cv'>{pv} <span style='color:{col};font-size:14px'>{dv}</span></div></div>")
     return f"<div class='chiprow'>{''.join(chips)}</div>" if chips else ""
@@ -959,7 +961,7 @@ elif page == "💎 הזדמנויות":
             f"<span style='color:#ef4444'>מתחת ל-50 חלש</span></div></div>", unsafe_allow_html=True)
 
         # ---------- shared helpers ----------
-        TAG_SUBSTR = {"פריצה": "פריצה", "מומנטום חזק": "מומנטום חזק", "מוערכת בחסר": "מוערך",
+        TAG_SUBSTR = {"פריצה טכנית (מידע)": "פריצה", "מומנטום חזק": "מומנטום חזק", "מוערכת בחסר": "מוערך",
                       "איכות גבוהה": "איכות גבוהה", "תפנית": "תפנית", "רוטציה סקטוריאלית": "רוטציה"}
 
         def _reason(r):
@@ -1113,7 +1115,7 @@ elif page == "💎 הזדמנויות":
                 def _type_badge(tags):
                     t = _otype(tags)
                     for kw, b in [("איכות", "🏆 איכות"), ("מומנטום", "🚀 מומנטום"), ("מוערך", "💎 ערך"),
-                                  ("תפנית", "❤️ נסתרת"), ("פריצה", "🚀 פריצה"), ("רוטציה", "🔄 רוטציה")]:
+                                  ("תפנית", "❤️ נסתרת"), ("פריצה", "📈 פריצה טכנית (מידע)"), ("רוטציה", "🔄 רוטציה")]:
                         if kw in t:
                             return b
                     return t
@@ -2039,7 +2041,8 @@ elif page == "📊 אינטליגנציית שוק":
                 body = ""
                 for r in rows_g:
                     p = r.get("price")
-                    pv = NA_ if p is None else (f"${p:,.0f}" if str(r["symbol"]).endswith("-USD") else f"{p:,.3f}".rstrip("0").rstrip("."))
+                    pv = (("דורש אימות" if r.get("suspect") else NA_) if p is None
+                          else (f"${p:,.0f}" if str(r["symbol"]).endswith("-USD") else f"{p:,.3f}".rstrip("0").rstrip(".")))
                     cells = ""
                     for dk in ("d1", "d7", "d30"):
                         dv = r.get(dk)

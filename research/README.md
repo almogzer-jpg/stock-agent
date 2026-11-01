@@ -85,3 +85,53 @@ without downloading again:
 ```bash
 python research/timing_study.py --from-csv <path>
 ```
+
+## signal_study.py — is the technical score or the breakout signal a reason to buy?
+
+Run on 01/11/2026: 499 tickers, 65,130 samples, 2015-2026, 1,800 breakout events.
+
+**Method.** Per-date Spearman rank correlation (IC) between the signal and forward returns,
+and the top-minus-bottom quintile spread, at 21, 63 and 126 trading days. Primary benchmark:
+the equal-weight cross-section of the same date (removes the market and most of the survivorship
+level bias). Secondary: the stock's SPDR sector ETF. Newey-West standard errors for the
+overlapping horizons. Stability across 2015-2018, 2019-2022, 2023-2026 and across market regimes
+(SPY above or below its 200-day average). Returns winsorised at 1%/99%. The breakout signal is
+also compared with a matched control: stocks meeting every breakout condition except the
+volume spike.
+
+**Technical score (25% of Score V2).**
+
+| Horizon | IC vs equal-weight (t) | Top − bottom quintile (t) | IC vs sector ETF (t) |
+|---|---|---|---|
+| 21 days | −0.014 (−1.1) | −0.45% (−1.7) | −0.007 (−0.6) |
+| 63 days | −0.019 (−1.4) | −0.99% (−1.9) | −0.009 (−0.7) |
+| 126 days | −0.015 (−0.9) | −1.32% (−1.4) | −0.008 (−0.5) |
+
+- No period shows a stable positive link. 2019-2022 is negative (t −2.1 to −2.9), 2023-2026 is
+  positive at 126 days (t 2.5). The sign flips, so there is no reliable return signal.
+- After market declines (SPY below its 200-day average) the link is clearly negative
+  (t −2.6 at 63 days, −3.9 at 126 days): high technical scores were followed by weaker
+  returns, the "momentum crash" pattern known from the literature.
+- Risk: higher scores came with shallower interim drawdowns (lowest quintile −9.7%, highest
+  −8.2% over 63 days). The score describes trend and risk, not expected return.
+
+**Breakout signal.**
+
+| Horizon | vs all stocks same date (t) | vs matched control without volume spike (t) | vs sector ETF (t) |
+|---|---|---|---|
+| 21 days | −0.41% (−1.3) | −0.13% (−0.4) | +0.16% (1.1) |
+| 63 days | −1.22% (−2.5) | −0.55% (−1.1) | +0.47% (1.6) |
+| 126 days | −1.66% (−1.9) | −0.41% (−0.6) | +0.92% (2.0) |
+
+The volume spike adds nothing over the matched control, the signal trails the equal-weight
+cross-section, and results change sign across sub-periods. **Conclusion: no evidence that the
+breakout signal is a buy signal.** Per the owner's decision (01/11/2026) it is shown as technical
+information only, never as a standalone buying opportunity.
+
+**Bias that remains.** Stocks that left the index are missing. That flatters weak stocks
+(low technical scores) and therefore pushes the IC down. The honest reading is "no evidence of
+positive predictive power", not "proven negative".
+
+**Not changed.** Score V2 weights stay as they are. A weight change would need a test of the whole
+V2 score, which requires point-in-time fundamentals that free sources do not provide. Options
+for the owner are listed in the V4 approval notes.

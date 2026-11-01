@@ -58,7 +58,7 @@ def explain(row, events: dict | None = None, sector: dict | None = None) -> dict
 
     # --- Catalysts (real upcoming/positive triggers) ---
     if row.get("Breakout"):
-        catalysts.append("🚀 פריצה טכנית מעל התנגדות בנפח גבוה")
+        why_watch.append("פריצה טכנית בנפח גבוה (מידע בלבד: בבדיקה ההיסטורית לא הוכחה כאות קנייה)")
     if vr >= 2:
         catalysts.append(f"📊 זינוק נפח חריג (פי {vr})")
     if events.get("days_to_earnings") is not None and events["days_to_earnings"] <= 14:
