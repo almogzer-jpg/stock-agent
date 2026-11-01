@@ -75,7 +75,7 @@ def decide_holding(p: dict, regime_label: str) -> dict:
         why.append(f"חוזק סקטור {int(ss)}")
     why.append(f"סיכון {rc}")
     if p.get("valuation") is not None:
-        why.append(f"שווי {int(p['valuation'])}")
+        why.append(f"ציון תמחור {int(p['valuation'])} מתוך 100")
 
     # Remaining risks
     risks = []

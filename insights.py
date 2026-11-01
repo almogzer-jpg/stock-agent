@@ -62,8 +62,8 @@ def generate_insights(market: dict, df, alert_center: list) -> dict:
     if sectors and "score" in sectors[0]:
         ranked = sorted(sectors, key=lambda s: s["score"], reverse=True)
         s, w = ranked[0], ranked[-1]
-        rotation_txt = (f"כניסת הון אל **{s['sector']}** (ציון {s['score']}, חוזק יחסי {s['rs']:+}%); "
-                        f"יציאה מ**{w['sector']}** (ציון {w['score']}, {w['rs']:+}%).")
+        rotation_txt = (f"חוזק סקטוריאלי (אומדן של כניסת הון): **{s['sector']}** (ציון {s['score']}, חוזק יחסי {s['rs']:+}%). "
+                        f"חולשה סקטוריאלית (אומדן של יציאת הון): **{w['sector']}** (ציון {w['score']}, {w['rs']:+}%).")
     else:
         rotation_txt = "אין נתוני רוטציה סקטוריאלית כרגע."
 

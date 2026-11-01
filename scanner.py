@@ -36,7 +36,7 @@ from scanners.breakout import is_breakout
 from ranking_engine.score import score_stock
 from ranking_engine.composite import composite_score
 from ranking_engine.factor_scores import fundamental_score
-from fundamentals.fundamentals import get_fundamentals
+from fundamentals.fundamentals import fetched_on, get_fundamentals
 from backtesting.backtester import backtest_signal
 from names import get_company_name
 
@@ -139,6 +139,7 @@ def scan_universe(name=None, limit=None, top_enrich=None) -> dict:
     for m in recs[:top_enrich]:
         t = m["Ticker"]
         fund = get_fundamentals(t)
+        m["FundDate"] = fetched_on(t)
         m["Name"] = get_company_name(t)
         m["Sector"] = fund.get("Sector")
         m["MarketCap"] = fund.get("MarketCap")

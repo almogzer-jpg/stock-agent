@@ -161,6 +161,16 @@ def _fresh(date_str: str) -> bool:
 _CACHE = _load_cache()
 
 
+def fetched_on(symbol: str) -> str | None:
+    """When the cached fundamentals for `symbol` were pulled (DD/MM/YYYY), or None.
+    Stored with every scan row so a verdict never looks fresher than its inputs."""
+    d = (_CACHE.get(symbol) or {}).get("_date")
+    try:
+        return date.fromisoformat(d).strftime("%d/%m/%Y") if d else None
+    except ValueError:
+        return None
+
+
 def get_fundamentals(symbol: str) -> dict:
     """Cached fundamentals for `symbol` (refetched weekly). Clean dict (no _date)."""
     entry = _CACHE.get(symbol)

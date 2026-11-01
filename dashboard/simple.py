@@ -341,7 +341,7 @@ def _analysis_block(t, rep, daily_v):
         ("מחיר נוכחי", _money(lv.get("price")), ""),
         (term("מחיר יעד"), _money(lv.get("target")),
          ((f"<span style='color:{POSITIVE}'>{up:+.1f}% {term('פוטנציאל', 'פוטנציאל עלייה')}</span>" if up >= 0 else
-           f"<span style='color:{WARNING}'>המחיר מעל היעד ב-{abs(up):.1f}%</span>")
+           f"<span style='color:{WARNING}'>היעד הממוצע של האנליסטים נמוך ב-{abs(up):.1f}% מהמחיר</span>")
           + (f" · {int(an)} אנליסטים" if an else "")) if up is not None else "אין יעד אנליסטים"),
         (term("תמיכה"), _money(lv.get("support")),
          f"<span style='color:{NEGATIVE}'>{dn:+.1f}% עד לשם</span>" if dn is not None else ""),

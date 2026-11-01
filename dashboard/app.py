@@ -541,7 +541,7 @@ def action_card_html(idx, h):
             f"<div class='a-row'><b>למה:</b> {h.get('reasoning','')}</div>"
             f"<div class='a-row'><b>השפעת סיכון:</b> {h.get('risk_impact','')}</div>"
             f"<div class='a-row'><b>תועלת צפויה:</b> {benefit}</div>"
-            f"<div class='a-row'><b>ביטחון:</b> {h.get('confidence','—')}%</div></div>")
+            f"<div class='a-row'><b>ביטחון:</b> {h.get('confidence','—')} מתוך 100</div></div>")
 
 
 if page.startswith("🏠"):
@@ -642,9 +642,9 @@ if page.startswith("🏠"):
         _fout = "".join(f"<div style='display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid {BORDER}'>"
                         f"<span>↘ {s['sector']}</span><b style='color:{NEGATIVE}'>ציון {s['score']} · RS {s['rs']:+.1f}%</b></div>"
                         for s in cf.get("outflows", [])[:4])
-        fc[0].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{POSITIVE}'>כניסת הון</div>{_fin}</div>",
+        fc[0].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{POSITIVE}'>חוזק סקטוריאלי (אומדן של כניסת הון)</div>{_fin}</div>",
                        unsafe_allow_html=True)
-        fc[1].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{NEGATIVE}'>יציאת הון</div>{_fout}</div>",
+        fc[1].markdown(f"<div class='ic-card'><div class='ic-title' style='color:{NEGATIVE}'>חולשה סקטוריאלית (אומדן של יציאת הון)</div>{_fout}</div>",
                        unsafe_allow_html=True)
         st.caption(cf.get("method", ""))
         _af = _delta.asset_flows(g.get("groups") or {})
@@ -920,8 +920,8 @@ elif page == "💎 הזדמנויות":
         lookup = VW.build_lookup(uni)
         nc = VW.names_cache()
 
-        TIP_SCORE = ("ציון משוקלל 0-100 המשלב פונדמנטל/איכות, תמחור, מומנטום טכני, חוזק סקטור וסיכון. "
-                     "80-100 יוצא דופן · 70-79 חזק · 60-69 טוב · 50-59 מעקב · מתחת ל-50 חלש.")
+        TIP_SCORE = ("ציון משוקלל 0-100: נתונים עסקיים 35%, מצב טכני 25%, חוזק סקטור 20%, חדשות 10%, יציבות מחיר 10%. "
+                     "התמחור לא נכלל בציון. 68 ומעלה חזקה · 55 עד 67 סבירה · 45 עד 54 חלשה · מתחת ל-45 חלשה מאוד.")
         TIP_VAL = "ציון תמחור: 100 זול מאוד · 70-99 אטרקטיבי · 40-69 הוגן · 0-39 יקר."
         TIP_QUAL = "איכות: צמיחת הכנסות/רווח, רווחיות, ROIC, חוזק מאזן ורמת חוב."
         TIP_MOM = "מומנטום: תשואת המחיר ב-3 חודשים. רוקטה=חזק מאוד, עולה=חיובי, ניטרלי, יורד=שלילי."
@@ -967,13 +967,12 @@ elif page == "💎 הזדמנויות":
         st.markdown(
             f"<div class='ic-card' style='border-right:5px solid {PRIMARY}'>"
             f"<div class='ic-title'>ℹ️ מהו ציון V2?</div>"
-            f"<div class='ic-sub'>ציון משוקלל 0–100 המשלב: פונדמנטל/איכות · תמחור · מומנטום טכני · חוזק סקטור · סיכון.</div>"
+            f"<div class='ic-sub'>ציון משוקלל 0–100: נתונים עסקיים 35% · מצב טכני 25% · חוזק סקטור 20% · חדשות 10% · יציבות מחיר 10%. התמחור לא נכלל בציון.</div>"
             f"<div class='ic-sub' style='margin-top:5px'>"
-            f"<span style='color:#22c55e'>80–100 יוצא דופן</span> · "
-            f"<span style='color:#38bdf8'>70–79 חזק</span> · "
-            f"<span style='color:#facc15'>60–69 טוב</span> · "
-            f"<span style='color:#fb923c'>50–59 מעקב</span> · "
-            f"<span style='color:#ef4444'>מתחת ל-50 חלש</span></div></div>", unsafe_allow_html=True)
+            f"<span style='color:#22c55e'>68 ומעלה חזקה</span> · "
+            f"<span style='color:#facc15'>55 עד 67 סבירה</span> · "
+            f"<span style='color:#fb923c'>45 עד 54 חלשה</span> · "
+            f"<span style='color:#ef4444'>מתחת ל-45 חלשה מאוד</span></div></div>", unsafe_allow_html=True)
 
         # ---------- shared helpers ----------
         TAG_SUBSTR = {"פריצה טכנית (מידע)": "פריצה", "מומנטום חזק": "מומנטום חזק", "מוערכת בחסר": "מוערך",
@@ -1430,7 +1429,7 @@ elif page == "🔎 ניתוח חברה":
                 + _hm("מחיר יעד (קונצנזוס)", base_t.get("price", "—"))
                 + _hm("אפסייד", up_txt, up_c)
                 + _hm("סיכון", rk["category"], risk_c)
-                + _hm("איכות", int(qual) if isinstance(qual, (int, float)) else "—",
+                + _hm("ציון עסקי", int(qual) if isinstance(qual, (int, float)) else "—",
                       score_color(qual if isinstance(qual, (int, float)) else None))
                 + _hm("ציון v2", v2, score_color(v2))
                 + "</div></div>", unsafe_allow_html=True)
@@ -1514,7 +1513,7 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>אמינות הנתונים</div>"
                     f"<div class='sbar-t' style='margin-top:4px'><div class='sbar-f' style='width:{conf if isinstance(conf,(int,float)) else 0}%;background:{score_color(conf)}'></div></div>"
                     f"<div style='font-size:14px;font-weight:600;color:{score_color(conf)}'>{int(conf) if isinstance(conf,(int,float)) else NEA}/100</div>"
-                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>הסכמה בין האותות (טכני, עסקי, סקטור)</div>"
+                    f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>ביטחון בתזה (הסכמת אותות, אימות היסטורי, מצב שוק, עומק ראיות)</div>"
                     f"<div style='font-size:16px;font-weight:700;color:{score_color((dec.get('thesis_confidence') or {}).get('score'))}'>"
                     f"{(dec.get('thesis_confidence') or {}).get('score', '—')}/100 · {(dec.get('thesis_confidence') or {}).get('label', '')}</div>"
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>אופק השקעה</div>"
@@ -1530,8 +1529,8 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='display:flex;gap:22px;flex-wrap:wrap'>"
                     + _kv("מחיר נוכחי", f"${_n2(dec.get('price'))}")
                     + _kv("מחיר יעד", dec.get("target", "—"), PRIMARY, "קונצנזוס אנליסטים")
-                    + _kv("שווי הוגן", dec.get("fair_value", "—"), TEXT, "קונצנזוס")
-                    + _kv("שולי ביטחון", _n2(dec.get("margin_of_safety"), "%", plus=True),
+                    + _kv("יעד אנליסטים ממוצע", dec.get("fair_value", "—"), TEXT, "הערכה ל-12 חודשים")
+                    + _kv("המרחק מהיעד (כאחוז מהיעד)", _n2(dec.get("margin_of_safety"), "%", plus=True),
                           POSITIVE if (dec.get("margin_of_safety") or 0) > 0 else NEGATIVE)
                     + _kv("תמיכה", f"${_n2(dec.get('support'))}" if dec.get("support") else "—", POSITIVE)
                     + _kv("התנגדות", f"${_n2(dec.get('resistance'))}" if dec.get("resistance") else "—", NEGATIVE)
@@ -1557,11 +1556,11 @@ elif page == "🔎 ניתוח חברה":
                     + "</div>", unsafe_allow_html=True)
                 c3[2].markdown(
                     f"<div class='ic-card' style='height:100%'>"
-                    f"<div style='color:{MUTED};font-size:12.5px'>אפסייד צפוי (ליעד)</div>"
+                    f"<div style='color:{MUTED};font-size:12.5px'>פער עד יעד האנליסטים</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{POSITIVE if (dec.get('upside') or 0)>=0 else NEGATIVE}'>{_n2(dec.get('upside'), '%', plus=True)}</div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>דאונסייד (לתמיכה)</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{NEGATIVE}'>{_n2(dec.get('downside'), '%', plus=True)}</div>"
-                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>יחס סיכון/סיכוי</div>"
+                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>יחס סיכוי לסיכון (יעד אנליסטים מול תמיכה)</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{rr_c}'>{dec.get('rr') if dec.get('rr') is not None else '—'}"
                     f" <span style='font-size:14px'>{dec.get('rr_interpretation') or ''}</span></div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>מתאים ל</div>"
@@ -1628,7 +1627,7 @@ elif page == "🔎 ניתוח חברה":
                                f"מוצגים רק אירועים ממקורות אמיתיים (דוחות/אנליסטים); אין מקור חינמי ליומן Fed/FDA פר-מניה.</div></div>",
                                unsafe_allow_html=True)
                 st.caption("כל הערכים נגזרים מהמדדים המחושבים במערכת — הנתונים מצביעים, לא תחזית. "
-                           "מחיר יעד/שווי הוגן = קונצנזוס אנליסטים. מידע בלבד, לא ייעוץ השקעות.")
+                           "מחיר יעד = יעד האנליסטים הממוצע ל-12 חודשים. מידע בלבד, לא ייעוץ השקעות.")
 
                 # ---- Explainability: recommendation breakdown + blockers (Phase 0.5) ----
                 _bd = dec.get("breakdown") or {}
@@ -1738,9 +1737,9 @@ elif page == "🔎 ניתוח חברה":
                     + "</div>", unsafe_allow_html=True)
 
                 if alpha is not None:
-                    ins_p = (f"🟢 המניה היכתה את S&P 500 ב-{alpha:+.1f}% בתקופה זו." if alpha >= 2
-                             else f"🔴 המניה פיגרה אחרי הבנצ'מרק ({alpha:+.1f}%)." if alpha <= -2
-                             else f"🟡 ביצוע דומה ל-S&P 500 ({alpha:+.1f}%).")
+                    ins_p = (f"🟢 המניה היכתה את S&P 500 ב-{alpha:+.1f} נקודות אחוז בתקופה זו." if alpha >= 2
+                             else f"🔴 המניה פיגרה אחרי הבנצ'מרק ({alpha:+.1f} נקודות אחוז)." if alpha <= -2
+                             else f"🟡 ביצוע דומה ל-S&P 500 ({alpha:+.1f} נקודות אחוז).")
                 else:
                     ins_p = "🟢 תשואה חיובית בתקופה." if sret >= 0 else "🔴 תשואה שלילית בתקופה."
                 st.markdown(f"<div class='ic-sub' style='margin:2px 0 8px'>{ins_p}</div>", unsafe_allow_html=True)
@@ -1839,11 +1838,11 @@ elif page == "🔎 ניתוח חברה":
             fcol = st.columns(2)
             fcol[0].markdown("#### דוחות כספיים")
             fcol[0].markdown("<div class='ic-card'>" + _tbl([
-                ("הכנסות", fin["revenue"]), ("צמיחת הכנסות", fin["revenue_growth"]),
+                ("הכנסות (שנה פיסקלית אחרונה)", fin["revenue"]), ("צמיחת הכנסות (רבעון אחרון מול אשתקד)", fin["revenue_growth"]),
                 ("רווח גולמי / שולי", f"{fin['gross_profit']} · {fin['gross_margin']}"),
-                ("רווח תפעולי / שולי", f"{fin['operating_income']} · {fin['operating_margin']}"),
+                ("רווח תפעולי (שנה פיסקלית) / שולי (12 חודשים אחרונים)", f"{fin['operating_income']} · {fin['operating_margin']}"),
                 ("רווח נקי / שולי", f"{fin['net_income']} · {fin['net_margin']}"),
-                ("רווח למניה / צמיחה", f"{fin['eps']} · {fin['eps_growth']}"),
+                ("רווח למניה (12 חודשים אחרונים) / צמיחה (רבעון אחרון מול אשתקד)", f"{fin['eps']} · {fin['eps_growth']}"),
                 ("FCF / שולי", f"{fin['fcf']} · {fin['fcf_margin']}"),
                 ("חוב / מזומן", f"{fin['debt']} · {fin['cash']}"),
                 ("חוב/הון · ROE · ROIC", f"{fin['debt_to_equity']} · {fin['roe']} · {fin['roic']}"),
@@ -1864,7 +1863,7 @@ elif page == "🔎 ניתוח חברה":
                     + score_bar("פונדמנטלי", _num_or(sc["fundamental"]["value"]))
                     + score_bar("סקטור", _num_or(sc["sector"]["value"]))
                     + score_bar("חדשות", _num_or(sc["news"]["value"]))
-                    + score_bar("ניהול סיכון", (None if not isinstance(rh, (int, float)) else 100 - rh))
+                    + score_bar("יציבות מחיר", (None if not isinstance(rh, (int, float)) else 100 - rh))
                     + score_bar("אמון", sc["trust"]["value"]))
             st.markdown(f"<div class='ic-card'>{bars}<div class='ic-sub' style='margin-top:8px'>{sc['final_v2']['explain']}</div></div>",
                         unsafe_allow_html=True)
@@ -1937,7 +1936,7 @@ elif page == "🔎 ניתוח חברה":
                     + _lvl("התנגדות קרובה", srl.get("resistance"), srl.get("dist_resistance_pct"), NEGATIVE)
                     + _lvl("רמת פריצה", srl.get("breakout_level"), None, SECONDARY)
                     + _lvl("רמת שבירה", srl.get("breakdown_level"), None, SECONDARY)
-                    + (f"<div style='min-width:150px'><div style='color:{MUTED};font-size:12.5px'>יחס סיכון/סיכוי</div>"
+                    + (f"<div style='min-width:150px'><div style='color:{MUTED};font-size:12.5px'>יחס סיכוי לסיכון (התנגדות מול תמיכה)</div>"
                        f"<div style='font-size:22px;font-weight:700;color:{rr_c}'>{rr if rr is not None else '—'}</div>"
                        f"<div style='color:{rr_c};font-size:13px'>{rrl or ''}</div></div>")
                     + "</div>"
@@ -2079,6 +2078,8 @@ elif page == "📊 אינטליגנציית שוק":
                 st.markdown(f"<table class='sectbl'><thead><tr><th>נכס</th><th>מחיר</th><th>יומי</th>"
                             f"<th>שבוע</th><th>חודש</th><th>מגמה</th><th>פרשנות</th></tr></thead>"
                             f"<tbody>{body}</tbody></table>", unsafe_allow_html=True)
+                if key == "rates":
+                    st.caption("בשורות התשואה: יומי, שבוע וחודש הם שינוי יחסי בתשואה (באחוזים מהתשואה עצמה), לא שינוי בנקודות אחוז.")
 
     st.markdown("#### טבלת מניות מדורגת")
     cols = ["Ticker", "Name", "ScoreV2", "Score", "ScoreFundamental", "ScoreRisk",
@@ -2109,7 +2110,7 @@ elif page == "📊 אינטליגנציית שוק":
         _rows = [{"קבוצה": k, "מקרים": v.get("n"),
                   "תשואה עודפת 3ח׳ %": v.get("excess_3m"), "± שגיאת תקן": v.get("excess_se"),
                   "שיעור הצלחה מול המדד %": v.get("hit_rate"), "ירידה ממוצעת בדרך %": v.get("avg_drawdown"),
-                  "אחוזון 10 %": v.get("p10_return"), "חציון %": v.get("median_return")}
+                  "אחוזון 10 (תשואת 3 חודשים, %)": v.get("p10_return"), "חציון (תשואת 3 חודשים, %)": v.get("median_return")}
                  for k, v in _ev["groups"].items() if not v.get("insufficient")]
         st.dataframe(pd.DataFrame(_rows), use_container_width=True, hide_index=True)
         st.caption(f"{_m['tickers']} מניות S&P 500 · {_m['first_date']} עד {_m['last_date']} · {_m['samples']:,} דגימות "
@@ -2154,7 +2155,7 @@ elif page == "⚙️ הגדרות":
         + " · ".join(f"{_wl_he.get(k, k)} {v:.0%}" for k, v in _W.items())
         + " (ממדים חסרים → המשקלים מנורמלים מחדש; הפירוק המלא מוצג בכל ניתוח).</div>"
         f"<div class='ic-sub'><b>פסק הדין (מנוע אחד לכל המערכת):</b> 🟢 שווה לשקול קנייה = ציון 68+ ומגמה תקינה · "
-        f"🟡 להמתין = ציון 55–67, או חברה חזקה במגמת ירידה · 🔴 לא עכשיו = ציון מתחת ל-45, או מגמת ירידה בלי חברה חזקה, "
+        f"🟡 להמתין = ציון 45–67, או חברה חזקה במגמת ירידה · 🔴 לא עכשיו = ציון מתחת ל-45, או מגמת ירידה בלי חברה חזקה, "
         f"או סיכון גבוה מאוד · ⚪ אין מספיק מידע = נתונים חסרים או אמינות מתחת ל-55.</div>"
         f"<div class='ic-sub'><b>כללי תזמון:</b> נבדקו היסטורית (S&P 500, 2015–2026, 66,625 מקרים). "
         f"קנוי-יתר, יחס סיכוי/סיכון, קרבה להתנגדות והמתנה לתמיכה לא שיפרו תשואה, ולכן לא משנים את פסק הדין "

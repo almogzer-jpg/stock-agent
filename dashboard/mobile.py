@@ -167,7 +167,7 @@ def _opp_card(r, lookup, nc, key_prefix="m"):
     if _num(r.get("Valuation")) is not None:
         extra.append(f"תמחור <b>{int(r['Valuation'])}</b>")
     if _num(r.get("Ret3m")) is not None:
-        extra.append(f"מומנטום <b style='color:{POSITIVE if r['Ret3m'] >= 0 else NEGATIVE}'>"
+        extra.append(f"מומנטום 3 חודשים <b style='color:{POSITIVE if r['Ret3m'] >= 0 else NEGATIVE}'>"
                      f"{'+' if r['Ret3m'] >= 0 else ''}{int(r['Ret3m'])}%</b>")
     st.markdown(
         f"""<div class="mcard" style="border-right:4px solid {info['color']}">
@@ -466,7 +466,7 @@ def _analysis(mkt, lookup, nc):
             f"{int(conf) if isinstance(conf, (int, float)) else '—'}/100</b> · אופק <b>{dec['horizon']}</b></div>"
             + _grid([
                 _mkpi("🎯", dec.get("target", "—"), "מחיר יעד", "קונצנזוס אנליסטים", PRIMARY),
-                _mkpi("⚖️", dec.get("rr") if dec.get("rr") is not None else "—", "סיכון/סיכוי",
+                _mkpi("⚖️", dec.get("rr") if dec.get("rr") is not None else "—", "יחס סיכוי לסיכון (יעד אנליסטים מול תמיכה)",
                       dec.get("rr_interpretation") or "", rr_c),
                 _mkpi("🟢", f"${_fmt(dec.get('support'))}" if dec.get("support") else "—", "תמיכה",
                       _fmt(dec.get("downside"), "%"), POSITIVE),
@@ -537,8 +537,8 @@ def _analysis(mkt, lookup, nc):
             st.markdown(f"<div class='mco'>{srl.get('interpretation', '')}</div>", unsafe_allow_html=True)
 
     with st.expander("פונדמנטלי"):
-        for k, vv in [("הכנסות", fin["revenue"]), ("צמיחת הכנסות", fin["revenue_growth"]),
-                      ("שולי תפעול", fin["operating_margin"]), ("רווח למניה", fin["eps"]),
+        for k, vv in [("הכנסות (שנה פיסקלית אחרונה)", fin["revenue"]), ("צמיחת הכנסות (רבעון אחרון מול אשתקד)", fin["revenue_growth"]),
+                      ("שולי רווח תפעולי (12 חודשים אחרונים)", fin["operating_margin"]), ("רווח למניה (12 חודשים אחרונים)", fin["eps"]),
                       ("תזרים חופשי", fin["fcf"]), ("חוב/הון", fin["debt_to_equity"]),
                       ("ROIC", fin["roic"])]:
             st.markdown(f"<div style='display:flex;justify-content:space-between;padding:9px 2px;"
@@ -556,7 +556,7 @@ def _analysis(mkt, lookup, nc):
 
     with st.expander("סיכונים"):
         st.markdown(f"<div class='mco'>ביתא {rk['beta']} · תנודתיות {rk['volatility']}% · "
-                    f"ירידה מקס׳ {rk['max_drawdown']}% · ציון סיכון <b>{rk['risk_score']}</b> ({rk['category']})</div>",
+                    f"ירידה מקס׳ (שנה אחרונה) {rk['max_drawdown']}% · ציון סיכון <b>{rk['risk_score']}</b> ({rk['category']})</div>",
                     unsafe_allow_html=True)
         for x in (dec or {}).get("risks", []):
             st.markdown(f"<div class='mco'>• {x}</div>", unsafe_allow_html=True)

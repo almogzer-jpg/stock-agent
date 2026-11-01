@@ -111,11 +111,11 @@ def quality(p: dict) -> dict:
     if gro:
         pil["growth"] = _mean(gro)
         if rg is not None and rg >= 15:
-            good.append(f"המכירות גדלות מהר ({rg:+.0f}% בשנה)")
+            good.append(f"המכירות גדלות מהר ({rg:+.0f}% ברבעון האחרון מול אשתקד)")
         elif cagr is not None and cagr >= 8:
             good.append(f"צמיחה עקבית במכירות ({cagr:+.0f}% בשנה בממוצע ב-3 שנים)")
         if rg is not None and rg < 0:
-            bad.append(f"המכירות יורדות ({rg:.0f}% בשנה)")
+            bad.append(f"המכירות יורדות ({rg:.0f}% ברבעון האחרון מול אשתקד)")
 
     fcf, rev = _n(p.get("fcf")), _n(p.get("revenue"))
     if not fin and fcf is not None and rev:
@@ -136,7 +136,7 @@ def quality(p: dict) -> dict:
                 if lev <= 1:
                     good.append("חוב נמוך ביחס לרווח")
                 elif lev > 3:
-                    bad.append(f"חוב גבוה (פי {lev:.1f} מהרווח התפעולי השנתי)")
+                    bad.append(f"חוב גבוה (חוב נטו פי {lev:.1f} מה-EBITDA)")
             elif nd > 0:
                 pil["balance"] = 15
                 bad.append("יש חוב נטו בלי רווח תפעולי שמכסה אותו")

@@ -51,10 +51,10 @@ def build_alerts(df, sectors: list | None, events_map: dict | None) -> list[dict
         top, bot = ranked[0], ranked[-1]
         if top["score"] >= 70:
             add("רוטציית סקטורים", top["sector"], "מידע",
-                f"כניסת הון לסקטור {top['sector']} (ציון {top['score']}, חוזק יחסי {top['rs']:+}%)")
+                f"חוזק סקטוריאלי (אומדן של כניסת הון): {top['sector']} (ציון {top['score']}, חוזק יחסי {top['rs']:+}%)")
         if bot["score"] < 35:
             add("רוטציית סקטורים", bot["sector"], "מידע",
-                f"יציאת הון מסקטור {bot['sector']} (ציון {bot['score']}, חוזק יחסי {bot['rs']:+}%)")
+                f"חולשה סקטוריאלית (אומדן של יציאת הון): {bot['sector']} (ציון {bot['score']}, חוזק יחסי {bot['rs']:+}%)")
 
     order = {"גבוהה": 0, "בינונית": 1, "מידע": 2}
     alerts.sort(key=lambda a: order.get(a["severity"], 3))

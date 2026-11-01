@@ -44,7 +44,7 @@ from ranking_engine.factor_scores import factor_scores
 from ranking_engine.composite import composite_score
 from news.sentiment import score_headlines
 from charts import sparkline_png
-from fundamentals.fundamentals import get_fundamentals
+from fundamentals.fundamentals import fetched_on, get_fundamentals
 from news.headlines import get_headlines
 from backtesting.backtester import backtest_symbol, backtest_signal
 import market
@@ -125,7 +125,7 @@ def _stock_card(r, info, chart_src: str | None) -> str:
             <b>{r['Ticker']}</b> — {r['Name']}
             &nbsp;<span style="color:{info['color']}">{info['emoji']} {info['label']}</span>
           </div>
-          <div style="color:#555;margin:4px 0">ציון <b>{r['Score']}</b>/100 · מחיר ${r['Price']}</div>
+          <div style="color:#555;margin:4px 0">ציון טכני <b>{r['Score']}</b> מתוך 100 · מחיר ${r['Price']}</div>
           <div style="font-weight:bold;color:{info['color']};margin:6px 0">{info['summary']}</div>
           <div style="color:#666;font-size:13px;line-height:1.6">{info['detail']}</div>
         </td>
@@ -184,7 +184,7 @@ def render_report_html(df: pd.DataFrame, closes_map: dict, embed: str = "cid"):
       <div style="line-height:1.8">
         🟢 {len(positive)} מניות בפסק דין "לשקול קנייה" ·
         🟡 {len(watch)} למעקב · 🔴 {len(avoid)} להימנעות.<br>
-        הבולטת היום: <b>{standout['Ticker']}</b> ({standout['Name']}) — ציון {standout['Score']}/100.
+        הבולטת היום: <b>{standout['Ticker']}</b> ({standout['Name']}) — ציון טכני {standout['Score']} מתוך 100.
       </div>
     </div>"""
 
@@ -199,7 +199,7 @@ def render_report_html(df: pd.DataFrame, closes_map: dict, embed: str = "cid"):
         style="font-family:Arial,Helvetica,sans-serif;color:#222;max-width:680px;margin:auto">
       <h2>📈 סוכן מניות — דוח יומי ({today})</h2>
       {bottom_line}
-      {section(f"🟢 מומנטום חיובי ({len(positive)})", positive, with_charts=True)}
+      {section(f"🟢 שווה לשקול קנייה ({len(positive)})", positive, with_charts=True)}
       {section(f"🟡 למעקב ({len(watch)})", watch, with_charts=True)}
       {avoid_html}
       <p style="color:#999;font-size:12px;margin-top:26px;border-top:1px solid #eee;padding-top:12px">
@@ -224,13 +224,13 @@ def build_report_email(df: pd.DataFrame, closes_map: dict):
 
     # Plain-text fallback.
     lines = [f"סוכן מניות — דוח יומי {today}", ""]
-    for grp_name, frame in [("🟢 מומנטום חיובי", positive),
+    for grp_name, frame in [("🟢 שווה לשקול קנייה", positive),
                             ("🟡 למעקב", watch), ("🔴 להימנעות", avoid)]:
         if frame.empty:
             continue
         lines.append(f"{grp_name} ({len(frame)}):")
         for _, r in frame.iterrows():
-            lines.append(f"  {r['Ticker']} {r['Name']} | ציון {r['Score']} | {classify(r)['summary']}")
+            lines.append(f"  {r['Ticker']} {r['Name']} | ציון טכני {r['Score']} | {classify(r)['summary']}")
         lines.append("")
     text = "\n".join(lines)
 
@@ -603,6 +603,7 @@ def main() -> None:
         metrics["Summary"] = info["summary"]
         if config.ENABLE_FUNDAMENTALS:
             metrics.update(get_fundamentals(sym))
+            metrics["FundDate"] = fetched_on(sym)
         # Daily % change (last close vs previous close).
         close = price_df["Close"]
         metrics["DailyChange%"] = (round(float(close.iloc[-1] / close.iloc[-2] - 1) * 100, 2)

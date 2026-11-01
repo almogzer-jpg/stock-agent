@@ -274,7 +274,7 @@ def _quality_tier(q):
 def _pros(f, trend):
     out = []
     if (f.get("rev_growth") or 0) >= 15:
-        out.append(f"המכירות גדלות מהר ({_pct(f['rev_growth'])} בשנה)")
+        out.append(f"המכירות גדלות מהר ({_pct(f['rev_growth'])} ברבעון האחרון מול אשתקד)")
     if (f.get("op_margin") or 0) >= 20:
         out.append(f"רווחית מאוד: מכל 100 דולר מכירות נשארים כ-{f['op_margin']:.0f} דולר רווח תפעולי")
     if (f.get("roic") or 0) >= 15:
@@ -308,7 +308,7 @@ def _cons(f, trend):
     if tgt and price and tgt < price * 0.98:
         out.append(f"המחיר כבר גבוה ממחיר היעד הממוצע של האנליסטים ({_money(tgt)})")
     if f.get("rev_growth") is not None and f["rev_growth"] < 0:
-        out.append(f"המכירות מתכווצות ({_pct(f['rev_growth'])})")
+        out.append(f"המכירות מתכווצות ({_pct(f['rev_growth'])} ברבעון האחרון מול אשתקד)")
     if f.get("debt_equity") is not None and f["debt_equity"] > 1.5:
         out.append("חוב גבוה ביחס להון")
     if f.get("sector_score") is not None and f["sector_score"] < 40:
@@ -333,7 +333,10 @@ def _holding_back(f):
     if not dims:
         return None
     v, label = min(dims)
-    return f"{label} חלשים יחסית ({int(v)} מתוך 100)" if label.endswith("נתונים העסקיים של החברה")         else f"{label} חלש יחסית ({int(v)} מתוך 100)"
+    if label == "החדשות האחרונות עליה" and v == 50:
+        return f"{label} לא תומכות ({int(v)} מתוך 100)"
+    adj = {"הנתונים העסקיים של החברה": "חלשים", "החדשות האחרונות עליה": "חלשות"}.get(label, "חלש")
+    return f"{label} {adj} יחסית ({int(v)} מתוך 100)"
 
 
 def _timing_flags(f, trend):
@@ -403,9 +406,10 @@ def decide(f: dict) -> dict:
             conditions.append("ירידה בתנודתיות, או כניסה בסכום קטן בלבד")
         else:
             weak = next((c for c in cons if not c.startswith("דוחות")), None) or _holding_back(f)
-            why = (f"חברה סבירה (ציון {int(q)} מתוך 100), אבל עוד לא מספיק חזקה"
+            word = "חברה חלשה" if tier == "weak" else "חברה סבירה"
+            why = (f"{word} (ציון {int(q)} מתוך 100), אבל עוד לא מספיק חזקה"
                    + (f": {weak}." if weak else "."))
-            conditions.append(f"שיפור בציון האיכות מעל {Q_STRONG}")
+            conditions.append(f"שיפור בציון האיכות ל-{Q_STRONG} ומעלה")
             if sup and price and sup < price:
                 conditions.append(f"או ירידה לאזור {_money(sup)} (רמת התמיכה)")
 
@@ -464,7 +468,7 @@ def facets(f: dict, v: dict) -> dict:
     val, up = _n(f.get("valuation")), (v.get("levels") or {}).get("upside")
     if val is not None:
         p = ("מחיר אטרקטיבי", "positive") if val >= 65 else ("מחיר הוגן", "warning") if val >= 40             else ("מחיר גבוה", "negative")
-        basis = f"לפי המכפילים ביחס לצמיחה (ציון תמחור {int(val)})"
+        basis = f"לפי המכפילים ביחס לצמיחה (ציון תמחור {int(val)} מתוך 100)"
     elif up is not None:
         p = ("מחיר אטרקטיבי", "positive") if up >= 15 else ("מחיר הוגן", "warning") if up >= 0             else ("מחיר גבוה", "negative")
         basis = "לפי יעד האנליסטים בלבד"

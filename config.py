@@ -63,7 +63,11 @@ RSI_MAX = 75.0            # healthy-momentum RSI band, upper bound
 # Cached weekly (they change quarterly) so daily runs stay fast.
 ENABLE_FUNDAMENTALS = True
 FUNDAMENTALS_CACHE = os.path.join(DATA_DIR, "fundamentals_cache.json")
-FUNDAMENTALS_TTL_DAYS = 7
+# One day: a weekly cache let a run in the days after an earnings report reuse the
+# figures from before it, with nothing on screen saying so (found 01/11/2026).
+# The daily bot starts from a clean checkout, so this changes only runs that keep
+# the cache between days (local runs, the app server).
+FUNDAMENTALS_TTL_DAYS = 1
 # Company profiles for the WHOLE universe (four-dimension engine, shadow mode).
 # Rolling refresh: each run refetches the stalest PROFILES_PER_RUN tickers, so the
 # full universe turns over about once a week without a burst of Yahoo calls.
@@ -107,6 +111,7 @@ COLUMN_LABELS_HE = {
     "Status": "סטטוס",
     "Summary": "שורה תחתונה",
     "Date": "תאריך",
+    "FundDate": "תאריך נתונים עסקיים",
     "Price": "מחיר",
     "MA20": "ממוצע 20",
     "MA50": "ממוצע 50",

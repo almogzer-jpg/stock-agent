@@ -18,7 +18,7 @@ WEIGHTS_V2 = {"fundamental": 0.35, "technical": 0.25, "sector": 0.20,
               "news": 0.10, "risk": 0.10}
 
 LABELS_HE = {"fundamental": "פונדמנטלי", "technical": "טכני", "sector": "סקטור",
-             "news": "חדשות", "risk": "ניהול סיכון"}
+             "news": "חדשות", "risk": "יציבות מחיר"}
 
 
 def composite_score(technical=None, fundamental=None, sector=None,

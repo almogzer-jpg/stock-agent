@@ -132,13 +132,13 @@ def build_thesis(ctx: dict) -> dict:
     om = f"{ctx['op_margin']:.1f}%" if ctx.get("op_margin") is not None else NA
     val = ctx.get("valuation_label", NA)
     risk_cat = ctx.get("risk_cat", NA)
-    bull = (f"אם הצמיחה נמשכת (הכנסות {rg}, רווח למניה {eg}) והשוליים התפעוליים ({om}) "
+    bull = (f"אם הצמיחה נמשכת (הכנסות {rg}, רווח למניה {eg}, ברבעון האחרון מול אשתקד) והשוליים התפעוליים ({om} ב-12 החודשים האחרונים) "
             f"נשמרים/משתפרים, ובהינתן מגמה טכנית {ctx.get('trend', NA)} — קיים פוטנציאל המשך עלייה.")
     base = (f"בתרחיש הבסיס: ציון סופי v2 {ctx.get('score_v2', NA)}, תמחור {val}, סיכון {risk_cat}. "
             f"ביצוע בקצב הסקטור, ללא הפתעה מהותית לכאן או לכאן.")
     bear = (f"בתרחיש השלילי: היחלשות צמיחה/שוליים, סיכון {risk_cat}"
             + (f", ביתא {ctx['beta']}" if ctx.get("beta") is not None else "")
-            + (f", ירידה מקס׳ {ctx['maxdd']}%" if ctx.get("maxdd") is not None else "")
+            + (f", ירידה מקס׳ (שנה אחרונה) {ctx['maxdd']}%" if ctx.get("maxdd") is not None else "")
             + f". אם התמחור ({val}) מתברר כמתוח — אכזבה אפשרית.")
     return {"bull": bull, "base": base, "bear": bear}
 
@@ -149,7 +149,7 @@ def build_pros_cons(ctx: dict) -> dict:
     if (ctx.get("fund") or 0) >= 65:
         pros.append(f"פונדמנטל חזק (ציון {ctx['fund']})")
     if (ctx.get("rev_growth") or 0) >= 15:
-        pros.append(f"צמיחת הכנסות גבוהה ({ctx['rev_growth']:+.1f}%)")
+        pros.append(f"צמיחת הכנסות גבוהה ({ctx['rev_growth']:+.1f}% ברבעון האחרון מול אשתקד)")
     if (ctx.get("op_margin") or 0) >= 20:
         pros.append(f"רווחיות תפעולית גבוהה ({ctx['op_margin']:.1f}%)")
     if ctx.get("trend") in ("מגמת עלייה", "מגמת עלייה חזקה"):
@@ -166,13 +166,13 @@ def build_pros_cons(ctx: dict) -> dict:
     if (ctx.get("beta") or 0) > 1.3:
         cons.append(f"ביתא גבוהה ({ctx['beta']}) — תנודתי מול השוק")
     if ctx.get("maxdd") is not None and ctx["maxdd"] < -30:
-        cons.append(f"ירידה מקסימלית עמוקה ({ctx['maxdd']}%)")
+        cons.append(f"ירידה מקסימלית עמוקה ({ctx['maxdd']}% בשנה האחרונה)")
     if (ctx.get("valuation") or 100) < 45:
         cons.append("תמחור מתוח (יקר יחסית)")
     if ctx.get("trend") in ("מגמת ירידה", "מגמת ירידה חזקה"):
         cons.append(f"מגמה טכנית שלילית ({ctx['trend']})")
     if (ctx.get("rev_growth") is not None) and ctx["rev_growth"] < 0:
-        cons.append(f"הכנסות מתכווצות ({ctx['rev_growth']:+.1f}%)")
+        cons.append(f"הכנסות מתכווצות ({ctx['rev_growth']:+.1f}% ברבעון האחרון מול אשתקד)")
     if (ctx.get("trust") or 100) < 40:
         cons.append("אמון נמוך — מעט אימות היסטורי")
     # pad to 5 honestly
@@ -633,9 +633,9 @@ def _tech_opinion(trend, mom, rsi, dist_high, sr, price):
 
 
 def _attractive_text(score_v2, val_score, risk_cat):
-    a = "אטרקטיבי" if (score_v2 or 0) >= 65 else "בינוני" if (score_v2 or 0) >= 50 else "פחות אטרקטיבי"
+    a = "גבוהה" if (score_v2 or 0) >= 65 else "בינונית" if (score_v2 or 0) >= 50 else "נמוכה"
     v = "זול" if (val_score or 0) >= 65 else "סביר" if (val_score or 0) >= 45 else "יקר"
-    return f"כרגע נראה {a} (ציון v2 {score_v2}), בתמחור {v}, ברמת סיכון {risk_cat}."
+    return f"איכות החברה {a} (ציון איכות {score_v2} מתוך 100), תמחור {v}, רמת סיכון {risk_cat}."
 
 
 def _investor_profile(risk_cat, vol):
@@ -682,7 +682,7 @@ def _entry_quality(trend, rsi, dist_sup, dist_res, rr, val_score):
     if dist_res is not None:
         reasons.append(f"{dist_res:.1f}% עד ההתנגדות")
     if rr is not None:
-        reasons.append(f"יחס סיכוי/סיכון לרמות {rr}")
+        reasons.append(f"יחס סיכוי לסיכון (התנגדות מול תמיכה) {rr}")
     if isinstance(val_score, (int, float)):
         reasons.append("התמחור אטרקטיבי" if val_score >= 65 else
                        "התמחור סביר" if val_score >= 40 else "התמחור יקר יחסית")
@@ -761,7 +761,7 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
         ("צמיחה", rm.get("rev_growth"), _check(rm.get("rev_growth"), 15, 5), "%"),
         ("רווחיות (ROIC)", rm.get("roic"), _check(rm.get("roic"), 15, 8), "%"),
         ("שוליים", rm.get("op_margin"), _check(rm.get("op_margin"), 20, 10), "%"),
-        ("תזרים מזומנים", rm.get("fcf_growth"), _check(rm.get("fcf_growth"), 10, 0), "%"),
+        ("צמיחת תזרים חופשי (שנתי)", rm.get("fcf_growth"), _check(rm.get("fcf_growth"), 10, 0), "%"),
         ("חוב", rm.get("debt_equity"), _check(rm.get("debt_equity"), 0.5, 1.5, higher_better=False), "x"),
         ("תמחור", val_s, _check(val_s, 65, 40), ""),
         ("מומנטום", ret3, _check(ret3, 15, 0), "%"),
@@ -830,7 +830,7 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
     if isinstance(sector_s, (int, float)) and sector_s < 40:
         risks.append("חולשה סקטוריאלית — רוח נגדית ענפית")
     if isinstance(rk.get("max_drawdown"), (int, float)) and rk["max_drawdown"] < -35:
-        risks.append(f"תנודתיות היסטורית עמוקה (ירידה מקס׳ {rk['max_drawdown']}%)")
+        risks.append(f"תנודתיות היסטורית עמוקה (ירידה מקס׳ בשנה האחרונה {rk['max_drawdown']}%)")
     if isinstance(trust_s, (int, float)) and trust_s < 40:
         risks.append("אימות היסטורי מוגבל — מדגם קטן")
     for x in (rep.get("regulation_risks") or {}).get("sector_risks", [])[:2]:
@@ -974,7 +974,7 @@ def thesis_invalidators(rep: dict) -> list:
     srl = (rep.get("technicals") or {}).get("sr_levels") or {}
     rm = rep.get("raw_metrics") or {}
     if srl.get("support"):
-        out.append(f"סגירה שבועית מתחת לתמיכה ${srl['support']} — שבירת המבנה הטכני")
+        out.append(f"סגירה מתחת לתמיכה ${srl['support']} — שבירת המבנה הטכני")
     if isinstance(rm.get("rev_growth"), (int, float)) and rm["rev_growth"] > 0:
         out.append(f"האטת צמיחת הכנסות מתחת ל-{max(0, round(rm['rev_growth'] / 2))}% (כיום {rm['rev_growth']:.0f}%)")
     if isinstance(rm.get("op_margin"), (int, float)):

@@ -29,11 +29,11 @@ def to_html(r: dict) -> str:
     rk = r["risk"]
 
     fin_rows = "".join(_row(k, v) for k, v in [
-        ("הכנסות", fin["revenue"]), ("צמיחת הכנסות", fin["revenue_growth"]),
+        ("הכנסות (שנה פיסקלית אחרונה)", fin["revenue"]), ("צמיחת הכנסות (רבעון אחרון מול אשתקד)", fin["revenue_growth"]),
         ("רווח גולמי", fin["gross_profit"]), ("שולי גולמי", fin["gross_margin"]),
-        ("רווח תפעולי", fin["operating_income"]), ("שולי תפעול", fin["operating_margin"]),
+        ("רווח תפעולי", fin["operating_income"]), ("שולי רווח תפעולי (12 חודשים אחרונים)", fin["operating_margin"]),
         ("רווח נקי", fin["net_income"]), ("שולי נטו", fin["net_margin"]),
-        ("רווח למניה", fin["eps"]), ("צמיחת רווח למניה", fin["eps_growth"]),
+        ("רווח למניה (12 חודשים אחרונים)", fin["eps"]), ("צמיחת רווח למניה (רבעון אחרון מול אשתקד)", fin["eps_growth"]),
         ("תזרים חופשי (FCF)", fin["fcf"]), ("שולי FCF", fin["fcf_margin"]),
         ("חוב", fin["debt"]), ("מזומן", fin["cash"]),
         ("חוב/הון", fin["debt_to_equity"]), ("ROE", fin["roe"]), ("ROIC", fin["roic"]),
@@ -54,7 +54,7 @@ def to_html(r: dict) -> str:
     bars = (_bar("ציון סופי v2", sc["final_v2"]["value"]) + _bar("טכני", sc["technical"]["value"])
             + _bar("פונדמנטלי", sc["fundamental"]["value"]) + _bar("סקטור", sc["sector"]["value"])
             + _bar("חדשות", sc["news"]["value"]) + _bar("אמון", sc["trust"]["value"])
-            + _bar("שווי", sc["valuation"]["value"]))
+            + _bar("ציון תמחור (מתוך 100)", sc["valuation"]["value"]))
     pros = "".join(f"<li>{x}</li>" for x in pc["pros"] if x != "—") or "<li>אין יתרונות בולטים כרגע.</li>"
     cons = "".join(f"<li>{x}</li>" for x in pc["cons"] if x != "—") or "<li>לא זוהו חסרונות בולטים.</li>"
     sector_risks = "".join(f"<li>{x}</li>" for x in r["regulation_risks"]["sector_risks"])
@@ -88,7 +88,7 @@ def to_html(r: dict) -> str:
     {tech['opinion']}</div>
 
   <h2>6. סיכון</h2><div class="card">
-    ביתא {rk['beta']} · תנודתיות {rk['volatility']}% · ירידה מקס׳ {rk['max_drawdown']}% ·
+    ביתא {rk['beta']} · תנודתיות {rk['volatility']}% · ירידה מקס׳ (שנה אחרונה) {rk['max_drawdown']}% ·
     ציון סיכון {rk['risk_score']} ({rk['category']})</div>
 
   <h2>7. ציוני Stock Agent</h2><div class="card">{bars}</div>
