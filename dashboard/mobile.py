@@ -377,7 +377,8 @@ def _alerts(alerts):
 
 def _settings(df, mkt, sysh):
     st.markdown("#### הגדרות ועוד")
-    if st.button("🌱 מעבר למצב פשוט", key="m_to_simple", use_container_width=True):
+    if config.SIMPLE_MODE_ENABLED and st.button("🌱 מעבר למצב פשוט", key="m_to_simple",
+                                                use_container_width=True):
         st.session_state["mode"] = "simple"
         if "mode" in st.query_params:
             del st.query_params["mode"]

@@ -307,6 +307,8 @@ _mywatch.use_backend(lambda: dict(st.session_state.get("_ls_cache", {}).get("wat
 
 # ---- Simple by Default, Professional on Demand ----
 def _mode() -> str:
+    if not config.SIMPLE_MODE_ENABLED:
+        return "pro"
     if "mode" not in st.session_state:
         st.session_state["mode"] = "pro" if st.query_params.get("mode") == "pro" else "simple"
     return st.session_state["mode"]
@@ -423,7 +425,8 @@ page = st.sidebar.radio(
 )
 st.sidebar.caption(f"{len(df)} מניות · עודכן {latest}")
 st.sidebar.divider()
-if st.sidebar.button("🌱 מעבר למצב פשוט", use_container_width=True, key="to_simple"):
+if config.SIMPLE_MODE_ENABLED and st.sidebar.button("🌱 מעבר למצב פשוט", use_container_width=True,
+                                                   key="to_simple"):
     set_mode("simple")
 if st.sidebar.button("📱 תצוגת מובייל", use_container_width=True):
     st.query_params["m"] = "1"
