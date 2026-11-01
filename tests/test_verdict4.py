@@ -201,8 +201,8 @@ def test_shadow_eval_measures_excess_per_day():
     days = pd.bdate_range("2026-01-05", periods=40)
     closes = pd.DataFrame({"AAA": [100 * 1.01 ** i for i in range(40)],
                            "BBB": [100.0] * 40, "SPY": [100 * 1.002 ** i for i in range(40)]}, index=days)
-    log = pd.DataFrame([{"d": days[0].strftime("%d/%m/%Y"), "t": "AAA", "live": "wait", "new": "buy", "p": "fair", "tm": "positive"},
-                        {"d": days[0].strftime("%d/%m/%Y"), "t": "BBB", "live": "buy", "new": "wait", "p": "full", "tm": "mixed"}])
+    log = pd.DataFrame([{"d": days[0].strftime("%d/%m/%Y"), "t": "AAA", "live": "wait", "new": "buy", "p": "fair", "tm": "positive", "q": 80},
+                        {"d": days[0].strftime("%d/%m/%Y"), "t": "BBB", "live": "buy", "new": "wait", "p": "full", "tm": "mixed", "q": 60}])
     log["day"] = pd.to_datetime(log["d"], format="%d/%m/%Y")
     df = SE.outcomes(log, closes)
     r = SE.report(df)[21]

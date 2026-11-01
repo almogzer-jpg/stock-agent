@@ -262,9 +262,9 @@ def price(ticker: str, p: dict, ctx: dict) -> dict:
         sc = max(0, min(100, round(50 + 2.5 * (up - (ctx or {}).get("median_upside", 0.0)))))
         if up < 0:
             sc = min(sc, 35)            # above the consensus target: never support attractiveness
-        side = "מעל " if up < 0 else "מתחת ל"
-        comps.append({"key": "analysts", "score": sc, "target": tgt, "upside": round(up, 1),
-                      "text": f"המחיר {abs(up):.0f}% {side}יעד הממוצע של {int(n)} אנליסטים ({_money(tgt)})"})
+        txt = (f"המחיר {(px / tgt - 1) * 100:.0f}% מעל היעד הממוצע של {int(n)} אנליסטים ({_money(tgt)})" if up < 0
+               else f"היעד הממוצע של {int(n)} אנליסטים ({_money(tgt)}) גבוה ב-{up:.0f}% מהמחיר")
+        comps.append({"key": "analysts", "score": sc, "target": tgt, "upside": round(up, 1), "text": txt})
 
     w = {"peers": 0.30, "history": 0.25, "growth": 0.20, "analysts": 0.25}
     if len(comps) < 2:
@@ -416,8 +416,9 @@ def decide(ticker: str, row: dict, profile: dict, ctx: dict, sector_score=None,
         conditions += _entry_conditions(pr, px)
     elif tier == "strong":
         action, reason = "buy", "strong_good_price"
-        why = (f"חברה חזקה{' (' + strength + ')' if strength else ''} ב{P_LABELS[plabel][0]}: "
-               f"{_price_reason(pr)}. " + ("המגמה תומכת." if trend == "up" else "המגמה לא נגדה."))
+        price_txt = pr["justification"] or f"{_price_reason(pr)}."
+        why = (f"חברה חזקה{': ' + strength if strength else ''}. {P_LABELS[plabel][0].replace('מחיר', 'המחיר')}: "
+               f"{price_txt} " + ("המגמה תומכת." if trend == "up" else "המגמה לא נגדה."))
         sup = _n((row or {}).get("Support"))
         if sup:
             conditions.append(f"ירידה מתחת ל-{_money(sup)} (רמת התמיכה) מחייבת בדיקה מחדש")
@@ -426,7 +427,7 @@ def decide(ticker: str, row: dict, profile: dict, ctx: dict, sector_score=None,
         why = (f"{q['label']} (ציון עסקי {q['score']} מתוך 100), עוד לא מספיק חזקה"
                + (f": {weakness}." if weakness else "."))
         conditions.append(f"שיפור בנתונים העסקיים לציון {Q_STRONG} ומעלה")
-    if pr.get("justification") and action != "nodata":
+    if pr.get("justification") and action not in ("nodata", "buy"):
         why += " " + pr["justification"]
     if rk["earnings_soon"] and action == "buy":
         why += " הדוחות הקרובים עלולים להזיז את המחיר בחדות."

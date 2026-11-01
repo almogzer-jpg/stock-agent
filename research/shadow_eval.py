@@ -113,8 +113,9 @@ def report(df: pd.DataFrame) -> dict:
                            ("both_buy", (d["live"] == "buy") & (d["new"] == "buy"))):
             if mask.any():
                 r["disagreements"][name] = _group_stats(d[mask])
-        for dim in ("p", "tm"):
-            r[f"by_{dim}"] = {k: _group_stats(g) for k, g in d[d["new"] != "nodata"].groupby(dim)}
+        d = d.assign(qt=pd.cut(d["q"], [-1, 44.5, 54.5, 67.5, 101], labels=["poor", "weak", "fair", "strong"]))
+        for dim in ("p", "tm", "qt"):
+            r[f"by_{dim}"] = {str(k): _group_stats(g) for k, g in d[d["new"] != "nodata"].groupby(dim, observed=True)}
         res[h] = r
     return res
 
