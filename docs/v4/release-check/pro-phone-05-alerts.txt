@@ -1,0 +1,141 @@
+🤖 Stock Agent · מצב שוק 93 · פחד/חמדנות 64
+
+🏠 בית
+
+🔎 ניתוח
+
+💎 הזדמנויות
+
+🗺️ סקטורים
+
+🚨 התראות
+
+⚙️
+
+מרכז התראות
+🔴 פריצה · LLY
+LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.84
+
+פתח ניתוח · LLY
+
+🔴 פריצה · MSFT
+MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.86
+
+פתח ניתוח · MSFT
+
+🔴 אזהרת סיכון · AVGO
+AVGO — סיכון גבוה ומתחת לממוצע 200
+
+פתח ניתוח · AVGO
+
+🔴 אזהרת סיכון · META
+META — סיכון גבוה ומתחת לממוצע 200
+
+פתח ניתוח · META
+
+🔴 שינוי דירוג · NFLX
+NFLX — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)
+
+פתח ניתוח · NFLX
+
+🟠 זינוק נפח · AMZN
+AMZN — נפח מסחר פי 2.2 מהממוצע
+
+פתח ניתוח · AMZN
+
+🟠 דוחות · AAPL
+AAPL — דוחות כספיים בעוד 3 ימים (2026-11-02)
+
+פתח ניתוח · AAPL
+
+🟠 דוחות · AMD
+AMD — דוחות כספיים בעוד 4 ימים (2026-11-03)
+
+פתח ניתוח · AMD
+
+🟠 זינוק נפח · GOOGL
+GOOGL — נפח מסחר פי 4.5 מהממוצע
+
+פתח ניתוח · GOOGL
+
+🔵 שינוי דירוג · LLY
+LLY — אישרור: Outperform → Outperform (Leerink Partners)
+
+פתח ניתוח · LLY
+
+🔵 שינוי דירוג · V
+V — אישרור: Outperform → Outperform (Macquarie)
+
+פתח ניתוח · V
+
+🔵 שינוי דירוג · MA
+MA — אישרור: Buy → Buy (Truist Securities)
+
+פתח ניתוח · MA
+
+🔵 שינוי דירוג · PG
+PG — אישרור: Equal-Weight → Equal-Weight (Barclays)
+
+פתח ניתוח · PG
+
+🔵 שינוי דירוג · COST
+COST — כיסוי חדש: → Outperform (CICC)
+
+פתח ניתוח · COST
+
+🔵 שינוי דירוג · UNH
+UNH — אישרור: Overweight → Overweight (Wells Fargo)
+
+פתח ניתוח · UNH
+
+🔵 שינוי דירוג · MSFT
+MSFT — אישרור: Outperform → Outperform (Bernstein)
+
+פתח ניתוח · MSFT
+
+🔵 שינוי דירוג · AMZN
+AMZN — אישרור: Buy → Buy (UBS)
+
+פתח ניתוח · AMZN
+
+🔵 שינוי דירוג · AAPL
+AAPL — אישרור: Neutral → Neutral (MoffettNathanson)
+
+פתח ניתוח · AAPL
+
+🔵 שינוי דירוג · HD
+HD — אישרור: Hold → Hold (Stifel)
+
+פתח ניתוח · HD
+
+🔵 שינוי דירוג · NVDA
+NVDA — reit: Buy → Buy (Needham)
+
+פתח ניתוח · NVDA
+
+🔵 שינוי דירוג · CRM
+CRM — אישרור: Neutral → Neutral (DA Davidson)
+
+פתח ניתוח · CRM
+
+🔵 שינוי דירוג · AMD
+AMD — אישרור: Positive → Positive (Susquehanna)
+
+פתח ניתוח · AMD
+
+🔵 שינוי דירוג · AVGO
+AVGO — אישרור: Buy → Buy (Rosenblatt)
+
+פתח ניתוח · AVGO
+
+🔵 שינוי דירוג · META
+META — אישרור: Buy → Buy (UBS)
+
+פתח ניתוח · META
+
+🔵 שינוי דירוג · TSLA
+TSLA — שדרוג: Equal-Weight → Overweight (Barclays)
+
+פתח ניתוח · TSLA
+
+לצרכי מידע בלבד, אין לראות בכך ייעוץ השקעות.

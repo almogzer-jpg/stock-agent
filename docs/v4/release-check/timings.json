@@ -1,0 +1,77 @@
+[
+ {
+  "name": "pro-desktop-01-home",
+  "first_render_s": 3.1,
+  "total_s": 3.2
+ },
+ {
+  "name": "pro-desktop-02-company-analysis",
+  "first_render_s": 2.0,
+  "total_s": 9.7
+ },
+ {
+  "name": "pro-desktop-03-watchlist",
+  "first_render_s": 2.0,
+  "total_s": 4.7
+ },
+ {
+  "name": "pro-desktop-04-opportunities",
+  "first_render_s": 2.0,
+  "total_s": 5.2
+ },
+ {
+  "name": "pro-desktop-05-sectors",
+  "first_render_s": 2.0,
+  "total_s": 5.2
+ },
+ {
+  "name": "pro-desktop-06-alerts",
+  "first_render_s": 2.0,
+  "total_s": 4.7
+ },
+ {
+  "name": "pro-desktop-07-market-intelligence",
+  "first_render_s": 2.0,
+  "total_s": 5.1
+ },
+ {
+  "name": "pro-desktop-08-settings",
+  "first_render_s": 2.0,
+  "total_s": 4.6
+ },
+ {
+  "name": "pro-desktop-09-diagnostics",
+  "first_render_s": 2.0,
+  "total_s": 2.1
+ },
+ {
+  "name": "pro-phone-01-home",
+  "first_render_s": 2.0,
+  "total_s": 2.2
+ },
+ {
+  "name": "pro-phone-02-analysis",
+  "first_render_s": 2.0,
+  "total_s": 7.3
+ },
+ {
+  "name": "pro-phone-03-opportunities",
+  "first_render_s": 2.0,
+  "total_s": 4.7
+ },
+ {
+  "name": "pro-phone-04-sectors",
+  "first_render_s": 2.0,
+  "total_s": 4.7
+ },
+ {
+  "name": "pro-phone-05-alerts",
+  "first_render_s": 2.0,
+  "total_s": 4.7
+ },
+ {
+  "name": "simple-desktop-01-today",
+  "first_render_s": 2.0,
+  "total_s": 2.2
+ }
+]

@@ -1,0 +1,77 @@
+🤖 Stock Agent Pro v3.0
+● המערכת מעודכנת 30/10/2026
+🔧 דיאגנוסטיקת מערכת (פנימי)
+
+משיכות מוצלחות
+
+20
+
+משיכות שנכשלו
+
+0
+
+שלמות ממוצעת
+
+100.0%
+
+אמון ממוצע
+
+60.4
+
+ציון אמינות
+
+92
+
+שימוש ב-fallback
+
+0
+
+בריאות מקורות
+{
+"primary":"Yahoo Finance (yfinance)"
+"crosscheck_status":"ok"
+"compared":"2/4"
+"last_reliability_report":"30/10/2026 10:47"
+"last_scan":"30/10/2026"
+"global_asof":NULL
+}
+טריות ארטיפקטים
+{
+"results":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+"market_overview":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+"universe":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+"global_markets":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+"alerts":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+"events":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+"backtest":{
+"exists":true
+"age_days":0
+"status":"fresh"
+}
+}
+יומן החלטות אחרון (audit trail)
+{"ticker": "AAPL", "recommendation": "🟢 שווה לשקול קנייה", "confidence": 88, "score_v2": 69, "data_confidence": 90, "sources": ["Yahoo Finance (yfinance)"], "fallbacks": [], "models": ["composite_v2", "risk_engine", "technicals", "verdict_v1"], "missing": [], "weights": {"fundamental": 0.35, "technical": 0.25, "sector": 0.2, "news": 0.1, "risk": 0.1}, "gate_pass": true, "version": "2.0", "ts": "01/11/2026 09:28:44"}

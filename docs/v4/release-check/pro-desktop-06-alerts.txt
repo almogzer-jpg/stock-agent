@@ -1,0 +1,172 @@
+keyboard_double_arrow_left
+
+🏠 ראשי
+
+🔎 ניתוח חברה
+
+⭐ המעקב שלי
+
+💎 הזדמנויות
+
+🗺️ סקטורים
+
+🚨 התראות
+
+📊 אינטליגנציית שוק
+
+⚙️ הגדרות
+
+20 מניות · עודכן 30/10/2026
+
+📱 תצוגת מובייל
+
+🔄 רענן נתונים עכשיו
+
+🤖 Stock Agent Pro v3.0
+● המערכת מעודכנת 30/10/2026
+מרכז התראות — דוחות · פריצות · זינוקי נפח · חדשות מהותיות
+5 התראות קריטיות מתוך 28 — התחל מהן; לכל התראה עם סימול יש כפתור ניתוח מיידי.
+
+🚀 פריצה: 2 · ⚠️ אזהרת סיכון: 2 · 🏦 שינוי דירוג: 18 · 📊 זינוק נפח: 2 · 📅 דוחות: 2 · 🔄 רוטציית סקטורים: 2
+
+🔴 קריטיות — דורשות התייחסות (5)
+🚀 פריצה · LLY
+LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.84
+
+🔎 LLY
+
+🚀 פריצה · MSFT
+MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.86
+
+🔎 MSFT
+
+⚠️ אזהרת סיכון · AVGO
+AVGO — סיכון גבוה ומתחת לממוצע 200
+
+🔎 AVGO
+
+⚠️ אזהרת סיכון · META
+META — סיכון גבוה ומתחת לממוצע 200
+
+🔎 META
+
+🏦 שינוי דירוג · NFLX
+NFLX — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)
+
+🔎 NFLX
+
+🟠 חשובות (4)
+📊 זינוק נפח · AMZN
+AMZN — נפח מסחר פי 2.2 מהממוצע
+
+🔎 AMZN
+
+📅 דוחות · AAPL
+AAPL — דוחות כספיים בעוד 3 ימים (2026-11-02)
+
+🔎 AAPL
+
+📅 דוחות · AMD
+AMD — דוחות כספיים בעוד 4 ימים (2026-11-03)
+
+🔎 AMD
+
+📊 זינוק נפח · GOOGL
+GOOGL — נפח מסחר פי 4.5 מהממוצע
+
+🔎 GOOGL
+
+🔵 מידע (19)
+🏦 שינוי דירוג · LLY
+LLY — אישרור: Outperform → Outperform (Leerink Partners)
+
+🔎 LLY
+
+🏦 שינוי דירוג · V
+V — אישרור: Outperform → Outperform (Macquarie)
+
+🔎 V
+
+🏦 שינוי דירוג · MA
+MA — אישרור: Buy → Buy (Truist Securities)
+
+🔎 MA
+
+🏦 שינוי דירוג · PG
+PG — אישרור: Equal-Weight → Equal-Weight (Barclays)
+
+🔎 PG
+
+🏦 שינוי דירוג · COST
+COST — כיסוי חדש: → Outperform (CICC)
+
+🔎 COST
+
+🏦 שינוי דירוג · UNH
+UNH — אישרור: Overweight → Overweight (Wells Fargo)
+
+🔎 UNH
+
+🏦 שינוי דירוג · MSFT
+MSFT — אישרור: Outperform → Outperform (Bernstein)
+
+🔎 MSFT
+
+🏦 שינוי דירוג · AMZN
+AMZN — אישרור: Buy → Buy (UBS)
+
+🔎 AMZN
+
+🏦 שינוי דירוג · AAPL
+AAPL — אישרור: Neutral → Neutral (MoffettNathanson)
+
+🔎 AAPL
+
+🏦 שינוי דירוג · HD
+HD — אישרור: Hold → Hold (Stifel)
+
+🔎 HD
+
+🏦 שינוי דירוג · NVDA
+NVDA — reit: Buy → Buy (Needham)
+
+🔎 NVDA
+
+🏦 שינוי דירוג · CRM
+CRM — אישרור: Neutral → Neutral (DA Davidson)
+
+🔎 CRM
+
+🏦 שינוי דירוג · AMD
+AMD — אישרור: Positive → Positive (Susquehanna)
+
+🔎 AMD
+
+🏦 שינוי דירוג · AVGO
+AVGO — אישרור: Buy → Buy (Rosenblatt)
+
+🔎 AVGO
+
+🏦 שינוי דירוג · META
+META — אישרור: Buy → Buy (UBS)
+
+🔎 META
+
+🏦 שינוי דירוג · TSLA
+TSLA — שדרוג: Equal-Weight → Overweight (Barclays)
+
+🔎 TSLA
+
+🏦 שינוי דירוג · GOOGL
+GOOGL — אישרור: Market Perform → Market Perform (Bernstein)
+
+🔎 GOOGL
+
+🔄 רוטציית סקטורים · אנרגיה
+כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.82%)
+🔄 רוטציית סקטורים · שירותי תקשורת
+יציאת הון מסקטור שירותי תקשורת (ציון 2, חוזק יחסי -9.69%)
+
+מקור ראשי: Yahoo Finance (yfinance) · עודכן 30/10/2026 10:47 · אימות-צולב (ECB (מט"ח) + Stooq (מדדים, מיטב-מאמץ)): תקין ✓ · אמינות נתונים: גבוהה (92/100)
+
+לצרכי מידע בלבד, אין לראות בכך ייעוץ השקעות.
