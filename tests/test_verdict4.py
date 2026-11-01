@@ -194,18 +194,77 @@ def test_lly_case_strong_company_at_a_full_price():
 
 
 # ------------------------------------------------------ outcome measurement
-def test_shadow_eval_measures_excess_per_day():
-    import sys, os
+def _se():
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "research"))
-    import shadow_eval as SE
-    days = pd.bdate_range("2026-01-05", periods=40)
-    closes = pd.DataFrame({"AAA": [100 * 1.01 ** i for i in range(40)],
-                           "BBB": [100.0] * 40, "SPY": [100 * 1.002 ** i for i in range(40)]}, index=days)
-    log = pd.DataFrame([{"d": days[0].strftime("%d/%m/%Y"), "t": "AAA", "live": "wait", "new": "buy", "p": "fair", "tm": "positive", "q": 80},
-                        {"d": days[0].strftime("%d/%m/%Y"), "t": "BBB", "live": "buy", "new": "wait", "p": "full", "tm": "mixed", "q": 60}])
+    import shadow_eval
+    return shadow_eval
+
+
+def _synthetic(n=300):
+    """AAA rises 1%/day, BBB is flat, CCC falls hard then recovers. SPY drifts up."""
+    days = pd.bdate_range("2025-01-06", periods=n)
+    ccc = [100 * (0.98 ** i if i < 10 else 0.98 ** 10) for i in range(n)]
+    closes = pd.DataFrame({"AAA": [100 * 1.01 ** i for i in range(n)], "BBB": [100.0] * n, "CCC": ccc,
+                           "SPY": [100 * 1.002 ** i for i in range(n)]}, index=days)
+    return days, closes
+
+
+def _log(days, idx, rows):
+    out = []
+    for i in idx:
+        for t, live, new, s in rows:
+            out.append({"d": days[i].strftime("%d/%m/%Y"), "t": t, "s": s, "live": live, "new": new,
+                        "p": "fair", "tm": "positive", "q": 75, "rel": 80, "pa": 2})
+    log = pd.DataFrame(out)
     log["day"] = pd.to_datetime(log["d"], format="%d/%m/%Y")
-    df = SE.outcomes(log, closes)
-    r = SE.report(df)[21]
+    return log
+
+
+def test_shadow_eval_measures_excess_drawdown_and_sector_neutral_return():
+    SE = _se()
+    days, closes = _synthetic()
+    log = _log(days, [250], [("AAA", "wait", "buy", "Tech"), ("BBB", "buy", "wait", "Tech"),
+                             ("CCC", "avoid", "avoid", "Energy")])
+    r = SE.report(SE.outcomes(log, closes))[21]
     assert r["new"]["buy"]["excess_vs_avg_%"] > 0 > r["live"]["buy"]["excess_vs_avg_%"]
+    assert r["new"]["buy"]["excess_vs_sector_%"] > 0                # beat its own sector too
     assert r["disagreements"]["new_buy_live_not"]["n"] == 1
-    assert r["new"]["buy"]["enough_days"] is False           # one day is never a conclusion
+    assert r["new"]["buy"]["enough_days"] is False                   # one day is never a conclusion
+    assert "rising" in r["by_regime"]                                # SPY above its 200-day average
+    assert set(r["by_sector"]) == {"Tech", "Energy"}
+
+
+def test_shadow_eval_reports_drawdowns():
+    SE = _se()
+    days, closes = _synthetic()
+    log = _log(days, [0], [("CCC", "buy", "avoid", "Energy"), ("AAA", "wait", "buy", "Tech")])
+    r = SE.report(SE.outcomes(log, closes))[21]
+    assert r["live"]["buy"]["avg_worst_drop_%"] < -15 and r["live"]["buy"]["share_fell_15%_%"] == 100.0
+    assert r["new"]["buy"]["avg_worst_drop_%"] == 0
+
+
+def test_stability_counts_changes_and_flips():
+    SE = _se()
+    days, _ = _synthetic(5)
+    log = pd.concat([_log(days, [0], [("AAA", "buy", "buy", "Tech")]),
+                     _log(days, [1], [("AAA", "avoid", "buy", "Tech")]),
+                     _log(days, [2], [("AAA", "buy", "buy", "Tech")])])
+    st = SE.stability(log)
+    assert st["live"]["change_rate_%"] == 100.0 and st["live"]["buy_avoid_flips"] == 2
+    assert st["new"]["change_rate_%"] == 0.0 and st["new"]["avg_buy_run_days"] == 3.0
+
+
+def test_data_quality_per_day():
+    SE = _se()
+    days, _ = _synthetic(5)
+    log = _log(days, [0], [("AAA", "nodata", "buy", "Tech"), ("BBB", "buy", "nodata", "Tech")])
+    dq = SE.data_quality(log)[0]
+    assert dq["new_nodata_%"] == 50.0 and dq["live_nodata_%"] == 50.0 and dq["avg_profile_age_days"] == 2.0
+
+
+def test_headline_never_concludes_without_matured_decisions():
+    SE = _se()
+    lines = SE.headline({"log_days": 1, "results": "no matured decisions yet"})
+    assert "אין מה להסיק" in lines[-1]

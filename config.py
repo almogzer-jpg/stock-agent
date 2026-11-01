@@ -73,6 +73,8 @@ PROFILES_PER_RUN = 110
 # Shadow run of the four-dimension engine: computed and logged, never displayed.
 SHADOW_JSON = os.path.join(DATA_DIR, "shadow_verdicts.json")    # latest snapshot
 SHADOW_LOG = os.path.join(DATA_DIR, "shadow_log.jsonl")         # one line per stock per day
+SHADOW_EVAL = os.path.join(DATA_DIR, "shadow_eval.json")       # weekly outcome measurement
+SHADOW_EVAL_EVERY_DAYS = 7
 # News is fetched only for breakout candidates (few calls), so it's cheap.
 ENABLE_NEWS = True
 NEWS_LIMIT = 5

@@ -13,7 +13,9 @@ Outputs (committed by the daily bot):
 """
 import json
 import os
+import sys
 from collections import Counter
+from datetime import date
 
 import config
 import market
@@ -22,9 +24,17 @@ import verdict4 as V4
 from fundamentals import profiles as prof
 
 
-def _log_line(t, row, live, v):
+def _profile_age(p):
+    try:
+        return (date.today() - date.fromisoformat((p or {}).get("_date", ""))).days
+    except ValueError:
+        return None
+
+
+def _log_line(t, row, live, v, p):
     d = v["dimensions"]
-    return {"d": row.get("Date"), "t": t, "px": v["price"], "live": live.get("action"),
+    return {"d": row.get("Date"), "t": t, "s": (p or {}).get("sector"), "pa": _profile_age(p),
+            "px": v["price"], "live": live.get("action"),
             "live_q": live.get("quality"), "new": v["action"], "why": v["reason"],
             "q": d["quality"]["score"], "p": d["price"]["key"], "ps": d["price"]["score"],
             "up": d["price"]["upside"], "tm": d["timing"]["key"], "r": d["risk"]["level"],
@@ -53,7 +63,7 @@ def run(sector_scores: dict | None = None, refresh: bool = True) -> dict:
         if problems:
             broken[t] = problems
         snap[t] = {**v, "live": {k: live[t].get(k) for k in ("action", "label", "quality", "why")}}
-        lines.append(_log_line(t, row, live[t], v))
+        lines.append(_log_line(t, row, live[t], v, p))
 
     day = next((r.get("Date") for r in rows.values() if r.get("Date")), None)
     summary = {"date": day, "stocks": len(tickers), "profiles": sum(1 for t in tickers if t in profiles),
@@ -73,7 +83,27 @@ def run(sector_scores: dict | None = None, refresh: bool = True) -> dict:
             fh.write(json.dumps(ln, ensure_ascii=False, separators=(",", ":")) + "\n")
     print(f"מנוע ארבעת הממדים (צל): {summary['new']} · המנוע החי: {summary['live']}"
           f" · חוסר עקביות: {len(broken)}")
+    _weekly_eval()
     return summary
+
+
+def _weekly_eval():
+    """Re-measure outcomes once a week (data/shadow_eval.json). Never fails the run."""
+    try:
+        with open(config.SHADOW_EVAL, encoding="utf-8") as fh:
+            last = json.load(fh).get("as_of")
+        d, m, y = (int(x) for x in last.split("/"))
+        if (date.today() - date(y, m, d)).days < config.SHADOW_EVAL_EVERY_DAYS:
+            return
+    except Exception:
+        pass                                    # missing or unreadable: measure now
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "research"))
+        import shadow_eval
+        res = shadow_eval.evaluate(out_path=config.SHADOW_EVAL)
+        print("מדידת תוצאות המנוע החדש:", " ".join(res["headline"]))
+    except Exception as exc:
+        print(f"  ! מדידת התוצאות לא רצה: {exc}")
 
 
 if __name__ == "__main__":

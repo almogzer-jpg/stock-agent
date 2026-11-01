@@ -17,6 +17,7 @@ data/*
 !data/profiles.json
 !data/shadow_verdicts.json
 !data/shadow_log.jsonl
+!data/shadow_eval.json
 !data/scores_today.json
 !data/scores_prev.json
 # keep ignoring logs, excel, caches and the timestamped outputs/
