@@ -119,6 +119,16 @@ def _age_days(as_of):
 
 
 # ----------------------------------------------------------------- features
+def _valuation(r):
+    """The app's existing valuation score (decisions.valuation_score) from PEG and
+    forward P/E, for rows that carry the inputs but not the score."""
+    try:
+        import decisions
+        return decisions.valuation_score({"PEG": _n(r.get("PEG")), "ForwardPE": _n(r.get("ForwardPE"))})
+    except Exception:
+        return None
+
+
 def features_from_row(r: dict, source: str = "daily") -> dict:
     """Normalise a daily-scan row (results.csv or universe.json) to features."""
     g = lambda k: _n(r.get(k))
@@ -144,7 +154,8 @@ def features_from_row(r: dict, source: str = "daily") -> dict:
         "sr_status": status,
         "quality": g("ScoreV2") if enriched else None, "fundamental": fund,
         "technical": g("Score"), "news": g("ScoreNews"),
-        "valuation": g("Valuation"), "sector_score": g("SectorScore"),
+        "valuation": g("Valuation") if g("Valuation") is not None else _valuation(r),
+        "sector_score": g("SectorScore"),
         "risk_level": r.get("RiskLevel"), "volatility": g("Volatility"), "max_dd": g("MaxDrawdown"),
         "beta": g("Beta"),
         "rev_growth": g("RevenueGrowth"), "eps_growth": g("EPSGrowth"), "op_margin": g("OperatingMargin"),
@@ -421,7 +432,7 @@ def decide(f: dict) -> dict:
     downside = _n(f.get("dist_sup"))
 
     a = ACTIONS[action]
-    return {
+    out = {
         "ticker": f.get("ticker"), "name": f.get("name"),
         "action": action, **{k: a[k] for k in ("emoji", "label", "short", "tone", "rank")},
         "why": why, "pros": pros[:3], "cons": (([r for _, r in flags]) + cons)[:3],
@@ -436,6 +447,36 @@ def decide(f: dict) -> dict:
                    "dist_res": _n(f.get("dist_res"))},
         "reliability": rel, "evidence": evidence_for(f, trend),
         "as_of": f.get("as_of"), "source": f.get("source"),
+    }
+    out["facets"] = facets(f, out)
+    return out
+
+
+def facets(f: dict, v: dict) -> dict:
+    """Three separate answers, never merged into one word (owner decision 01/11/2026):
+    is it a good company, is the price attractive, is now a moment to consider buying.
+    Pure presentation of existing inputs: quality = Score V2 tier, price = the
+    valuation score (PEG + forward P/E), with the analyst consensus as a second
+    opinion, buy-now = the verdict itself."""
+    q = {"strong": ("חברה חזקה", "positive"), "fair": ("חברה סבירה", "warning"),
+         "weak": ("חברה חלשה", "negative"), "poor": ("חברה חלשה מאוד", "negative")}.get(
+        v.get("quality_tier"), ("אין מספיק מידע", "muted"))
+    val, up = _n(f.get("valuation")), (v.get("levels") or {}).get("upside")
+    if val is not None:
+        p = ("מחיר אטרקטיבי", "positive") if val >= 65 else ("מחיר הוגן", "warning") if val >= 40             else ("מחיר גבוה", "negative")
+        basis = f"לפי המכפילים ביחס לצמיחה (ציון תמחור {int(val)})"
+    elif up is not None:
+        p = ("מחיר אטרקטיבי", "positive") if up >= 15 else ("מחיר הוגן", "warning") if up >= 0             else ("מחיר גבוה", "negative")
+        basis = "לפי יעד האנליסטים בלבד"
+    else:
+        p, basis = ("אין מספיק מידע", "muted"), "אין נתוני תמחור"
+    if up is not None and val is not None:
+        basis += f" · יעד האנליסטים {'+' if up >= 0 else '−'}{abs(up):.0f}% מהמחיר"
+    return {
+        "quality": {"label": q[0], "tone": q[1],
+                    "basis": f"ציון איכות {int(v['quality'])} מתוך 100" if v.get("quality") is not None else ""},
+        "price": {"label": p[0], "tone": p[1], "basis": basis},
+        "now": {"label": v["label"], "tone": v["tone"], "basis": "פסק הדין: איכות, מגמה וסיכון יחד"},
     }
 
 

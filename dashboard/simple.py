@@ -136,6 +136,22 @@ def pill(v, big=False):
             f"{v['emoji']} {v['label']}</span>")
 
 
+def facets_html(v, compact=False):
+    """Three separate answers: good company? attractive price? buy now?"""
+    fc = v.get("facets") or {}
+    rows = [("החברה", fc.get("quality")), ("המחיר", fc.get("price")), ("עכשיו", fc.get("now"))]
+    if compact:
+        return "<div class='s-note'>" + " · ".join(
+            f"{k}: <b style='color:{TONE.get((x or {}).get('tone'), MUTED)}'>{(x or {}).get('label', '—')}</b>"
+            for k, x in rows if x) + "</div>"
+    cells = "".join(
+        f"<div class='s-tile'><div class='l'>{k}</div>"
+        f"<div style='font-size:16px;font-weight:700;margin-top:2px;color:{TONE.get((x or {}).get('tone'), MUTED)}'>"
+        f"{(x or {}).get('label', '—')}</div><div class='x'>{(x or {}).get('basis', '')}</div></div>"
+        for k, x in rows if x)
+    return f"<div class='s-grid' style='grid-template-columns:repeat(3,1fr)'>{cells}</div>"
+
+
 def rel_chip(rel):
     col = POSITIVE if rel["label"] == "גבוהה" else WARNING if rel["label"] == "בינונית" else NEGATIVE
     why = " · ".join(rel.get("reasons", []))
@@ -173,6 +189,7 @@ def stock_card(v, row, key, show_holder=False):
           f"<div class='s-nm'>{company_search.display_name(v['ticker'], row.get('Name'))}</div></div>"
           f"<div style='text-align:left'>{pill(v)}</div></div>"
           f"<div class='s-why'>{gloss(v['why'])}</div>"
+          f"{facets_html(v, compact=True)}"
           f"{watch_out}<div class='s-note'>מחיר {_money(lv.get('price'))} {chg_html}{tgt}</div>{holder}")
     if st.button(f"לפרטים על {v['ticker']} ←", key=key, use_container_width=True):
         goto("check", v["ticker"])
@@ -307,6 +324,7 @@ def _analysis_block(t, rep, daily_v):
         f"<div style='color:{chg_col};font-size:14.5px'>{chg} היום</div></div></div>"
         f"<div style='margin-top:16px'>{pill(v, big=True)}</div>"
         f"<div class='s-why' style='font-size:17px;color:{TEXT}'>{gloss(v['why'])}</div>"
+        f"{facets_html(v)}"
         f"<div style='margin-top:10px'>{rel_chip(v['reliability'])}"
         f"<span class='s-chip'>ציון {term('איכות', 'ציון איכות')}: <b style='color:{score_color(v.get('quality'))}'>"
         f"{int(v['quality']) if v.get('quality') is not None else '—'}</b> מתוך 100</span></div></div>",

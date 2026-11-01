@@ -1486,7 +1486,15 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='color:{MUTED};font-size:12.5px'>המלצה</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{reco_c};line-height:1.2'>{reco_he}</div>"
                     f"<div style='color:{SECONDARY};font-size:13.5px;line-height:1.6;margin-top:6px'>{_V.get('why', '')}</div>"
-                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:6px'>אם יש לך את המניה: "
+                    + "".join(
+                        f"<div style='display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:13.5px'>"
+                        f"<span style='color:{MUTED}'>{_lbl}</span>"
+                        f"<b style='color:{ {'positive': POSITIVE, 'warning': WARNING, 'negative': NEGATIVE}.get((_fx or {}).get('tone'), MUTED) }'>"
+                        f"{(_fx or {}).get('label', '—')}</b></div>"
+                        for _lbl, _fx in (("החברה", (_V.get("facets") or {}).get("quality")),
+                                          ("המחיר", (_V.get("facets") or {}).get("price")),
+                                          ("עכשיו", (_V.get("facets") or {}).get("now"))))
+                    + f"<div style='color:{MUTED};font-size:12.5px;margin-top:6px'>אם יש לך את המניה: "
                     f"<b style='color:{TEXT}'>{_V.get('holder_emoji', '')} {_V.get('holder_label', '')}</b></div>"
                     f"<div style='margin-top:10px;color:{MUTED};font-size:12.5px'>אמינות הנתונים</div>"
                     f"<div class='sbar-t' style='margin-top:4px'><div class='sbar-f' style='width:{conf if isinstance(conf,(int,float)) else 0}%;background:{score_color(conf)}'></div></div>"

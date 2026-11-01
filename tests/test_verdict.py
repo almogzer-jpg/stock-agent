@@ -111,3 +111,19 @@ def test_evidence_only_with_large_sample():
     ev = V.evidence_for(V.features_from_row(_row()))
     if ev:                                    # research results committed with the repo
         assert ev["n"] >= 300 and ev["p10_return"] < 0
+
+
+def test_quality_price_and_buy_now_are_separate_answers():
+    # a cheap stock is not automatically a buy: weak company in a downtrend
+    cheap_weak = V.verdict_for_row(_row(ScoreV2=50, Price=80.0, PEG=0.8, ForwardPE=12))
+    f = cheap_weak["facets"]
+    assert f["price"]["label"] == "מחיר אטרקטיבי"
+    assert f["quality"]["label"] == "חברה חלשה" and f["now"]["label"] == "לא עכשיו"
+    # a strong company can be a consider-buy even when expensive, and says so
+    pricey = V.verdict_for_row(_row(ScoreV2=75, PEG=2.8, ForwardPE=36))
+    assert pricey["facets"]["quality"]["label"] == "חברה חזקה"
+    assert pricey["facets"]["price"]["label"] == "מחיר גבוה"
+    assert pricey["action"] == "buy" and any("יקרה" in c for c in pricey["cons"])
+    # no valuation inputs and no analyst target: say so, never guess
+    unknown = V.verdict_for_row(_row())
+    assert unknown["facets"]["price"]["label"] == "אין מספיק מידע"
