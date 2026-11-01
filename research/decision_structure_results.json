@@ -1,0 +1,1898 @@
+{
+ "as_of": {
+  "rows": "29/10/2026",
+  "fundamentals_targets": "01/11/2026"
+ },
+ "n": 57,
+ "rank_vs_live": {
+  "v2_tech10": {
+   "spearman": 0.967,
+   "top10_overlap": 9
+  },
+  "v2_tech0": {
+   "spearman": 0.859,
+   "top10_overlap": 9
+  },
+  "business": {
+   "spearman": 0.034,
+   "top10_overlap": 4
+  }
+ },
+ "v2_rank_drivers": {
+  "fundamental": -0.046,
+  "technical": 0.581,
+  "sector": 0.554,
+  "risk": -0.449
+ },
+ "quality_tiers": {
+  "v2_live": {
+   "strong": 40,
+   "fair": 12,
+   "weak": 5
+  },
+  "v2_tech10": {
+   "strong": 32,
+   "fair": 21,
+   "weak": 4
+  },
+  "v2_tech0": {
+   "fair": 26,
+   "strong": 29,
+   "weak": 2
+  },
+  "business": {
+   "strong": 33,
+   "fair": 14,
+   "weak": 8,
+   "poor": 2
+  }
+ },
+ "actions": {
+  "live": {
+   "buy": 40,
+   "wait": 10,
+   "avoid": 7
+  },
+  "v2_tech10": {
+   "buy": 32,
+   "wait": 18,
+   "avoid": 7
+  },
+  "v2_tech0": {
+   "wait": 21,
+   "buy": 29,
+   "avoid": 7
+  },
+  "business_only_q": {
+   "buy": 27,
+   "wait": 27,
+   "avoid": 3
+  },
+  "proposed": {
+   "buy": 19,
+   "wait": 35,
+   "avoid": 3
+  },
+  "proposed_b": {
+   "buy": 25,
+   "wait": 29,
+   "avoid": 3
+  }
+ },
+ "changes_vs_live": {
+  "v2_tech10": [
+   "AME: buy→wait",
+   "APD: buy→wait",
+   "AWK: buy→wait",
+   "CSX: buy→wait",
+   "EQIX: buy→wait",
+   "MSFT: buy→wait",
+   "MSI: buy→wait",
+   "VTRS: buy→wait"
+  ],
+  "v2_tech0": [
+   "AME: buy→wait",
+   "APD: buy→wait",
+   "AWK: buy→wait",
+   "CSX: buy→wait",
+   "EBAY: buy→wait",
+   "ECL: buy→wait",
+   "EQIX: buy→wait",
+   "EXPD: buy→wait",
+   "IEX: buy→wait",
+   "MSFT: buy→wait",
+   "MSI: buy→wait",
+   "NVDA: wait→buy",
+   "VTRS: buy→wait"
+  ],
+  "business_only_q": [
+   "AAPL: wait→buy",
+   "ADBE: avoid→wait",
+   "AMCR: buy→wait",
+   "AMD: avoid→wait",
+   "AMZN: buy→wait",
+   "APD: buy→wait",
+   "AVGO: avoid→wait",
+   "AVY: buy→wait",
+   "AWK: buy→wait",
+   "BDX: buy→wait",
+   "CINF: buy→wait",
+   "CRM: wait→buy",
+   "EBAY: buy→wait",
+   "ECL: buy→wait",
+   "EG: buy→wait",
+   "EQIX: buy→wait",
+   "EVRG: buy→wait",
+   "GEN: wait→buy",
+   "GILD: buy→wait",
+   "GOOGL: avoid→wait",
+   "IFF: wait→avoid",
+   "JPM: buy→wait",
+   "KDP: buy→wait",
+   "META: avoid→wait",
+   "NFLX: avoid→wait",
+   "NVDA: wait→buy",
+   "PNW: wait→avoid",
+   "RTX: wait→buy",
+   "UNH: buy→wait",
+   "VTRS: buy→wait",
+   "WEC: buy→wait"
+  ],
+  "proposed": [
+   "ADBE: avoid→wait",
+   "AMCR: buy→wait",
+   "AMD: avoid→wait",
+   "AMGN: buy→wait",
+   "AMZN: buy→wait",
+   "APD: buy→wait",
+   "AVGO: avoid→wait",
+   "AVY: buy→wait",
+   "AWK: buy→wait",
+   "BDX: buy→wait",
+   "CHD: buy→wait",
+   "CINF: buy→wait",
+   "COST: buy→wait",
+   "CRM: wait→buy",
+   "EBAY: buy→wait",
+   "ECL: buy→wait",
+   "EG: buy→wait",
+   "EQIX: buy→wait",
+   "EVRG: buy→wait",
+   "EXPD: buy→wait",
+   "GEN: wait→buy",
+   "GILD: buy→wait",
+   "GOOGL: avoid→wait",
+   "IFF: wait→avoid",
+   "JPM: buy→wait",
+   "KDP: buy→wait",
+   "LLY: buy→wait",
+   "META: avoid→wait",
+   "MO: buy→wait",
+   "NFLX: avoid→wait",
+   "NVDA: wait→buy",
+   "PNW: wait→avoid",
+   "REGN: buy→wait",
+   "RTX: wait→buy",
+   "UNH: buy→wait",
+   "VTRS: buy→wait",
+   "WEC: buy→wait"
+  ],
+  "proposed_b": [
+   "ADBE: avoid→wait",
+   "AMD: avoid→wait",
+   "AMGN: buy→wait",
+   "AMZN: buy→wait",
+   "APD: buy→wait",
+   "AVGO: avoid→wait",
+   "AWK: buy→wait",
+   "BDX: buy→wait",
+   "CHD: buy→wait",
+   "CINF: buy→wait",
+   "COST: buy→wait",
+   "CRM: wait→buy",
+   "ECL: buy→wait",
+   "EG: buy→wait",
+   "EQIX: buy→wait",
+   "EVRG: buy→wait",
+   "EXPD: buy→wait",
+   "FDX: wait→buy",
+   "GEN: wait→buy",
+   "GILD: buy→wait",
+   "GOOGL: avoid→wait",
+   "IFF: wait→avoid",
+   "KDP: buy→wait",
+   "LLY: buy→wait",
+   "MAS: wait→buy",
+   "META: avoid→wait",
+   "MO: buy→wait",
+   "NFLX: avoid→wait",
+   "NVDA: wait→buy",
+   "PNW: wait→avoid",
+   "REGN: buy→wait",
+   "RTX: wait→buy",
+   "UNH: buy→wait",
+   "VTRS: buy→wait",
+   "WEC: buy→wait"
+  ]
+ },
+ "proposed_reasons": {
+  "strong_good_price": 19,
+  "strong_full_price": 8,
+  "not_strong_enough": 21,
+  "weak_business": 2,
+  "strong_very_high_risk": 1,
+  "downtrend_not_strong": 1,
+  "strong_downtrend": 5
+ },
+ "price_labels": {
+  "attractive": 30,
+  "full": 12,
+  "fair": 12,
+  "expensive": 3
+ },
+ "live_buys_above_target": [
+  "AMGN",
+  "AWK",
+  "BDX",
+  "CHD",
+  "EXPD",
+  "LLY",
+  "MO",
+  "REGN"
+ ],
+ "detail": {
+  "IEX": {
+   "v2": 74,
+   "business_q": 77.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 71,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 10.9
+   },
+   "price_now": 233.84,
+   "target": 259.2857,
+   "analysts": 14,
+   "timing": {
+    "trend": "up",
+    "technical": 100.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "LLY": {
+   "v2": 89,
+   "business_q": 89.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 56,
+    "label": "full",
+    "valuation": 65.0,
+    "upside": -1.0
+   },
+   "price_now": 1417.54,
+   "target": 1403.6427,
+   "analysts": 29,
+   "timing": {
+    "trend": "up",
+    "technical": 100.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "MO": {
+   "v2": 85,
+   "business_q": 80.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 44,
+    "label": "full",
+    "valuation": 55.0,
+    "upside": -7.0
+   },
+   "price_now": 78.03,
+   "target": 72.54545,
+   "analysts": 11,
+   "timing": {
+    "trend": "up",
+    "technical": 100.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "AJG": {
+   "v2": 77,
+   "business_q": 68.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 72,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 5.6
+   },
+   "price_now": 276.07,
+   "target": 291.44443,
+   "analysts": 18,
+   "timing": {
+    "trend": "up",
+    "technical": 99.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "EBAY": {
+   "v2": 74,
+   "business_q": 55.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 70,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 3.7
+   },
+   "price_now": 121.64,
+   "target": 126.11111,
+   "analysts": 27,
+   "timing": {
+    "trend": "up",
+    "technical": 99.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "buy"
+  },
+  "NDAQ": {
+   "v2": 86,
+   "business_q": 83.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 68,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 8.5
+   },
+   "price_now": 106.23,
+   "target": 115.25,
+   "analysts": 16,
+   "timing": {
+    "trend": "up",
+    "technical": 99.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "EG": {
+   "v2": 78,
+   "business_q": 52.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 75,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 1.9
+   },
+   "price_now": 410.97,
+   "target": 418.625,
+   "analysts": 16,
+   "timing": {
+    "trend": "up",
+    "technical": 98.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "MSI": {
+   "v2": 68,
+   "business_q": 75.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 54,
+    "label": "fair",
+    "valuation": 40.0,
+    "upside": 7.2
+   },
+   "price_now": 491.53,
+   "target": 526.9091,
+   "analysts": 11,
+   "timing": {
+    "trend": "up",
+    "technical": 98.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "AME": {
+   "v2": 68,
+   "business_q": 76.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 66,
+    "label": "attractive",
+    "valuation": 40.0,
+    "upside": 17.0
+   },
+   "price_now": 241.12,
+   "target": 282.05557,
+   "analysts": 18,
+   "timing": {
+    "trend": "up",
+    "technical": 97.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "EXPD": {
+   "v2": 74,
+   "business_q": 91.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 34,
+    "label": "expensive",
+    "valuation": 40.0,
+    "upside": -8.7
+   },
+   "price_now": 198.85,
+   "target": 181.46667,
+   "analysts": 15,
+   "timing": {
+    "trend": "up",
+    "technical": 97.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "MA": {
+   "v2": 84,
+   "business_q": 79.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 69,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 9.3
+   },
+   "price_now": 638.01,
+   "target": 697.2814,
+   "analysts": 37,
+   "timing": {
+    "trend": "up",
+    "technical": 97.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "BDX": {
+   "v2": 75,
+   "business_q": 48.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 64,
+    "label": "full",
+    "valuation": 80.0,
+    "upside": -1.2
+   },
+   "price_now": 197.88,
+   "target": 195.57143,
+   "analysts": 14,
+   "timing": {
+    "trend": "up",
+    "technical": 96.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "ECL": {
+   "v2": 73,
+   "business_q": 55.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 46,
+    "label": "full",
+    "valuation": 20.0,
+    "upside": 9.1
+   },
+   "price_now": 302.98,
+   "target": 330.57144,
+   "analysts": 21,
+   "timing": {
+    "trend": "up",
+    "technical": 96.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "GILD": {
+   "v2": 77,
+   "business_q": 53.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 53,
+    "label": "fair",
+    "valuation": 55.0,
+    "upside": 0.1
+   },
+   "price_now": 170.68,
+   "target": 170.88461,
+   "analysts": 26,
+   "timing": {
+    "trend": "up",
+    "technical": 96.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "APD": {
+   "v2": 70,
+   "business_q": 48.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 55,
+    "label": "fair",
+    "valuation": 40.0,
+    "upside": 8.3
+   },
+   "price_now": 316.43,
+   "target": 342.55,
+   "analysts": 20,
+   "timing": {
+    "trend": "up",
+    "technical": 95.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "AVY": {
+   "v2": 76,
+   "business_q": 62.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 79,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 11.2
+   },
+   "price_now": 182.22,
+   "target": 202.7,
+   "analysts": 10,
+   "timing": {
+    "trend": "up",
+    "technical": 94.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "buy"
+  },
+  "ICE": {
+   "v2": 84,
+   "business_q": 78.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 74,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 13.2
+   },
+   "price_now": 168.85,
+   "target": 191.06667,
+   "analysts": 15,
+   "timing": {
+    "trend": "up",
+    "technical": 94.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "IFF": {
+   "v2": 65,
+   "business_q": 38.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "poor",
+   "price": {
+    "score": 51,
+    "label": "fair",
+    "valuation": 40.0,
+    "upside": 4.8
+   },
+   "price_now": 93.02,
+   "target": 97.47059,
+   "analysts": 17,
+   "timing": {
+    "trend": "up",
+    "technical": 94.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "avoid",
+   "proposed_reason": "weak_business",
+   "proposed_b": "avoid"
+  },
+  "EQIX": {
+   "v2": 69,
+   "business_q": 65.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 60,
+    "label": "fair",
+    "valuation": 20.0,
+    "upside": 21.7
+   },
+   "price_now": 1013.7,
+   "target": 1234.0938,
+   "analysts": 32,
+   "timing": {
+    "trend": "up",
+    "technical": 93.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "EW": {
+   "v2": 82,
+   "business_q": 70.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 71,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 10.7
+   },
+   "price_now": 92.01,
+   "target": 101.86704,
+   "analysts": 27,
+   "timing": {
+    "trend": "up",
+    "technical": 93.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "WTW": {
+   "v2": 80,
+   "business_q": 84.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 82,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 14.0
+   },
+   "price_now": 324.42,
+   "target": 369.6842,
+   "analysts": 19,
+   "timing": {
+    "trend": "up",
+    "technical": 92.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "AMCR": {
+   "v2": 74,
+   "business_q": 63.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 72,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 5.7
+   },
+   "price_now": 47.39,
+   "target": 50.07182,
+   "analysts": 11,
+   "timing": {
+    "trend": "up",
+    "technical": 91.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "buy"
+  },
+  "EVRG": {
+   "v2": 74,
+   "business_q": 61.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 52,
+    "label": "fair",
+    "valuation": 40.0,
+    "upside": 5.5
+   },
+   "price_now": 85.93,
+   "target": 90.64286,
+   "analysts": 14,
+   "timing": {
+    "trend": "up",
+    "technical": 91.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "FDX": {
+   "v2": 66,
+   "business_q": 59.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 82,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 13.9
+   },
+   "price_now": 313.28,
+   "target": 356.84616,
+   "analysts": 26,
+   "timing": {
+    "trend": "up",
+    "technical": 91.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "buy"
+  },
+  "AWK": {
+   "v2": 70,
+   "business_q": 57.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 42,
+    "label": "full",
+    "valuation": 40.0,
+    "upside": -2.3
+   },
+   "price_now": 144.37,
+   "target": 141.09091,
+   "analysts": 11,
+   "timing": {
+    "trend": "up",
+    "technical": 90.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "MAS": {
+   "v2": 66,
+   "business_q": 67.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 68,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 2.3
+   },
+   "price_now": 80.64,
+   "target": 82.52632,
+   "analysts": 19,
+   "timing": {
+    "trend": "up",
+    "technical": 89.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "buy"
+  },
+  "V": {
+   "v2": 86,
+   "business_q": 88.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 66,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 6.7
+   },
+   "price_now": 413.59,
+   "target": 441.14542,
+   "analysts": 37,
+   "timing": {
+    "trend": "up",
+    "technical": 89.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "VTRS": {
+   "v2": 70,
+   "business_q": 47.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 59,
+    "label": "fair",
+    "valuation": 55.0,
+    "upside": 5.1
+   },
+   "price_now": 19.035,
+   "target": 20.0,
+   "analysts": 10,
+   "timing": {
+    "trend": "up",
+    "technical": 89.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "WEC": {
+   "v2": 75,
+   "business_q": 65.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 47,
+    "label": "full",
+    "valuation": 40.0,
+    "upside": 1.6
+   },
+   "price_now": 116.07,
+   "target": 117.88235,
+   "analysts": 17,
+   "timing": {
+    "trend": "up",
+    "technical": 89.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "CHD": {
+   "v2": 78,
+   "business_q": 78.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 42,
+    "label": "full",
+    "valuation": 40.0,
+    "upside": -2.2
+   },
+   "price_now": 107.23,
+   "target": 104.89474,
+   "analysts": 19,
+   "timing": {
+    "trend": "up",
+    "technical": 88.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "CSX": {
+   "v2": 68,
+   "business_q": 70.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 62,
+    "label": "fair",
+    "valuation": 65.0,
+    "upside": 3.5
+   },
+   "price_now": 51.99,
+   "target": 53.80739,
+   "analysts": 23,
+   "timing": {
+    "trend": "up",
+    "technical": 88.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "RTX": {
+   "v2": 67,
+   "business_q": 79.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 63,
+    "label": "fair",
+    "valuation": 40.0,
+    "upside": 14.7
+   },
+   "price_now": 199.8,
+   "target": 229.1739,
+   "analysts": 23,
+   "timing": {
+    "trend": "up",
+    "technical": 88.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "CINF": {
+   "v2": 73,
+   "business_q": 59.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 49,
+    "label": "full",
+    "valuation": 40.0,
+    "upside": 3.0
+   },
+   "price_now": 181.19,
+   "target": 186.66667,
+   "analysts": 6,
+   "timing": {
+    "trend": "up",
+    "technical": 87.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "KDP": {
+   "v2": 75,
+   "business_q": 52.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 67,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 1.5
+   },
+   "price_now": 35.84,
+   "target": 36.38235,
+   "analysts": 17,
+   "timing": {
+    "trend": "up",
+    "technical": 87.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "CB": {
+   "v2": 76,
+   "business_q": 68.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 56,
+    "label": "fair",
+    "valuation": 55.0,
+    "upside": 2.5
+   },
+   "price_now": 364.12,
+   "target": 373.21738,
+   "analysts": 23,
+   "timing": {
+    "trend": "up",
+    "technical": 86.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "GEN": {
+   "v2": 67,
+   "business_q": 74.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 77,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 9.8
+   },
+   "price_now": 29.13,
+   "target": 31.975,
+   "analysts": 10,
+   "timing": {
+    "trend": "up",
+    "technical": 86.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "NUE": {
+   "v2": 78,
+   "business_q": 76.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 62,
+    "label": "fair",
+    "valuation": 55.0,
+    "upside": 7.2
+   },
+   "price_now": 273.87,
+   "target": 293.5625,
+   "analysts": 16,
+   "timing": {
+    "trend": "up",
+    "technical": 86.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "PNW": {
+   "v2": 66,
+   "business_q": 43.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "poor",
+   "price": {
+    "score": 44,
+    "label": "full",
+    "valuation": 40.0,
+    "upside": -1.2
+   },
+   "price_now": 106.28,
+   "target": 104.96667,
+   "analysts": 15,
+   "timing": {
+    "trend": "up",
+    "technical": 86.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "avoid",
+   "proposed_reason": "weak_business",
+   "proposed_b": "avoid"
+  },
+  "REGN": {
+   "v2": 80,
+   "business_q": 85.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 64,
+    "label": "full",
+    "valuation": 80.0,
+    "upside": -0.4
+   },
+   "price_now": 927.89,
+   "target": 924.0,
+   "analysts": 27,
+   "timing": {
+    "trend": "up",
+    "technical": 86.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "AMGN": {
+   "v2": 77,
+   "business_q": 69.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 27,
+    "label": "expensive",
+    "valuation": 40.0,
+    "upside": -14.7
+   },
+   "price_now": 466.01,
+   "target": 397.3231,
+   "analysts": 29,
+   "timing": {
+    "trend": "up",
+    "technical": 85.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "AAPL": {
+   "v2": 65,
+   "business_q": 82.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 30,
+    "label": "expensive",
+    "valuation": 20.0,
+    "upside": -3.6
+   },
+   "price_now": 344.63,
+   "target": 332.3858,
+   "analysts": 38,
+   "timing": {
+    "trend": "up",
+    "technical": 84.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": true
+   },
+   "live": "wait",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "MSFT": {
+   "v2": 69,
+   "business_q": 85.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 82,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 20.9
+   },
+   "price_now": 521.91,
+   "target": 631.09235,
+   "analysts": 51,
+   "timing": {
+    "trend": "up",
+    "technical": 83.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "PG": {
+   "v2": 77,
+   "business_q": 75.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 54,
+    "label": "fair",
+    "valuation": 40.0,
+    "upside": 7.5
+   },
+   "price_now": 161.57,
+   "target": 173.65218,
+   "analysts": 23,
+   "timing": {
+    "trend": "up",
+    "technical": 78.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "JPM": {
+   "v2": 74,
+   "business_q": 61.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 78,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 10.7
+   },
+   "price_now": 337.04,
+   "target": 373.26086,
+   "analysts": 23,
+   "timing": {
+    "trend": "up",
+    "technical": 75.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "buy"
+  },
+  "UNH": {
+   "v2": 71,
+   "business_q": 53.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 86,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 17.1
+   },
+   "price_now": 406.97,
+   "target": 476.64,
+   "analysts": 25,
+   "timing": {
+    "trend": "up",
+    "technical": 75.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "COST": {
+   "v2": 73,
+   "business_q": 83.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 42,
+    "label": "full",
+    "valuation": 20.0,
+    "upside": 5.5
+   },
+   "price_now": 1012.28,
+   "target": 1067.5946,
+   "analysts": 37,
+   "timing": {
+    "trend": "up",
+    "technical": 63.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "strong_full_price",
+   "proposed_b": "wait"
+  },
+  "TSLA": {
+   "v2": 47,
+   "business_q": 45.0,
+   "q_tier_live": "weak",
+   "q_tier_business": "weak",
+   "price": {
+    "score": 39,
+    "label": "full",
+    "valuation": 20.0,
+    "upside": 3.0
+   },
+   "price_now": 399.81,
+   "target": 411.8155,
+   "analysts": 40,
+   "timing": {
+    "trend": "up",
+    "technical": 54.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "גבוה",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "AMZN": {
+   "v2": 68,
+   "business_q": 61.0,
+   "q_tier_live": "strong",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 82,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 36.3
+   },
+   "price_now": 240.35,
+   "target": 327.6969,
+   "analysts": 58,
+   "timing": {
+    "trend": "mixed",
+    "technical": 53.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "buy",
+   "proposed": "wait",
+   "proposed_reason": "not_strong_enough",
+   "proposed_b": "wait"
+  },
+  "AMD": {
+   "v2": 55,
+   "business_q": 81.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 80,
+    "label": "attractive",
+    "valuation": 60.0,
+    "upside": 26.8
+   },
+   "price_now": 504.8,
+   "target": 640.208,
+   "analysts": 50,
+   "timing": {
+    "trend": "up",
+    "technical": 52.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "גבוה מאוד",
+    "very_high": true,
+    "earnings_soon": true
+   },
+   "live": "avoid",
+   "proposed": "wait",
+   "proposed_reason": "strong_very_high_risk",
+   "proposed_b": "wait"
+  },
+  "HD": {
+   "v2": 62,
+   "business_q": 61.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "fair",
+   "price": {
+    "score": 76,
+    "label": "attractive",
+    "valuation": 65.0,
+    "upside": 15.1
+   },
+   "price_now": 329.2,
+   "target": 379.0,
+   "analysts": 32,
+   "timing": {
+    "trend": "down",
+    "technical": 49.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "נמוך",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "avoid",
+   "proposed": "avoid",
+   "proposed_reason": "downtrend_not_strong",
+   "proposed_b": "avoid"
+  },
+  "CRM": {
+   "v2": 57,
+   "business_q": 80.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 98,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 25.3
+   },
+   "price_now": 229.17,
+   "target": 287.0836,
+   "analysts": 53,
+   "timing": {
+    "trend": "mixed",
+    "technical": 38.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "NVDA": {
+   "v2": 60,
+   "business_q": 95.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 98,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 60.7
+   },
+   "price_now": 204.64,
+   "target": 328.95346,
+   "analysts": 58,
+   "timing": {
+    "trend": "mixed",
+    "technical": 36.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "wait",
+   "proposed": "buy",
+   "proposed_reason": "strong_good_price",
+   "proposed_b": "buy"
+  },
+  "ADBE": {
+   "v2": 58,
+   "business_q": 84.0,
+   "q_tier_live": "fair",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 84,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 8.8
+   },
+   "price_now": 250.23,
+   "target": 272.31375,
+   "analysts": 32,
+   "timing": {
+    "trend": "down",
+    "technical": 33.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "avoid",
+   "proposed": "wait",
+   "proposed_reason": "strong_downtrend",
+   "proposed_b": "wait"
+  },
+  "META": {
+   "v2": 50,
+   "business_q": 85.0,
+   "q_tier_live": "weak",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 98,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 37.9
+   },
+   "price_now": 614.99,
+   "target": 848.3765,
+   "analysts": 58,
+   "timing": {
+    "trend": "down",
+    "technical": 24.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "גבוה",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "avoid",
+   "proposed": "wait",
+   "proposed_reason": "strong_downtrend",
+   "proposed_b": "wait"
+  },
+  "GOOGL": {
+   "v2": 45,
+   "business_q": 74.0,
+   "q_tier_live": "weak",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 90,
+    "label": "attractive",
+    "valuation": 80.0,
+    "upside": 45.3
+   },
+   "price_now": 279.84,
+   "target": 406.54807,
+   "analysts": 52,
+   "timing": {
+    "trend": "down",
+    "technical": 20.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "avoid",
+   "proposed": "wait",
+   "proposed_reason": "strong_downtrend",
+   "proposed_b": "wait"
+  },
+  "AVGO": {
+   "v2": 52,
+   "business_q": 92.0,
+   "q_tier_live": "weak",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 98,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 62.6
+   },
+   "price_now": 326.08,
+   "target": 530.14166,
+   "analysts": 48,
+   "timing": {
+    "trend": "down",
+    "technical": 10.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "גבוה",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "avoid",
+   "proposed": "wait",
+   "proposed_reason": "strong_downtrend",
+   "proposed_b": "wait"
+  },
+  "NFLX": {
+   "v2": 46,
+   "business_q": 88.0,
+   "q_tier_live": "weak",
+   "q_tier_business": "strong",
+   "price": {
+    "score": 98,
+    "label": "attractive",
+    "valuation": 95.0,
+    "upside": 36.5
+   },
+   "price_now": 62.08,
+   "target": 84.76326,
+   "analysts": 43,
+   "timing": {
+    "trend": "down",
+    "technical": 1.0,
+    "stretched": false
+   },
+   "risk": {
+    "level": "בינוני",
+    "very_high": false,
+    "earnings_soon": false
+   },
+   "live": "avoid",
+   "proposed": "wait",
+   "proposed_reason": "strong_downtrend",
+   "proposed_b": "wait"
+  }
+ }
+}
