@@ -220,7 +220,7 @@ def build_report_email(df: pd.DataFrame, closes_map: dict):
     positive, watch, avoid = (grp[grp["_g"] == g] for g in ("positive", "watch", "avoid"))
     n_break = int(df["Breakout"].sum())
     subject = (f"📈 דוח מניות {today} — "
-               f"{len(positive)} בהערכה "לשקול קנייה")
+               f"{len(positive)} בהערכה ״לשקול קנייה״")
 
     # Plain-text fallback.
     lines = [f"סוכן מניות — דוח יומי {today}", ""]
