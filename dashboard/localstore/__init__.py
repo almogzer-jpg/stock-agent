@@ -23,7 +23,9 @@ def sync(key: str, default=None):
     browser has answered). Must be called once per run before reading."""
     cache = st.session_state.setdefault(_SS, {})
     pending = st.session_state.get(f"_ls_write_{key}")
-    res = _component(key=f"ls_{key}", default=None,
+    # `name` is the storage slot. `key` only identifies the widget to Streamlit and is
+    # NOT sent to the browser, so without `name` every key shared one slot.
+    res = _component(name=key, key=f"ls_{key}", default=None,
                      **({"write": pending} if pending is not None else {}))
     if pending is not None:
         st.session_state.pop(f"_ls_write_{key}", None)

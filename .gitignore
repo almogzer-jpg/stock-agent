@@ -44,3 +44,6 @@ portfolio.csv
 data/portfolio.json
 # Local test coverage database
 .coverage
+
+# Streamlit secrets (deployment settings) stay out of the repository
+.streamlit/secrets.toml
