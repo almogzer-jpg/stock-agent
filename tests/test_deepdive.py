@@ -200,3 +200,30 @@ def test_engine_v2_checklist_extended():
     assert any("אחזקות מוסדיות" in n for n in names)
     ch = {c[0]: c[2] for c in d["checklist"]}
     assert ch["אחזקות מוסדיות"] == "good"                        # 72% ≥ 60
+
+
+def test_risk_reward_two_separate_measures():
+    d = dd.investment_decision(_rep())
+    tgt, tech = d["rr_measures"]
+    assert tgt["kind"] == "target" and tgt["value"] == round(18.0 / 2.5, 2) == d["rr"]
+    assert tech["kind"] == "technical" and tech["value"] == 4.8
+    assert tgt["formula"] and tech["formula"] and tgt["formula"] != tech["formula"]
+    assert dict(tgt["inputs"])["יעד אנליסטים (ממוצע)"] == "$118.00"
+    assert dict(tech["inputs"])["התנגדות"] == "$112.00"
+
+
+def test_risk_reward_no_silent_fallback():
+    # Analyst target below the price: the target ratio is "—" with the reason,
+    # and the technical ratio is NOT shown in its place.
+    below = _rep(scenarios=[{"key": "base", "target": {"price": "$95", "price_num": 95.0, "upside": -5.0}}])
+    d = dd.investment_decision(below)
+    tgt, tech = d["rr_measures"]
+    assert d["rr"] is None and tgt["value"] is None and "אינו מעל המחיר" in tgt["note"]
+    assert tech["value"] == 4.8 and tech["note"] is None
+    # Breakout (no resistance above the price): the technical ratio is "—" with the reason.
+    brk = _rep(technicals={"trend": "מגמת עלייה", "sub_scores": {},
+                           "sr_levels": {"price": 100.0, "support": 97.5, "resistance": None,
+                                         "dist_support_pct": -2.5, "dist_resistance_pct": None,
+                                         "risk_reward": None, "status": "breakout"}})
+    tgt, tech = dd.investment_decision(brk)["rr_measures"]
+    assert tgt["value"] == 7.2 and tech["value"] is None and "התנגדות" in tech["note"]

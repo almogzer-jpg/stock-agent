@@ -454,7 +454,9 @@ def _analysis(mkt, lookup, nc):
         conf = ((dec.get("verdict") or {}).get("reliability") or {}).get("score")
         _vd = dec.get("verdict") or {}
         _vc = _TONE_COL.get(_vd.get("tone"), MUTED)
-        rr_c = {"מצוין": POSITIVE, "טוב": POSITIVE, "סביר": WARNING, "חלש": NEGATIVE}.get(dec.get("rr_interpretation"), MUTED)
+        _rrc = {"מצוין": POSITIVE, "טוב": POSITIVE, "אטרקטיבי": POSITIVE, "סביר": WARNING,
+                "מאוזן": WARNING, "חלש": NEGATIVE, "לא אטרקטיבי": NEGATIVE}
+        _rrm = dec.get("rr_measures") or []
         st.markdown(
             f"<div class='mcard' style='border-right:4px solid {PRIMARY}'>"
             f"<div style='font-size:20px;font-weight:700;margin-bottom:8px'>החלטת השקעה</div>"
@@ -466,13 +468,17 @@ def _analysis(mkt, lookup, nc):
             f"{int(conf) if isinstance(conf, (int, float)) else '—'}/100</b> · אופק <b>{dec['horizon']}</b></div>"
             + _grid([
                 _mkpi("🎯", dec.get("target", "—"), "מחיר יעד", "קונצנזוס אנליסטים", PRIMARY),
-                _mkpi("⚖️", dec.get("rr") if dec.get("rr") is not None else "—", dec.get("rr_label") or "יחס סיכוי לסיכון",
-                      dec.get("rr_interpretation") or "", rr_c),
+                *[_mkpi("⚖️", m["value"] if m.get("value") is not None else "—", m["label"],
+                        m.get("interpretation") or "", _rrc.get(m.get("interpretation"), MUTED))
+                  for m in _rrm],
                 _mkpi("🟢", f"${_fmt(dec.get('support'))}" if dec.get("support") else "—", "תמיכה",
                       _fmt(dec.get("downside"), "%"), POSITIVE),
                 _mkpi("🔴", f"${_fmt(dec.get('resistance'))}" if dec.get("resistance") else "—", "התנגדות",
                       "", NEGATIVE),
-            ]) + "</div>", unsafe_allow_html=True)
+            ])
+            + "".join(f"<div class='mco'>{m['label']}: {m['formula']}"
+                      + (f" · {m['note']}" if m.get("note") else "") + "</div>" for m in _rrm)
+            + "</div>", unsafe_allow_html=True)
 
     # --- Collapsed sections (lazy content, charts behind a toggle) ---
     with st.expander("ביצועים"):

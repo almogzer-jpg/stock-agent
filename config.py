@@ -154,7 +154,7 @@ COLUMN_LABELS_HE = {
     "Resistance": "התנגדות",
     "DistSupport%": "מרחק מתמיכה %",
     "DistResistance%": "מרחק מהתנגדות %",
-    "RiskReward": "סיכון/סיכוי",
+    "RiskReward": "סיכוי־סיכון טכני",
     "Breakout": "פריצה",
     "Score": "ציון",
     # Fundamentals

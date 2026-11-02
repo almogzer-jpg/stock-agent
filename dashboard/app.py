@@ -1155,7 +1155,7 @@ elif page == "💎 הזדמנויות":
                         "תמחור": _val_badge(r.get("Valuation")), "סיכון": f"{rb[0]} {rb[1]}",
                         "תמיכה": _sr_cell(r.get("Support"), r.get("DistSupport%")),
                         "התנגדות": _sr_cell(r.get("Resistance"), r.get("DistResistance%")),
-                        "סיכון/סיכוי": r.get("RiskReward") if _num(r.get("RiskReward")) is not None else float("nan"),
+                        "סיכוי־סיכון טכני": r.get("RiskReward") if _num(r.get("RiskReward")) is not None else float("nan"),
                         "סוג הזדמנות": _type_badge(r.get("tags")),
                     })
                 gdf = pd.DataFrame(rows)
@@ -1168,7 +1168,8 @@ elif page == "💎 הזדמנויות":
                         column_config={
                             "Score V2": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
                             "מומנטום 3ח׳": st.column_config.NumberColumn(format="%+.1f%%"),
-                            "סיכון/סיכוי": st.column_config.NumberColumn(format="%.2f")})
+                            "סיכוי־סיכון טכני": st.column_config.NumberColumn(
+                                format="%.2f", help="(התנגדות − מחיר) ÷ (מחיר − תמיכה)")})
                     cc = st.columns([3, 1])
                     cc[0].caption("מיון: לחיצה על כותרת עמודה · לחיצה על שורה → ניתוח מניה אוטומטי.")
                     cc[1].download_button("📥 ייצוא CSV", gdf.to_csv(index=False).encode("utf-8-sig"),
@@ -1490,7 +1491,19 @@ elif page == "🔎 ניתוח חברה":
                 ent = dec["entry"]
                 ent_c = {"excellent": SECONDARY, "good": SECONDARY, "wait": SECONDARY,
                          "extended": WARNING, "avoid": NEGATIVE}.get(ent["band"], MUTED)
-                rr_c = {"מצוין": POSITIVE, "טוב": POSITIVE, "סביר": WARNING, "חלש": NEGATIVE}.get(dec.get("rr_interpretation"), MUTED)
+                _rrc = {"מצוין": POSITIVE, "טוב": POSITIVE, "אטרקטיבי": POSITIVE, "סביר": WARNING,
+                        "מאוזן": WARNING, "חלש": NEGATIVE, "לא אטרקטיבי": NEGATIVE}
+
+                def _rr_block(m):
+                    # One risk/reward measure: value (or "—" with the reason), formula, inputs.
+                    val = (f"{m['value']} <span style='font-size:14px'>{m.get('interpretation') or ''}</span>"
+                           if m.get("value") is not None else "—")
+                    ins = " · ".join(f"{k} {v}" for k, v in m["inputs"])
+                    return (f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>{m['label']}</div>"
+                            f"<div style='font-size:24px;font-weight:700;color:{_rrc.get(m.get('interpretation'), MUTED)}'>{val}</div>"
+                            + (f"<div style='color:{WARNING};font-size:11.5px'>{m['note']}</div>" if m.get("note") else "")
+                            + f"<div style='color:{MUTED};font-size:11.5px'>נוסחה: {m['formula']}</div>"
+                            f"<div style='color:{MUTED};font-size:11.5px'>{ins}</div>")
 
                 def _kv(lbl, val, color=TEXT, sub=""):
                     return (f"<div style='min-width:96px'><div style='color:{MUTED};font-size:12.5px'>{lbl}</div>"
@@ -1562,9 +1575,8 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='font-size:26px;font-weight:700;color:{POSITIVE if (dec.get('upside') or 0)>=0 else NEGATIVE}'>{_n2(dec.get('upside'), '%', plus=True)}</div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>דאונסייד (לתמיכה)</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{NEGATIVE}'>{_n2(dec.get('downside'), '%', plus=True)}</div>"
-                    f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>{dec.get('rr_label') or 'יחס סיכוי לסיכון'}</div>"
-                    f"<div style='font-size:26px;font-weight:700;color:{rr_c}'>{dec.get('rr') if dec.get('rr') is not None else '—'}"
-                    f" <span style='font-size:14px'>{dec.get('rr_interpretation') or ''}</span></div>"
+                    + "".join(_rr_block(m) for m in dec.get("rr_measures", []))
+                    + f"<div style='color:{MUTED};font-size:11.5px;margin-top:4px'>שני מדדים נפרדים. מדד שאי אפשר לחשב מוצג כ־— ואינו מוחלף במדד האחר.</div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>מתאים ל</div>"
                     f"<div>" + " ".join(f"<span class='tbadge' style='color:{PRIMARY};margin:2px'>{t}</span>"
                                         for t in dec.get("investor_types", []))
@@ -1938,7 +1950,7 @@ elif page == "🔎 ניתוח חברה":
                     + _lvl("התנגדות קרובה", srl.get("resistance"), srl.get("dist_resistance_pct"), NEGATIVE)
                     + _lvl("רמת פריצה", srl.get("breakout_level"), None, SECONDARY)
                     + _lvl("רמת שבירה", srl.get("breakdown_level"), None, SECONDARY)
-                    + (f"<div style='min-width:150px'><div style='color:{MUTED};font-size:12.5px'>יחס סיכוי לסיכון (התנגדות מול תמיכה)</div>"
+                    + (f"<div style='min-width:150px'><div style='color:{MUTED};font-size:12.5px'>יחס סיכוי־סיכון טכני: (התנגדות − מחיר) ÷ (מחיר − תמיכה)</div>"
                        f"<div style='font-size:22px;font-weight:700;color:{rr_c}'>{rr if rr is not None else '—'}</div>"
                        f"<div style='color:{rr_c};font-size:13px'>{rrl or ''}</div></div>")
                     + "</div>"

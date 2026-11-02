@@ -662,14 +662,58 @@ def _explain(key):
 NOT_ENOUGH = "אין מספיק נתונים"
 
 
-RR_LABEL = {"target": "יחס סיכוי לסיכון (יעד אנליסטים מול תמיכה)",
-            "resistance": "יחס סיכוי לסיכון (התנגדות מול תמיכה, כי היעד אינו מעל המחיר)"}
+RR_LABEL = {"target": "יחס סיכוי־סיכון לפי יעד האנליסטים",
+            "technical": "יחס סיכוי־סיכון טכני"}
+RR_FORMULA = {"target": "(יעד האנליסטים − מחיר) ÷ (מחיר − תמיכה)",
+              "technical": "(התנגדות − מחיר) ÷ (מחיר − תמיכה)"}
 
 
 def _rr_interpretation(rr):
     if rr is None:
         return None
     return ("מצוין" if rr >= 2.5 else "טוב" if rr >= 1.5 else "סביר" if rr >= 1.0 else "חלש")
+
+
+def _usd(x):
+    return f"${x:,.2f}" if isinstance(x, (int, float)) else "—"
+
+
+def _rr_measures(price, fair, upside, srl):
+    """The two risk/reward ratios, kept apart: analyst target vs support, and resistance vs
+    support. Each carries its formula and inputs. A ratio that can't be computed is None
+    with the reason, never replaced by the other one."""
+    sup, res = srl.get("support"), srl.get("resistance")
+    down = srl.get("dist_support_pct")                  # % to support (negative)
+    no_sup = ("לא זוהתה רמת תמיכה מתחת למחיר" if sup is None else
+              "המחיר צמוד לתמיכה, ולכן היחס אינו מוגדר"
+              if not isinstance(down, (int, float)) or abs(down) <= 0.05 else None)
+
+    if fair is None or not isinstance(upside, (int, float)):
+        t_val, t_note = None, "אין יעד אנליסטים"
+    elif upside <= 0:
+        t_val, t_note = None, f"יעד האנליסטים ({_usd(fair)}) אינו מעל המחיר ({_usd(price)}), ולכן אין סיכוי לפי היעד"
+    elif no_sup:
+        t_val, t_note = None, no_sup
+    else:
+        t_val, t_note = round(upside / abs(down), 2), None
+
+    t_rr = srl.get("risk_reward")
+    if res is None:
+        h_note = "המחיר מעל כל רמות ההתנגדות שזוהו"
+    else:
+        h_note = no_sup if t_rr is None else None
+    if h_note:
+        t_rr = None
+
+    return [
+        {"kind": "target", "label": RR_LABEL["target"], "formula": RR_FORMULA["target"],
+         "value": t_val, "interpretation": _rr_interpretation(t_val), "note": t_note,
+         "inputs": [("יעד אנליסטים (ממוצע)", _usd(fair)), ("מחיר", _usd(price)), ("תמיכה", _usd(sup))]},
+        {"kind": "technical", "label": RR_LABEL["technical"], "formula": RR_FORMULA["technical"],
+         "value": t_rr, "interpretation": srl.get("risk_reward_label") if t_rr is not None else None,
+         "note": h_note,
+         "inputs": [("התנגדות", _usd(res)), ("מחיר", _usd(price)), ("תמיכה", _usd(sup))]},
+    ]
 
 
 ENTRY_NOTE = ("מידע על מיקום המחיר בלבד. במחקר ההיסטורי של המערכת (S&P 500, 2015–2026) "
@@ -686,7 +730,7 @@ def _entry_quality(trend, rsi, dist_sup, dist_res, rr, val_score):
     if dist_res is not None:
         reasons.append(f"{dist_res:.1f}% עד ההתנגדות")
     if rr is not None:
-        reasons.append(f"יחס סיכוי לסיכון (התנגדות מול תמיכה) {rr}")
+        reasons.append(f"יחס סיכוי־סיכון טכני {rr}")
     if isinstance(val_score, (int, float)):
         reasons.append("התמחור אטרקטיבי" if val_score >= 65 else
                        "התמחור סביר" if val_score >= 40 else "התמחור יקר יחסית")
@@ -740,13 +784,10 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
     upside = base_t.get("upside")                       # % to consensus target
     mos = round((fair - price) / fair * 100, 1) if (fair and price and fair > 0) else None
     downside = srl.get("dist_support_pct")              # % to support (negative)
-    rr = (round(upside / abs(downside), 2)
-          if (isinstance(upside, (int, float)) and isinstance(downside, (int, float))
-              and upside > 0 and abs(downside) > 0.05) else srl.get("risk_reward"))
-    # Which formula produced rr, so the label never names the wrong one: when the analyst
-    # target is not above the price, rr falls back to the resistance/support ratio.
-    rr_basis = ("target" if (isinstance(upside, (int, float)) and isinstance(downside, (int, float))
-                             and upside > 0 and abs(downside) > 0.05) else "resistance")
+    # Risk/reward: two separate measures (analyst target, technical). "rr" is the analyst
+    # one only; when it can't be computed it stays None, with no fallback to the other.
+    rr_measures = _rr_measures(price, fair, upside, srl)
+    rr = rr_measures[0]["value"]
 
     trend = tech.get("trend")
     entry = _entry_quality(trend, rm.get("rsi"), downside, srl.get("dist_resistance_pct"),
@@ -867,9 +908,9 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
         "price": price, "target": base_t.get("price", NA), "target_num": fair,
         "fair_value": base_t.get("price", NA), "margin_of_safety": mos,
         "support": srl.get("support"), "resistance": srl.get("resistance"),
-        "upside": upside, "downside": downside, "rr": rr, "rr_basis": rr_basis,
-        "rr_label": RR_LABEL[rr_basis],
-        "rr_interpretation": _rr_interpretation(rr),
+        "upside": upside, "downside": downside, "rr": rr, "rr_basis": "target",
+        "rr_label": RR_LABEL["target"],
+        "rr_interpretation": _rr_interpretation(rr), "rr_measures": rr_measures,
         "risk_level": risk_cat or NOT_ENOUGH, "score_v2": v2,
         "entry": {"emoji": entry[0], "label": entry[1], "band": entry[2], "reasons": entry[3]},
         "checklist": checklist, "matrix": matrix,
