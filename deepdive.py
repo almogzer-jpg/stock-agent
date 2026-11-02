@@ -667,12 +667,26 @@ RR_LABEL = {"target": "יחס סיכוי־סיכון לפי יעד האנליס�
             "technical": "יחס סיכוי־סיכון טכני"}
 RR_FORMULA = {"target": "(יעד האנליסטים − מחיר) ÷ (מחיר − תמיכה)",
               "technical": "(התנגדות − מחיר) ÷ (מחיר − תמיכה)"}
+RR_ASSUMPTION = {"target": "הנחה: המחיר יגיע ליעד הממוצע של האנליסטים, ולא ירד מתחת לתמיכה.",
+                 "technical": "הנחה: ההתנגדות הקרובה היא התקרה, והתמיכה הקרובה היא הרצפה."}
+# Below this distance to support the denominator is small and the ratio balloons.
+RR_NEAR_SUPPORT_PCT = 3.0
 
 
 def _rr_interpretation(rr):
+    """One scale for both ratios: each is distance up ÷ distance down to the same support,
+    so the same number means the same thing. Same thresholds as technicals.sr_levels."""
     if rr is None:
         return None
-    return ("מצוין" if rr >= 2.5 else "טוב" if rr >= 1.5 else "סביר" if rr >= 1.0 else "חלש")
+    return "אטרקטיבי" if rr > 2.0 else ("מאוזן" if rr >= 1.0 else "לא אטרקטיבי")
+
+
+def rr_near_support_note(down):
+    """A warning when the price sits just above support (down = % to support, negative)."""
+    if isinstance(down, (int, float)) and 0.05 < abs(down) < RR_NEAR_SUPPORT_PCT:
+        return (f"המחיר רק {abs(down):.1f}% מעל התמיכה, ולכן היחס גבוה במיוחד. ירידה קטנה מספיקה "
+                "כדי לשבור את התמיכה, והסיכון בפועל עלול להיות גדול מהמרחק הזה.")
+    return None
 
 
 def _usd(x):
@@ -708,10 +722,12 @@ def _rr_measures(price, fair, upside, srl):
 
     return [
         {"kind": "target", "label": RR_LABEL["target"], "formula": RR_FORMULA["target"],
+         "assumption": RR_ASSUMPTION["target"],
          "value": t_val, "interpretation": _rr_interpretation(t_val), "note": t_note,
          "inputs": [("יעד אנליסטים (ממוצע)", _usd(fair)), ("מחיר", _usd(price)), ("תמיכה", _usd(sup))]},
         {"kind": "technical", "label": RR_LABEL["technical"], "formula": RR_FORMULA["technical"],
-         "value": t_rr, "interpretation": srl.get("risk_reward_label") if t_rr is not None else None,
+         "assumption": RR_ASSUMPTION["technical"],
+         "value": t_rr, "interpretation": _rr_interpretation(t_rr),
          "note": h_note,
          "inputs": [("התנגדות", _usd(res)), ("מחיר", _usd(price)), ("תמיכה", _usd(sup))]},
     ]
@@ -912,6 +928,8 @@ def investment_decision(rep: dict, regime_score=None) -> dict:
         "upside": upside, "downside": downside, "rr": rr, "rr_basis": "target",
         "rr_label": RR_LABEL["target"],
         "rr_interpretation": _rr_interpretation(rr), "rr_measures": rr_measures,
+        "rr_near_support": (rr_near_support_note(downside)
+                            if any(m["value"] is not None for m in rr_measures) else None),
         "risk_level": risk_cat or NOT_ENOUGH, "score_v2": v2,
         "entry": {"emoji": entry[0], "label": entry[1], "band": entry[2], "reasons": entry[3]},
         "checklist": checklist, "matrix": matrix,

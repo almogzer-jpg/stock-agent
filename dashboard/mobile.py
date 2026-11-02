@@ -478,6 +478,8 @@ def _analysis(mkt, lookup, nc):
             ])
             + "".join(f"<div class='mco'>{m['label']}: {m['formula']}"
                       + (f" · {m['note']}" if m.get("note") else "") + "</div>" for m in _rrm)
+            + (f"<div class='mco' style='color:{WARNING}'>⚠️ {dec['rr_near_support']}</div>"
+               if dec.get("rr_near_support") else "")
             + "</div>", unsafe_allow_html=True)
 
     # --- Collapsed sections (lazy content, charts behind a toggle) ---

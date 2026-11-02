@@ -1497,7 +1497,8 @@ elif page == "🔎 ניתוח חברה":
                             f"<div style='font-size:24px;font-weight:700;color:{_rrc.get(m.get('interpretation'), MUTED)}'>{val}</div>"
                             + (f"<div style='color:{WARNING};font-size:11.5px'>{m['note']}</div>" if m.get("note") else "")
                             + f"<div style='color:{MUTED};font-size:11.5px'>נוסחה: {m['formula']}</div>"
-                            f"<div style='color:{MUTED};font-size:11.5px'>{ins}</div>")
+                            f"<div style='color:{MUTED};font-size:11.5px'>{ins}</div>"
+                            f"<div style='color:{MUTED};font-size:11.5px'>{m['assumption']}</div>")
 
                 def _kv(lbl, val, color=TEXT, sub=""):
                     return (f"<div style='min-width:96px'><div style='color:{MUTED};font-size:12.5px'>{lbl}</div>"
@@ -1570,7 +1571,9 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>דאונסייד (לתמיכה)</div>"
                     f"<div style='font-size:26px;font-weight:700;color:{NEGATIVE}'>{_n2(dec.get('downside'), '%', plus=True)}</div>"
                     + "".join(_rr_block(m) for m in dec.get("rr_measures", []))
-                    + f"<div style='color:{MUTED};font-size:11.5px;margin-top:4px'>שני מדדים נפרדים. מדד שאי אפשר לחשב מוצג כ־— ואינו מוחלף במדד האחר.</div>"
+                    + (f"<div style='color:{WARNING};font-size:12px;margin-top:6px'>⚠️ {dec['rr_near_support']}</div>"
+                       if dec.get("rr_near_support") else "")
+                    + f"<div style='color:{MUTED};font-size:11.5px;margin-top:4px'>שני מדדים נפרדים עם אותו סולם פירוש: מעל 2 אטרקטיבי, 1 עד 2 מאוזן, מתחת ל-1 לא אטרקטיבי. מדד שאי אפשר לחשב מוצג כ־— ואינו מוחלף במדד האחר.</div>"
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>מתאים ל</div>"
                     f"<div>" + " ".join(f"<span class='tbadge' style='color:{PRIMARY};margin:2px'>{t}</span>"
                                         for t in dec.get("investor_types", []))

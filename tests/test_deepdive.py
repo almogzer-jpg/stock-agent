@@ -87,7 +87,7 @@ def test_decision_core_numbers():
     assert d["upside"] == 18.0 and d["downside"] == -2.5
     assert abs(d["margin_of_safety"] - round((118 - 100) / 118 * 100, 1)) < 0.01
     assert d["rr"] == round(18.0 / 2.5, 2)             # target-upside / support-downside
-    assert d["rr_interpretation"] == "מצוין"           # ≥2.5
+    assert d["rr_interpretation"] == "אטרקטיבי"        # >2, the same scale as the technical ratio
     assert d["score_v2"] == 76 and d["confidence"] == 68
 
 
@@ -227,3 +227,16 @@ def test_risk_reward_no_silent_fallback():
                                          "risk_reward": None, "status": "breakout"}})
     tgt, tech = dd.investment_decision(brk)["rr_measures"]
     assert tgt["value"] == 7.2 and tech["value"] is None and "התנגדות" in tech["note"]
+
+
+def test_risk_reward_one_scale_and_near_support_warning():
+    assert [dd._rr_interpretation(x) for x in (2.01, 2.0, 1.0, 0.99, None)] ==         ["אטרקטיבי", "מאוזן", "מאוזן", "לא אטרקטיבי", None]
+    d = dd.investment_decision(_rep())                 # price 2.5% above support
+    assert "2.5%" in d["rr_near_support"]
+    assert all(m["assumption"].startswith("הנחה:") for m in d["rr_measures"])
+    far = dd.investment_decision(_rep(technicals={
+        "trend": "מגמת עלייה", "sub_scores": {},
+        "sr_levels": {"price": 100.0, "support": 90.0, "resistance": 125.0, "dist_support_pct": -10.0,
+                      "dist_resistance_pct": 25.0, "risk_reward": 2.5, "status": "normal"}}))
+    assert far["rr_near_support"] is None
+    assert [m["interpretation"] for m in far["rr_measures"]] == ["מאוזן", "אטרקטיבי"]   # 1.8 and 2.5
