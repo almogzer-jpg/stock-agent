@@ -15,6 +15,7 @@ Owner rules (01/11/2026), enforced here:
 from datetime import date, datetime
 from statistics import median
 
+import config
 from dashboard.v4 import home_data as H
 from dashboard.v4 import names_he as NH
 
@@ -63,7 +64,7 @@ def _age(s, today=None):
     d = _dmy(s)
     if not d:
         return None
-    return ((today or date.today()) - datetime.strptime(d, "%d/%m/%Y").date()).days
+    return ((today or config.now_local().date()) - datetime.strptime(d, "%d/%m/%Y").date()).days
 
 
 # ------------------------------------------------------------------ header
@@ -428,7 +429,7 @@ def business(prof: dict, row: dict) -> dict:
 # ------------------------------------------------------------------ risks
 def risks(v: dict | None, row: dict, events: dict, t: str, today: date | None = None) -> dict:
     from deepdive import SECTOR_RISK_HE
-    row, today = row or {}, today or date.today()
+    row, today = row or {}, today or config.now_local().date()
     items = []
     lvl = row.get("RiskLevel")
     vol, dd, beta = _n(row.get("Volatility")), _n(row.get("MaxDrawdown")), _n(row.get("Beta"))
@@ -484,7 +485,7 @@ def about(t: str, row: dict, prof: dict, info: dict) -> dict:
 
 
 def sources(row: dict, prof: dict, live: dict, today: date | None = None) -> list:
-    today = today or date.today()
+    today = today or config.now_local().date()
     row = row or {}
     out = [{"what": "חישוב הערכת ההשקעה", "src": "הסריקה היומית, לפי מחיר הסגירה",
             "date": _dmy(row.get("Date")) or "—", "ok": bool(row)},

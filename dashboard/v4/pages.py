@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """V4 screens. Home is the first screen built; the rest follow after the owner
 approves it, and until then show a clear placeholder (never a half-built screen)."""
-from datetime import date
 
 import streamlit as st
 
@@ -23,7 +22,7 @@ def _nav():
 
 
 def _today_line(close):
-    d = date.today()
+    d = config.now_local().date()
     return f"יום {H.DAYS_HE[d.weekday()]}, {d:%d/%m/%Y} · לפי סגירת המסחר של {close}"
 
 
@@ -71,7 +70,7 @@ def home():
             st.html('<div class="v4-gap"></div>' + ui.method_note(cov) + ui.market_table(H.market_table(d["global"])))
 
     with side:
-        st.html(ui.week_panel(H.week(d["events"], d["rows"], d["global"], date.today())))
+        st.html(ui.week_panel(H.week(d["events"], d["rows"], d["global"], config.now_local().date())))
         if adv:
             _html(ui.sector_panel(H.sector_bars(d["mkt"])))
 
@@ -262,7 +261,7 @@ def alerts():
     adv = p["mode"] == "pro"
     nav = _nav()
     data = A.build(shell._read_json(config.ALERTS_CENTER_JSON, []), d["rows"], d["vmap"], d["events"],
-                   d["mkt"], d["close"], date.today())
+                   d["mkt"], d["close"], config.now_local().date())
     shell.header("alerts", "התראות", f"מה כדאי לדעת היום · נוצרו בסריקה של {d['close']}")
     st.html(ui.note("ההתראות מכסות את המניות ברשימת המעקב הקבועה של המערכת ואת הענפים, לא את כל 500 המניות. "
                     "מניה שאין עליה התראה לא בהכרח שקטה."))

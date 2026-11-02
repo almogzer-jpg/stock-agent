@@ -9,8 +9,6 @@ preferences are also kept in the visitor's browser (dashboard.localstore).
 import os
 import subprocess
 import sys
-import time
-from datetime import date
 
 import streamlit as st
 
@@ -120,7 +118,7 @@ def company_live(t: str) -> dict:
     finally:
         ex.shutdown(wait=False)
     res["ok"] = res.get("hist") is not None
-    res["fetched"] = datetime.now().strftime("%d/%m/%Y %H:%M") if res["ok"] else None
+    res["fetched"] = config.now_local().strftime("%d/%m/%Y %H:%M") if res["ok"] else None
     return res
 
 
@@ -308,7 +306,7 @@ def main():
             st.page_link(nav["glossary"], label="הסבר", icon=":material/help:")
 
     from dashboard.v4 import home_data as H
-    _html_banner(H.data_warning(load()["close"], date.today()))
+    _html_banner(H.data_warning(load()["close"], config.now_local().date()))
     current.run()
 
     # Phone: bottom tab bar.

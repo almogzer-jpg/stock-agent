@@ -9,6 +9,7 @@ shown with their date and labelled as calculations.
 """
 from datetime import date, datetime
 
+import config
 from dashboard.v4 import home_data as H
 
 _n = H._n
@@ -221,7 +222,7 @@ def calc_age(mkt: dict, today: date | None = None) -> dict:
         d = datetime.strptime(str(mkt.get("date"))[:10], "%d/%m/%Y").date()
     except ValueError:
         return {"date": "לא ידוע", "stale": True}
-    age = ((today or date.today()) - d).days
+    age = ((today or config.now_local().date()) - d).days
     return {"date": d.strftime("%d/%m/%Y"), "stale": age > STALE_DAYS, "age": age}
 
 
