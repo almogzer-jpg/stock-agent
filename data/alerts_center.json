@@ -1,21 +1,15 @@
 [
   {
-    "type": "פריצה",
-    "scope": "LLY",
-    "severity": "גבוהה",
-    "message": "LLY פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.84"
-  },
-  {
-    "type": "פריצה",
-    "scope": "MSFT",
-    "severity": "גבוהה",
-    "message": "MSFT פורצת — מעל ממוצעי 50/200, קרוב לשיא, נפח פי 1.86"
-  },
-  {
     "type": "אזהרת סיכון",
     "scope": "AVGO",
     "severity": "גבוהה",
     "message": "AVGO — סיכון גבוה ומתחת לממוצע 200"
+  },
+  {
+    "type": "שינוי דירוג",
+    "scope": "NFLX",
+    "severity": "גבוהה",
+    "message": "NFLX — הורדת דירוג: תשואת-יתר ← תשואת-שוק (Wolfe Research)"
   },
   {
     "type": "אזהרת סיכון",
@@ -24,147 +18,63 @@
     "message": "META — סיכון גבוה ומתחת לממוצע 200"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "NFLX",
-    "severity": "גבוהה",
-    "message": "NFLX — הורדת דירוג: Outperform → Peer Perform (Wolfe Research)"
-  },
-  {
     "type": "זינוק נפח",
-    "scope": "AMZN",
+    "scope": "LLY",
     "severity": "בינונית",
-    "message": "AMZN — נפח מסחר פי 2.2 מהממוצע"
+    "message": "LLY — נפח מסחר פי 2.07 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "AAPL",
     "severity": "בינונית",
-    "message": "AAPL — דוחות כספיים בעוד 3 ימים (2026-11-02)"
+    "message": "AAPL — דוחות כספיים היום (2026-11-02)"
+  },
+  {
+    "type": "זינוק נפח",
+    "scope": "AMZN",
+    "severity": "בינונית",
+    "message": "AMZN — נפח מסחר פי 2.51 מהממוצע"
   },
   {
     "type": "דוחות",
     "scope": "AMD",
     "severity": "בינונית",
-    "message": "AMD — דוחות כספיים בעוד 4 ימים (2026-11-03)"
+    "message": "AMD — דוחות כספיים מחר (2026-11-03)"
   },
   {
-    "type": "זינוק נפח",
-    "scope": "GOOGL",
-    "severity": "בינונית",
-    "message": "GOOGL — נפח מסחר פי 4.5 מהממוצע"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "LLY",
+    "type": "פריצה טכנית",
+    "scope": "COST",
     "severity": "מידע",
-    "message": "LLY — אישרור: Outperform → Outperform (Leerink Partners)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "V",
-    "severity": "מידע",
-    "message": "V — אישרור: Outperform → Outperform (Macquarie)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MA",
-    "severity": "מידע",
-    "message": "MA — אישרור: Buy → Buy (Truist Securities)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "PG",
-    "severity": "מידע",
-    "message": "PG — אישרור: Equal-Weight → Equal-Weight (Barclays)"
+    "message": "COST — פריצה טכנית בנפח גבוה (מידע בלבד, לא המלצת קנייה)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "COST",
     "severity": "מידע",
-    "message": "COST — כיסוי חדש:  → Outperform (CICC)"
+    "message": "COST — כיסוי חדש: תשואת-יתר (CICC)"
   },
   {
-    "type": "שינוי דירוג",
-    "scope": "UNH",
-    "severity": "מידע",
-    "message": "UNH — אישרור: Overweight → Overweight (Wells Fargo)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "MSFT",
-    "severity": "מידע",
-    "message": "MSFT — אישרור: Outperform → Outperform (Bernstein)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMZN",
-    "severity": "מידע",
-    "message": "AMZN — אישרור: Buy → Buy (UBS)"
-  },
-  {
-    "type": "שינוי דירוג",
+    "type": "פריצה טכנית",
     "scope": "AAPL",
     "severity": "מידע",
-    "message": "AAPL — אישרור: Neutral → Neutral (MoffettNathanson)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "HD",
-    "severity": "מידע",
-    "message": "HD — אישרור: Hold → Hold (Stifel)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "NVDA",
-    "severity": "מידע",
-    "message": "NVDA — reit: Buy → Buy (Needham)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "CRM",
-    "severity": "מידע",
-    "message": "CRM — אישרור: Neutral → Neutral (DA Davidson)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AMD",
-    "severity": "מידע",
-    "message": "AMD — אישרור: Positive → Positive (Susquehanna)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "AVGO",
-    "severity": "מידע",
-    "message": "AVGO — אישרור: Buy → Buy (Rosenblatt)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "META",
-    "severity": "מידע",
-    "message": "META — אישרור: Buy → Buy (UBS)"
+    "message": "AAPL — פריצה טכנית בנפח גבוה (מידע בלבד, לא המלצת קנייה)"
   },
   {
     "type": "שינוי דירוג",
     "scope": "TSLA",
     "severity": "מידע",
-    "message": "TSLA — שדרוג: Equal-Weight → Overweight (Barclays)"
-  },
-  {
-    "type": "שינוי דירוג",
-    "scope": "GOOGL",
-    "severity": "מידע",
-    "message": "GOOGL — אישרור: Market Perform → Market Perform (Bernstein)"
+    "message": "TSLA — שדרוג: משקל-שוק ← משקל-יתר (Barclays)"
   },
   {
     "type": "רוטציית סקטורים",
-    "scope": "אנרגיה",
+    "scope": "בריאות",
     "severity": "מידע",
-    "message": "כניסת הון לסקטור אנרגיה (ציון 96, חוזק יחסי +10.82%)"
+    "message": "חוזק סקטוריאלי (אומדן של כניסת הון): בריאות (ציון 96, חוזק יחסי +12.36%)"
   },
   {
     "type": "רוטציית סקטורים",
     "scope": "שירותי תקשורת",
     "severity": "מידע",
-    "message": "יציאת הון מסקטור שירותי תקשורת (ציון 2, חוזק יחסי -9.69%)"
+    "message": "חולשה סקטוריאלית (אומדן של יציאת הון): שירותי תקשורת (ציון 1, חוזק יחסי -8.01%)"
   }
 ]

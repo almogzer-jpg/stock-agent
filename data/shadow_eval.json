@@ -1,0 +1,45 @@
+{
+ "as_of": "02/11/2026",
+ "log_days": 1,
+ "first_day": "30/10/2026",
+ "last_day": "30/10/2026",
+ "matured": {
+  "21": 0,
+  "63": 0
+ },
+ "min_days_for_conclusion": 20,
+ "results": "no matured decisions yet",
+ "stability": {
+  "live": {
+   "day_pairs": 0,
+   "compared": 0,
+   "change_rate_%": null,
+   "buy_avoid_flips": 0,
+   "avg_buy_run_days": 1.0,
+   "transitions": {}
+  },
+  "new": {
+   "day_pairs": 0,
+   "compared": 0,
+   "change_rate_%": null,
+   "buy_avoid_flips": 0,
+   "avg_buy_run_days": 1.0,
+   "transitions": {}
+  }
+ },
+ "data_quality": [
+  {
+   "day": "30/10/2026",
+   "stocks": 500,
+   "new_nodata_%": 78.4,
+   "live_nodata_%": 88.4,
+   "avg_reliability": 30.4,
+   "with_quality_%": 21.6,
+   "avg_profile_age_days": 0.0
+  }
+ ],
+ "headline": [
+  "יומן הצל: 1 ימי החלטה.",
+  "עדיין אין החלטות שהבשילו ל-21 ימי מסחר. אין מה להסיק בשלב זה."
+ ]
+}
