@@ -21,9 +21,14 @@
     var d = ev.data || {};
     if (d.type !== "streamlit:render") return;
     var args = d.args || {};
-    var key = "stockagent:" + (args.key || "default");
+    var key = "stockagent:" + (args.name || args.key || "default");
     if (typeof args.write === "string") write(key, args.write);
     var val = read(key);
+    // Before slots were named, the list was saved under "stockagent:default": move it once.
+    if (val === null && args.name === "watch") {
+      var legacy = read("stockagent:default");
+      if (legacy !== null) { write(key, legacy); val = legacy; }
+    }
     var payload = JSON.stringify({ value: val, ok: true });
     if (payload !== lastSent) {
       lastSent = payload;

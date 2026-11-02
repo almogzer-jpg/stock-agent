@@ -405,13 +405,11 @@ def decide(f: dict) -> dict:
             why = "חברה חזקה, אבל רמת הסיכון גבוהה מאוד."
             conditions.append("ירידה בתנודתיות, או כניסה בסכום קטן בלבד")
         else:
-            weak = next((c for c in cons if not c.startswith("דוחות")), None) or _holding_back(f)
+            weak = _holding_back(f)
             word = "חברה חלשה" if tier == "weak" else "חברה סבירה"
-            why = (f"{word} (ציון {int(q)} מתוך 100), אבל עוד לא מספיק חזקה"
-                   + (f": {weak}." if weak else "."))
+            why = (f"{word}: ציון האיכות {int(q)} מתוך 100, מתחת לסף של {Q_STRONG}"
+                   + (f". הגורם החלש ביותר: {weak}." if weak else "."))
             conditions.append(f"שיפור בציון האיכות ל-{Q_STRONG} ומעלה")
-            if sup and price and sup < price:
-                conditions.append(f"או ירידה לאזור {_money(sup)} (רמת התמיכה)")
 
     # Holder guidance
     if action == "nodata":
