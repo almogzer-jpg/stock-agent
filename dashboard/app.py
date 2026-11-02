@@ -844,7 +844,9 @@ if page.startswith("🏠"):
                 st.session_state["dd_context"] = f"בתור המחקר של הבוקר: {_why}"
                 st.session_state["_pending_nav"] = "🔎 ניתוח חברה"
                 st.rerun()
-    st.caption("התור נבנה מהשינויים המדידים של הבוקר + התראות המעקב שלך — כל פריט עם פעולה אחת ברורה.")
+    st.caption("התור נבנה מהשינויים המדידים של הבוקר"
+               + (" + התראות המעקב שלך" if config.PERSONAL_LISTS_ENABLED else "")
+               + " — כל פריט עם פעולה אחת ברורה.")
 
     # ---- 12. Quick actions ----
     qa = st.columns(4)

@@ -346,7 +346,8 @@ def analyze(ticker: str, sectors=None, bundle=None) -> dict:
     for k in FUND_FIELDS:
         if fund.get(k) is None and snap.get(k) is not None:
             fund[k] = snap[k]
-            from_daily.append(k)
+            if k not in ("LastQuarter", "LastReport"):      # dates, not figures: no "live fetch failed" note
+                from_daily.append(k)
     fund_score = fundamental_score(fund)
     val_score = dec.valuation_score(fund)
     rev_growth = _num(fund.get("RevenueGrowth"))
