@@ -29,7 +29,6 @@ import pandas as pd
 
 import config
 import proprietary
-import portfolio
 import technicals
 import insights as insights_mod
 from data_loader import load_ohlcv
@@ -49,7 +48,6 @@ from news.headlines import get_headlines
 from backtesting.backtester import backtest_symbol, backtest_signal
 import market
 import risk as risk_engine
-import decisions as decision_engine
 import trust as trust_engine
 import events as events_mod
 from alerts.center import build_alerts
@@ -474,99 +472,6 @@ def write_timestamped_outputs(df: pd.DataFrame, closes_map: dict,
 
 
 # ---------------------------------------------------------------------------
-# Portfolio helpers
-# ---------------------------------------------------------------------------
-
-def _returns(close) -> dict:
-    """Daily / 1-month / YTD % returns from a Close series (NaN-safe)."""
-    close = close.dropna()
-    out = {"daily": None, "m1": None, "ytd": None}
-    if len(close) >= 2:
-        out["daily"] = round(float(close.iloc[-1] / close.iloc[-2] - 1) * 100, 2)
-    if len(close) > 22:
-        out["m1"] = round(float(close.iloc[-1] / close.iloc[-23] - 1) * 100, 2)
-    year = datetime.now().year
-    ytd_base = close[close.index.year == year]
-    if len(ytd_base):
-        out["ytd"] = round(float(close.iloc[-1] / ytd_base.iloc[0] - 1) * 100, 2)
-    return out
-
-
-def build_portfolio_payload(sectors=None, regime_label=""):
-    """Load holdings, fetch each one's real data, and compute the analytics
-    + Risk (Part 2) + Decisions (Part 3)."""
-    sectors = sectors or []
-    holdings = portfolio.load_holdings(config.PORTFOLIO_CSV)
-    if not holdings:
-        return {"empty": True}
-    print(f"\nמחשב תיק ({len(holdings)} החזקות)...")
-    mkt_df = load_ohlcv("^GSPC")
-    mkt_close = mkt_df["Close"] if mkt_df is not None else None
-    positions, closes_pf = [], {}
-    for h in holdings:
-        sym = h["ticker"]
-        pdf = load_ohlcv(sym)
-        if pdf is None:
-            print(f"  ! {sym}: אין נתונים — דולג")
-            continue
-        close = pdf["Close"]
-        m = compute_indicators(pdf)
-        if m is None:
-            continue
-        m["Breakout"] = is_breakout(m)
-        m["Score"] = score_stock(m)
-        rets = _returns(close)
-        fund = get_fundamentals(sym)
-        fs = factor_scores(m, closes=close.tail(60).tolist(), fundamentals=fund)
-        rp = risk_engine.risk_profile(close, mkt_close)   # beta / vol / maxDD
-        closes_pf[sym] = close.tail(252)
-        # Composite v2 + decision inputs for this holding.
-        m["ScoreFundamental"] = fs["fundamental"]
-        m["ScoreSentiment"] = fs["sentiment"]
-        m["ScoreRisk"] = rp["risk_score"] if rp["risk_score"] is not None else fs["risk"]
-        sec_score = market.sector_score_for(fund.get("Sector"), sectors)
-        news_sc = (score_headlines(get_headlines(sym, config.NEWS_LIMIT))["score"]
-                   if config.ENABLE_NEWS else 50)
-        comp = composite_score(technical=m["Score"], fundamental=fs["fundamental"],
-                               sector=sec_score, news=news_sc, risk=m["ScoreRisk"])
-        positions.append({
-            "ticker": sym, "name": get_company_name(sym),
-            "quantity": h["quantity"], "avg_cost": h["avg_cost"],
-            "price": round(float(close.iloc[-1]), 2),
-            "daily_change_pct": rets["daily"], "ret_1m": rets["m1"], "ret_ytd": rets["ytd"],
-            "sector": fund.get("Sector") or None,
-            "market_cap": fund.get("MarketCap") or None,
-            "risk_level": rp["category"] if rp["risk_score"] is not None else fs["risk_level"],
-            "beta": rp["beta"], "volatility": rp["volatility"], "max_drawdown": rp["max_drawdown"],
-            "score": m["Score"],
-            "score_v2": comp["final"] if comp else m["Score"],
-            "valuation": decision_engine.valuation_score(fund),
-            "sector_score": sec_score,
-            "confidence": proprietary.confidence(m)["score"],
-            "status_group": classify({**m, **fund, "ScoreV2": comp["final"] if comp else None,
-                                      "Completeness": int(comp["completeness"] * 100) if comp else None,
-                                      "RiskLevel": rp["category"] if rp["risk_score"] is not None else fs["risk_level"],
-                                      "Date": datetime.now().strftime("%d/%m/%Y")})["group"],
-        })
-    # Benchmark: S&P 500 returns.
-    b = _returns(mkt_close) if mkt_close is not None else {}
-    benchmark = {"daily": b.get("daily"), "ret_1m": b.get("m1"), "ret_ytd": b.get("ytd")}
-    payload = portfolio.build_portfolio(positions, benchmark)
-    # Portfolio-level risk: correlation matrix + weighted beta/vol + concentration.
-    if not payload.get("empty"):
-        betas = {p["ticker"]: p.get("beta") for p in positions}
-        vols = {p["ticker"]: p.get("volatility") for p in positions}
-        payload["correlation"] = risk_engine.correlation_pairs(closes_pf)
-        payload["risk"] = risk_engine.portfolio_risk(
-            payload["positions"], betas, vols, payload["exposures"]["sector"])
-        # Decision engine (Part 3): actions, allocation targets, rebalancing.
-        payload["decisions"] = decision_engine.portfolio_decisions(
-            payload["positions"], sectors, regime_label,
-            payload["risk"], payload["correlation"])
-    return payload
-
-
-# ---------------------------------------------------------------------------
 # Main pipeline
 # ---------------------------------------------------------------------------
 
@@ -808,15 +713,6 @@ def main() -> None:
             print(f"  ! שכבת אמינות נכשלה (לא חוסם): {exc}")
     except OSError as exc:
         print(f"  ! שמירת artifact נכשלה: {exc}")
-
-    # Portfolio analytics (Phase 7) — computed from portfolio.csv holdings.
-    try:
-        portfolio_payload = build_portfolio_payload(sectors=sectors,
-                                                    regime_label=regime.get("label", ""))
-        with open(config.PORTFOLIO_JSON, "w", encoding="utf-8") as fh:
-            json.dump(portfolio_payload, fh, ensure_ascii=False, indent=2)
-    except Exception as exc:
-        print(f"  ! חישוב התיק נכשל: {exc}")
 
     # Write the full deliverable set (timestamped + latest + index.html).
     # Delta Engine snapshots (Morning Terminal): rotate today→prev, write today.

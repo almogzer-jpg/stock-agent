@@ -44,8 +44,6 @@ SCAN_TOP_ENRICH = 40           # deep-enrich (fundamentals/composite/backtest) o
 ENABLE_EVENTS = True
 
 # Portfolio (Phase 7): holdings you edit, analytics computed into JSON.
-PORTFOLIO_CSV = os.path.join(BASE_DIR, "portfolio.csv")
-PORTFOLIO_JSON = os.path.join(DATA_DIR, "portfolio.json")
 
 # --- Data ----------------------------------------------------------------
 # ~2y of daily candles so the 200-day MA / 52-week high are valid.

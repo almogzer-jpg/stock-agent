@@ -25,7 +25,7 @@ stock-agent/
 ├── alerts/             # התראות למסוף/לוג + מייל
 ├── backtesting/        # בדיקת אות היסטורית (תשואה עתידית)
 ├── proprietary.py      # מדדים קנייניים מחושבים (Fear&Greed, Breadth, Capital Flow, Upside, Confidence)
-├── portfolio.py        # ניתוח תיק (Phase 7) + portfolio.csv (ההחזקות שלך)
+├── portfolio.py        # ניתוח תיק (Phase 7). לא פעיל: אין תיק אישי במערכת הציבורית
 ├── explain.py          # הסברי הזדמנות (למה כן/לא, קטליזטורים, סיכונים)
 ├── events.py           # אירועים (דוחות, שינויי דירוג) מ-yfinance
 ├── insights.py         # תובנות AI יומיות בעברית (מבוסס כללים)

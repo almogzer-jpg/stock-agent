@@ -39,3 +39,8 @@ CHATGPT_REVIEW_PACKAGE/
 data/decision_audit.jsonl
 data/rec_history.json
 data/my_watchlist.json
+# No personal holdings in the public repository (owner decision 02/11/2026).
+portfolio.csv
+data/portfolio.json
+# Local test coverage database
+.coverage

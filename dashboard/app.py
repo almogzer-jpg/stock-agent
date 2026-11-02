@@ -194,14 +194,6 @@ def load_backtest() -> dict:
     return {}
 
 
-@st.cache_data(ttl=120, show_spinner=False)
-def load_portfolio() -> dict:
-    if os.path.exists(config.PORTFOLIO_JSON):
-        with open(config.PORTFOLIO_JSON, encoding="utf-8") as fh:
-            return json.load(fh)
-    return {"empty": True}
-
-
 @st.cache_data(ttl=300, show_spinner=False)
 def read_outputs():
     d = config.OUTPUTS_DIR
