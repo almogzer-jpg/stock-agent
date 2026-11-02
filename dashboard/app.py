@@ -1577,10 +1577,10 @@ elif page == "🔎 ניתוח חברה":
                     f"<div style='color:{MUTED};font-size:12.5px;margin-top:8px'>מתאים ל</div>"
                     f"<div>" + " ".join(f"<span class='tbadge' style='color:{PRIMARY};margin:2px'>{t}</span>"
                                         for t in dec.get("investor_types", []))
-                    + f"</div><div style='color:{MUTED};font-size:12.5px;margin-top:8px'>חשיפה מוצעת בתיק</div>"
-                    f"<div style='font-size:17px;font-weight:700'>{(dec.get('position') or {}).get('name', '—')} "
-                    f"<span style='color:{SECONDARY};font-size:14px'>({(dec.get('position') or {}).get('range', '')})</span></div>"
-                    f"<div style='color:{MUTED};font-size:12.5px'>{(dec.get('position') or {}).get('why', '')}</div></div>",
+                    + f"</div><div style='color:{MUTED};font-size:12.5px;margin-top:8px'>סיכון וריכוז</div>"
+                    f"<div style='font-size:15px;font-weight:600'>רמת הסיכון של המניה: {dec.get('risk_level') or '—'}</div>"
+                    f"<div style='color:{MUTED};font-size:12.5px'>המערכת לא ממליצה על גודל השקעה, כי היא לא מכירה את התיק, "
+                    f"את פרופיל הסיכון ואת המצב האישי שלך. כדאי לבדוק כמה מהתיק כבר מושקע במניה הזו ובענף שלה.</div></div>",
                     unsafe_allow_html=True)
 
                 # Checklist + decision matrix
@@ -2020,11 +2020,7 @@ elif page == "🔎 ניתוח חברה":
             st.markdown(f"<div class='ic-card' style='border-right:6px solid {PRIMARY}'>"
                         f"<div style='font-size:24px;font-weight:800;color:{PRIMARY}'>{op['recommendation']}</div>"
                         f"<div style='margin-top:6px'>{op['attractive']}</div>"
-                        f"<div class='ic-sub' style='margin-top:6px'>חשיפה מוצעת בתיק: <b style='color:{TEXT}'>"
-                        + ((f"{dec['position'].get('name', '')} ({dec['position'].get('range', '')})")
-                           if (dec and dec.get("position")) else f"{op['allocation_pct']}%")
-                        + "</b> · "
-                        f"פרופיל משקיע: {op['investor_profile']}</div>"
+                        f"<div class='ic-sub' style='margin-top:6px'>פרופיל משקיע: {op['investor_profile']}</div>"
                         f"<div class='ic-sub'>מה ישנה את ההמלצה: {op['what_changes']}</div></div>", unsafe_allow_html=True)
 
             # ---- Export ----
