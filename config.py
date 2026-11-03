@@ -49,6 +49,15 @@ ENABLE_EVENTS = True
 # ~2y of daily candles so the 200-day MA / 52-week high are valid.
 HISTORY_PERIOD = "2y"
 DATE_FMT = "%d/%m/%Y"                                 # Israeli standard DD/MM/YYYY
+# Times and "today" on screen follow Israel, summer and winter time included,
+# not the server's clock (UTC on Streamlit Cloud).
+TIMEZONE = "Asia/Jerusalem"
+
+
+def now_local():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    return datetime.now(ZoneInfo(TIMEZONE))
 
 # --- Breakout thresholds (scanners/breakout.py) --------------------------
 NEAR_HIGH_PCT = 10.0      # within 10% of the 52-week high

@@ -1,13 +1,32 @@
 name: Daily data refresh
 
-# Refreshes the data snapshot every weekday morning (Israel time) and commits
-# it back — Streamlit Cloud auto-redeploys, so the app is never stale.
-# Manual trigger available via the Actions tab (workflow_dispatch).
+# Refreshes the data snapshot after each US trading day and commits it back.
+# Streamlit Cloud redeploys on the commit, so the app is never stale.
+#
+# GitHub starts scheduled runs late when it is busy (2 to 8 hours late from
+# September to November 2026), and the top of the hour is the busiest time.
+# So each US session (Monday to Friday) has three slots, off the hour, all after
+# its close (16:00 New York = 21:00 UTC in winter, 20:00 in summer) and before the next open:
+#   22:41 UTC the same evening, then 03:17 and 06:23 UTC the next morning
+#   (Israel: 00:41, 05:17, 08:23 in winter, an hour later in summer).
+# data_freshness.py decides: a slot scans only when the close on screen is
+# older than the last finished US session (taken from the market itself, so
+# weekends and US holidays need no calendar), and never while a session is in progress.
+# A failed run, data still not current after the last slot, or a whole missed
+# trading day opens an issue, which GitHub emails to the owner.
+# Manual trigger via the Actions tab (workflow_dispatch) scans unless a session is in progress.
 
 on:
   schedule:
-    - cron: "0 4 * * 1-5"   # 04:00 UTC = 06:00/07:00 Israel, Mon-Fri
+    - cron: "41 22 * * 1-5"   # the evening of a session day, well after the bars settle
+    - cron: "17 3 * * 2-6"    # the next morning
+    - cron: "23 6 * * 2-6"    # the next morning, the last slot for that session
   workflow_dispatch:
+
+# One refresh at a time: a slot that starts while another runs waits for it.
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
 
 jobs:
   refresh:
@@ -15,6 +34,11 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: write
+      issues: write
+    env:
+      TZ: Asia/Jerusalem        # dates and times written into the data are Israel time
+      PYTHONUTF8: "1"
+      LAST_SLOT: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '23 6 * * 2-6' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,19 +50,24 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Is the data current?
+        id: before
+        run: python data_freshness.py
+
       - name: Watchlist scan (run.py)
+        if: steps.before.outputs.state == 'behind' || steps.before.outputs.state == 'unknown' || (github.event_name == 'workflow_dispatch' && steps.before.outputs.state != 'open')
         env:
           STOCK_AGENT_DISABLE_EMAIL: "1"
-          PYTHONUTF8: "1"
           MPLBACKEND: "Agg"
         run: python run.py
 
       - name: Universe scan (scanner.py ALL)
-        env:
-          PYTHONUTF8: "1"
+        id: scan
+        if: steps.before.outputs.state == 'behind' || steps.before.outputs.state == 'unknown' || (github.event_name == 'workflow_dispatch' && steps.before.outputs.state != 'open')
         run: python scanner.py ALL
 
       - name: Commit refreshed snapshot
+        if: steps.scan.outcome == 'success'
         run: |
           git config user.name "stock-agent-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -47,5 +76,31 @@ jobs:
             echo "No data changes."
           else
             git commit -m "chore: daily data refresh"
+            # main may have moved during the run (a merged change): put the data on top of it
+            git pull --rebase origin main
             git push
           fi
+
+      - name: Is the data current now?
+        id: after
+        run: python data_freshness.py
+
+      - name: Report data that is not current
+        if: (steps.after.outputs.state != 'current' && env.LAST_SLOT == 'true') || steps.before.outputs.missed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="הנתונים באתר לא עודכנו בזמן $(date +%d/%m/%Y)"
+          body="הסגירה המוצגת באתר: ${{ steps.after.outputs.close }}. יום המסחר האחרון שהסתיים: ${{ steps.after.outputs.last }}. מצב: ${{ steps.after.outputs.state }}. פרטים: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ -z "$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title $title" --json number --jq '.[].number')" ]; then
+            gh issue create --repo "${{ github.repository }}" --title "$title" --body "$body"
+          fi
+
+      - name: Report a failed refresh
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo "${{ github.repository }}" \
+            --title "עדכון הנתונים היומי נכשל $(date +%d/%m/%Y)" \
+            --body "הריצה נכשלה ולכן ייתכן שהנתונים באתר לא התעדכנו. פרטים: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

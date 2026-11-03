@@ -8,5 +8,6 @@ plotly>=5.20.0,<8       # Interactive charts in the dashboard
 matplotlib>=3.7.0,<4    # Sparkline charts for the email/report
 lxml>=5.0.0          # Parse index constituents (Wikipedia) for the universe
 deep-translator>=1.11.0  # Auto-translate company summaries to Hebrew (best-effort, optional)
+tzdata>=2024.1        # Time zone data for Israel time on any server
 pytest>=8.0.0        # Test suite (dev)
 pytest-cov>=4.1.0    # Test coverage (dev)
