@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """V4 markets screen: only verified values as numbers, honest units, plain summaries."""
-from datetime import date
+from datetime import date, datetime
 
 import globalmkt
 from dashboard.v4 import markets_data as M
@@ -20,29 +20,38 @@ def _g(**over):
                       {"symbol": "BZ=F", "name": "Brent", "price": 113.43, "d1": -1.26, "as_of": "30/10/2026"}],
         "crypto": [], "fx": []}
     rows.update(over)
-    return {"schema": globalmkt.SCHEMA, "updated": date.today().strftime("%d/%m/%Y") + " 09:00", "groups": rows}
+    return {"schema": globalmkt.SCHEMA, "updated": "01/11/2026 09:00", "groups": rows}
+
+
+# A fixed "now" for the validation: the sample values are from 30/10/2026, and against the
+# real clock they turn stale a few weeks later and the tests fail for no reason.
+NOW = datetime(2026, 11, 1, 10, 0)
+
+
+def _check(g):
+    return globalmkt.check(g, now=NOW)
 
 
 def test_yield_changes_are_in_basis_points():
-    secs = {s["key"]: s for s in M.sections(globalmkt.check(_g()))}
+    secs = {s["key"]: s for s in M.sections(_check(_g()))}
     tnx = next(r for r in secs["rates"]["rows"] if r["sym"] == "^TNX")
     assert tnx["val"] == "4.93%" and tnx["d1"] == "−6 נ״ב"                       # 4.99% to 4.93%, not "−1.2%"
     assert "(−6 נ״ב)" in secs["rates"]["summary"]
 
 
 def test_missing_and_unverified_values_never_show_as_numbers():
-    g = globalmkt.check(_g())
+    g = _check(_g())
     secs = {s["key"]: s for s in M.sections(g)}
     two = next(r for r in secs["rates"]["rows"] if r["sym"] == "2YY=F")
     assert two["status"] == "missing" and two["val"] == "אין נתון"
     assert "עקום התשואות" in secs["rates"]["note"]
-    stale = globalmkt.check({**_g(), "updated": "01/01/2020 09:00"})
+    stale = _check({**_g(), "updated": "01/01/2020 09:00"})
     assert all(r["status"] != "ok" for s in M.sections(stale) for r in s["rows"])
     assert MU.validation(M.validation(stale), True) == ""
 
 
 def test_oil_benchmarks_that_disagree_are_named_not_averaged():
-    secs = {s["key"]: s for s in M.sections(globalmkt.check(_g()))}
+    secs = {s["key"]: s for s in M.sections(_check(_g()))}
     assert secs["commodity"]["summary"].startswith("נפט WTI עלה (+2.08%) ונפט ברנט ירד (−1.26%).")
 
 
@@ -65,7 +74,7 @@ def _series(last, n=300, end="2026-10-30"):
 
 
 def test_history_is_shown_only_when_it_matches_the_verified_value():
-    g = globalmkt.check(_g())
+    g = _check(_g())
     ok = M.history({"^GSPC": _series(7580.07)}, g)[0]
     assert ok["status"] == "ok" and ok["val"] == "7,580.07"
     bad = M.history({"^GSPC": _series(8000.0)}, g)[0]
