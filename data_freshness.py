@@ -45,12 +45,14 @@ def state(close: date | None, sessions: list[date], now_ny: datetime) -> dict:
     done = [d for d in sessions if d < today or (d == today and now_ny.time() >= DONE)]
     last = done[-1] if done else None
     prev = done[-2] if len(done) > 1 else None
-    if in_session:
-        s = "open"
+    if close is not None and last is not None and close >= last:
+        s = "current"                  # current data stays current while the next session trades
+    elif in_session:
+        s = "open"                     # behind, but a scan now would store part of a day
     elif close is None or last is None:
         s = "unknown"
     else:
-        s = "current" if close >= last else "behind"
+        s = "behind"
     # A whole trading day went by without an update (every slot of a day was missed)
     missed = bool(close and prev and close < prev)
     return {"state": s, "close": close, "last": last, "missed": missed}

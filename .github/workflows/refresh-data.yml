@@ -3,12 +3,13 @@ name: Daily data refresh
 # Refreshes the data snapshot after each US trading day and commits it back.
 # Streamlit Cloud redeploys on the commit, so the app is never stale.
 #
-# GitHub starts scheduled runs late when it is busy (2 to 8 hours late from
+# GitHub starts scheduled runs late when it is busy (2 to 10 hours late from
 # September to November 2026), and the top of the hour is the busiest time.
 # So each US session (Monday to Friday) has three slots, off the hour, all after
-# its close (16:00 New York = 21:00 UTC in winter, 20:00 in summer) and before the next open:
-#   22:41 UTC the same evening, then 03:17 and 06:23 UTC the next morning
-#   (Israel: 00:41, 05:17, 08:23 in winter, an hour later in summer).
+# its close (16:00 New York = 21:00 UTC in winter, 20:00 in summer), and early
+# enough that even 8 hours late they start before the next open (14:30 UTC in winter):
+#   22:41 UTC the same evening, then 00:29 and 02:13 UTC
+#   (Israel: 00:41, 02:29, 04:13 in winter, an hour later in summer).
 # data_freshness.py decides: a slot scans only when the close on screen is
 # older than the last finished US session (taken from the market itself, so
 # weekends and US holidays need no calendar), and never while a session is in progress.
@@ -19,8 +20,8 @@ name: Daily data refresh
 on:
   schedule:
     - cron: "41 22 * * 1-5"   # the evening of a session day, well after the bars settle
-    - cron: "17 3 * * 2-6"    # the next morning
-    - cron: "23 6 * * 2-6"    # the next morning, the last slot for that session
+    - cron: "29 0 * * 2-6"    # backup slot
+    - cron: "13 2 * * 2-6"    # backup slot, the last one for that session
   workflow_dispatch:
 
 # One refresh at a time: a slot that starts while another runs waits for it.
@@ -38,7 +39,7 @@ jobs:
     env:
       TZ: Asia/Jerusalem        # dates and times written into the data are Israel time
       PYTHONUTF8: "1"
-      LAST_SLOT: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '23 6 * * 2-6' }}
+      LAST_SLOT: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '13 2 * * 2-6' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -76,8 +77,10 @@ jobs:
             echo "No data changes."
           else
             git commit -m "chore: daily data refresh"
-            # main may have moved during the run (a merged change): put the data on top of it
-            git pull --rebase origin main
+            # main may have moved during the run (a merged change): put the data on top of it.
+            # The scan also rewrites files outside data/ that are not committed (dashboard/index.html).
+            # --autostash sets them aside, or the pull refuses to start (every save failed 03-21/11/2026).
+            git pull --rebase --autostash origin main
             git push
           fi
 
@@ -101,6 +104,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh issue create --repo "${{ github.repository }}" \
-            --title "עדכון הנתונים היומי נכשל $(date +%d/%m/%Y)" \
-            --body "הריצה נכשלה ולכן ייתכן שהנתונים באתר לא התעדכנו. פרטים: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          title="עדכון הנתונים היומי נכשל $(date +%d/%m/%Y)"
+          body="הריצה נכשלה ולכן ייתכן שהנתונים באתר לא התעדכנו. פרטים: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          # one issue a day, not one for every failed slot
+          if [ -z "$(gh issue list --repo "${{ github.repository }}" --state open --search "in:title $title" --json number --jq '.[].number')" ]; then
+            gh issue create --repo "${{ github.repository }}" --title "$title" --body "$body"
+          fi
