@@ -24,9 +24,15 @@ def test_a_us_holiday_is_not_a_missing_day():
 
 
 def test_no_scan_while_a_session_is_in_progress():
-    assert state(date(2026, 11, 20), SESSIONS[:3], at(2026, 11, 23, 11, 0))["state"] == "open"
+    # behind (Thursday's close on Monday) during Monday's session: wait for the close
+    assert state(date(2026, 11, 19), SESSIONS[:3], at(2026, 11, 23, 11, 0))["state"] == "open"
     # after the close the day counts as finished
     assert state(date(2026, 11, 20), SESSIONS[:3], at(2026, 11, 23, 17, 0))["state"] == "behind"
+
+
+def test_current_data_is_not_an_alert_while_the_next_session_trades():
+    # Friday's close on Monday at 11:00 New York is the latest finished session
+    assert state(date(2026, 11, 20), SESSIONS[:3], at(2026, 11, 23, 11, 0))["state"] == "current"
 
 
 def test_a_whole_missed_day_is_flagged():
