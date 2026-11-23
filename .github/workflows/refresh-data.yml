@@ -13,9 +13,11 @@ name: Daily data refresh
 # data_freshness.py decides: a slot scans only when the close on screen is
 # older than the last finished US session (taken from the market itself, so
 # weekends and US holidays need no calendar), and never while a session is in progress.
-# A failed run, data still not current after the last slot, or a whole missed
-# trading day opens an issue, which GitHub emails to the owner.
-# Manual trigger via the Actions tab (workflow_dispatch) scans unless a session is in progress.
+# A failed run, or data still not current after the last slot or after a whole
+# missed trading day, opens an issue, which GitHub emails to the owner.
+# Manual trigger via the Actions tab (workflow_dispatch) decides the same way, so a
+# second click does not scan the same day twice. Tick "force" to scan anyway
+# (never while a session is in progress).
 
 on:
   schedule:
@@ -23,6 +25,11 @@ on:
     - cron: "29 0 * * 2-6"    # backup slot
     - cron: "13 2 * * 2-6"    # backup slot, the last one for that session
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Scan even when the data is already current"
+        type: boolean
+        default: false
 
 # One refresh at a time: a slot that starts while another runs waits for it.
 concurrency:
@@ -41,7 +48,12 @@ jobs:
       PYTHONUTF8: "1"
       LAST_SLOT: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '13 2 * * 2-6' }}
     steps:
+      # main as it is when the job starts, not when the run was queued: a run that
+      # waited for another one sees that run's data, so it skips instead of scanning
+      # the same day again and clashing with it on save (23/11/2026, runs 128 and 129).
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-python@v5
         with:
@@ -56,7 +68,7 @@ jobs:
         run: python data_freshness.py
 
       - name: Watchlist scan (run.py)
-        if: steps.before.outputs.state == 'behind' || steps.before.outputs.state == 'unknown' || (github.event_name == 'workflow_dispatch' && steps.before.outputs.state != 'open')
+        if: steps.before.outputs.state == 'behind' || steps.before.outputs.state == 'unknown' || (inputs.force && steps.before.outputs.state != 'open')
         env:
           STOCK_AGENT_DISABLE_EMAIL: "1"
           MPLBACKEND: "Agg"
@@ -64,7 +76,7 @@ jobs:
 
       - name: Universe scan (scanner.py ALL)
         id: scan
-        if: steps.before.outputs.state == 'behind' || steps.before.outputs.state == 'unknown' || (github.event_name == 'workflow_dispatch' && steps.before.outputs.state != 'open')
+        if: steps.before.outputs.state == 'behind' || steps.before.outputs.state == 'unknown' || (inputs.force && steps.before.outputs.state != 'open')
         run: python scanner.py ALL
 
       - name: Commit refreshed snapshot
@@ -89,7 +101,8 @@ jobs:
         run: python data_freshness.py
 
       - name: Report data that is not current
-        if: (steps.after.outputs.state != 'current' && env.LAST_SLOT == 'true') || steps.before.outputs.missed == '1'
+        # A missed day that this run made up is not news: only data still not current is.
+        if: steps.after.outputs.state != 'current' && (env.LAST_SLOT == 'true' || steps.before.outputs.missed == '1')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
