@@ -1,8 +1,8 @@
 {
- "as_of": "02/11/2026",
- "log_days": 1,
+ "as_of": "23/11/2026",
+ "log_days": 2,
  "first_day": "30/10/2026",
- "last_day": "30/10/2026",
+ "last_day": "20/11/2026",
  "matured": {
   "21": 0,
   "63": 0
@@ -11,35 +11,60 @@
  "results": "no matured decisions yet",
  "stability": {
   "live": {
-   "day_pairs": 0,
-   "compared": 0,
-   "change_rate_%": null,
-   "buy_avoid_flips": 0,
-   "avg_buy_run_days": 1.0,
-   "transitions": {}
+   "day_pairs": 1,
+   "compared": 29,
+   "change_rate_%": 27.6,
+   "buy_avoid_flips": 2,
+   "avg_buy_run_days": 1.2,
+   "transitions": {
+    "wait->wait": 6,
+    "avoid->avoid": 6,
+    "avoid->wait": 2,
+    "buy->wait": 1,
+    "buy->buy": 9,
+    "wait->avoid": 3,
+    "buy->avoid": 2
+   }
   },
   "new": {
-   "day_pairs": 0,
-   "compared": 0,
-   "change_rate_%": null,
+   "day_pairs": 1,
+   "compared": 216,
+   "change_rate_%": 15.7,
    "buy_avoid_flips": 0,
-   "avg_buy_run_days": 1.0,
-   "transitions": {}
+   "avg_buy_run_days": 1.4,
+   "transitions": {
+    "wait->wait": 123,
+    "wait->buy": 4,
+    "wait->avoid": 15,
+    "buy->buy": 13,
+    "avoid->avoid": 46,
+    "avoid->wait": 9,
+    "buy->wait": 6
+   }
   }
  },
  "data_quality": [
   {
    "day": "30/10/2026",
    "stocks": 500,
-   "new_nodata_%": 78.4,
+   "new_nodata_%": 56.8,
    "live_nodata_%": 88.4,
-   "avg_reliability": 30.4,
-   "with_quality_%": 21.6,
+   "avg_reliability": 46.6,
+   "with_quality_%": 43.2,
    "avg_profile_age_days": 0.0
+  },
+  {
+   "day": "20/11/2026",
+   "stocks": 500,
+   "new_nodata_%": 34.8,
+   "live_nodata_%": 88.4,
+   "avg_reliability": 58.0,
+   "with_quality_%": 65.2,
+   "avg_profile_age_days": 14.0
   }
  ],
  "headline": [
-  "יומן הצל: 1 ימי החלטה.",
+  "יומן הצל: 2 ימי החלטה.",
   "עדיין אין החלטות שהבשילו ל-21 ימי מסחר. אין מה להסיק בשלב זה."
  ]
 }
