@@ -1,16 +1,16 @@
 {
   "AAPL": {
     "occurrences": 6,
-    "win_rate": 33.3,
-    "avg_return": 0.32,
-    "median_return": -1.71,
+    "win_rate": 50.0,
+    "avg_return": 0.56,
+    "median_return": -0.99,
     "max_drawdown": -8.75,
-    "benchmark_rel": 0.49,
-    "avg_holding": 13.8,
+    "benchmark_rel": 0.8,
+    "avg_holding": 14,
     "is_win_rate": 50.0,
-    "oos_win_rate": 0.0,
-    "oos_avg_return": -1.71,
-    "confidence": "נמוך"
+    "oos_win_rate": 50.0,
+    "oos_avg_return": -0.99,
+    "confidence": "בינוני"
   },
   "MSFT": {
     "occurrences": 3,
@@ -122,14 +122,14 @@
   "COST": {
     "occurrences": 2,
     "win_rate": 50.0,
-    "avg_return": 2.45,
-    "median_return": 2.45,
+    "avg_return": 3.66,
+    "median_return": 3.66,
     "max_drawdown": -3.56,
-    "benchmark_rel": 6.69,
-    "avg_holding": 15,
+    "benchmark_rel": 8.14,
+    "avg_holding": 15.5,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 8.46,
+    "oos_avg_return": 10.88,
     "confidence": "נמוך"
   },
   "LLY": {
@@ -161,14 +161,14 @@
   "V": {
     "occurrences": 5,
     "win_rate": 40.0,
-    "avg_return": 1.22,
+    "avg_return": 1.57,
     "median_return": -0.7,
     "max_drawdown": -4.8,
-    "benchmark_rel": 0.37,
-    "avg_holding": 18.4,
+    "benchmark_rel": 0.81,
+    "avg_holding": 18.6,
     "is_win_rate": 33.3,
     "oos_win_rate": 50.0,
-    "oos_avg_return": 0.87,
+    "oos_avg_return": 1.74,
     "confidence": "נמוך"
   },
   "MA": {
@@ -200,27 +200,27 @@
   "HD": {
     "occurrences": 1,
     "win_rate": 0.0,
-    "avg_return": -2.64,
-    "median_return": -2.64,
+    "avg_return": -0.49,
+    "median_return": -0.49,
     "max_drawdown": -5.28,
-    "benchmark_rel": 3.23,
-    "avg_holding": 13,
+    "benchmark_rel": 5.85,
+    "avg_holding": 14,
     "is_win_rate": null,
     "oos_win_rate": 0.0,
-    "oos_avg_return": -2.64,
+    "oos_avg_return": -0.49,
     "confidence": "נמוך"
   },
   "PG": {
     "occurrences": 4,
     "win_rate": 50.0,
-    "avg_return": 1.67,
-    "median_return": -0.19,
+    "avg_return": 2.1,
+    "median_return": 0.67,
     "max_drawdown": -2.86,
-    "benchmark_rel": 3.1,
-    "avg_holding": 12.2,
+    "benchmark_rel": 3.66,
+    "avg_holding": 12.5,
     "is_win_rate": 0.0,
     "oos_win_rate": 100.0,
-    "oos_avg_return": 5.71,
+    "oos_avg_return": 6.57,
     "confidence": "בינוני"
   },
   "CRM": {
